@@ -20,12 +20,12 @@ cdf = psi_out.split(':=')[1]
 
 with open('ch02/flip.psi', 'r') as infile:
     codes = infile.read()
-    codes = re.sub(re.compile(r'bernoulli(.+);') , 'bernoulli('+r'\g<1>' +'+?eps)', codes)
+    codes = re.sub(re.compile(r'bernoulli\((.+)\)') , 'bernoulli('+r'\g<1>' +'+?eps)', codes)
 with open('ch02_eps/flip_eps1.psi', 'w') as outfile:
     outfile.write(codes)
 
 
-psi_eps_out = sp.run(['psi', 'ch02/flip_eps1.psi', '--cdf', '--mathematica'], stdout=sp.PIPE)
+psi_eps_out = sp.run(['psi', 'ch02_eps/flip_eps1.psi', '--cdf', '--mathematica'], stdout=sp.PIPE)
 psi_eps_out = parse_psi_output(psi_eps_out.stdout.decode('utf-8'))
 cdf_eps = psi_eps_out.split(':=')[1]
 
