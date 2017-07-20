@@ -73,7 +73,7 @@ def run_file(file, output_file):
     founction_newname = get_newname(psi_out.split(':=')[0].strip())
     founction_num_param = len(founction_newname.split(','))
 
-    
+    parse_dis = re.compile(r'bernoulli\((.+?)\)')
     def replace(nth):
         count = 0
         def replace_counter(match):
@@ -88,9 +88,9 @@ def run_file(file, output_file):
     codes_eps = []
     with open(psi_file, 'r') as f:
         codes = f.read()
-        num_eps = len(re.findall(r'bernoulli\((.+?)\)', codes))
+        num_eps = len(parse_dis.findall(codes))
         for i in range(1, num_eps + 1):
-            codes_eps.append(re.sub(re.compile(r'bernoulli\((.+?)\)'), replace(nth=i), codes))
+            codes_eps.append(parse_dis.sub(replace(nth=i), codes))
     
 
     create_dirs_from_path(psi_eps_dir)
