@@ -20,9 +20,16 @@ kl[p_,q_,cons_,min_,max_]:=Sum[FullSimplify[entropy[p,q],cons],{r1,min,max}]
 gtd[p_] := D[FullSimplify[ComplexExpand[p],eps>0],eps]
 ltd[p_] := D[FullSimplify[ComplexExpand[p],eps<0],eps]
 islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))
-islinear2[p_] := Module[
+(*islinear2[p_] := Module[
 		{islinearlist := {}},
 		Do[AppendTo[islinearlist,D[FullSimplify[p[i],eps>0],eps]];AppendTo[islinearlist,D[FullSimplify[p[i],eps<0],eps]],{i,-5,5}];
 		Print[islinearlist];
 		AllTrue[islinearlist, NumberQ]
+  ]*)
+islinear2[p_] := Module[
+		{islinearlist := {}},
+		Do[AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],{i,-5,5}];
+		Print[islinearlist];
+		NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
   ]
+		
