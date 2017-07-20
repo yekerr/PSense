@@ -1,6 +1,7 @@
 (* ::Package:: *)
+Get["base2.m"]
 
-(* ::Input:: *)
+(*(* ::Input:: *)
 f[_ DiracDelta[point_]]=Solve[point==0,r1]
 
 
@@ -35,7 +36,7 @@ kl[p_,q_,cons_,min_,max_]:=Sum[FullSimplify[entropy[p,q],cons],{x,min,max}]
 
 (* ::Text:: *)
 (* *)
-
+*)
 
 (* ::Item:: *)
 (*Flip*)
@@ -49,27 +50,32 @@ flipne:=10*Boole[-1+r1<=0]*Boole[-r1<=0]*DiracDelta[-10*r1+1+10*eps]
 
 
 (* ::Input:: *)
-edistance[flipe,flipne]
+Print["edistance"]
+Print[edistance[flipe,flipne]]
 
 
 (* ::Input:: *)
-edistancemax[flipe,flipne,eps>=-0.1 && eps <=0.2]
-
+(*Print["edistancemax"]
+Print[edistancemax[flipe,flipne,eps>=-0.1 && eps <=0.2]]
+*)
 
 (* ::Input:: *)
 (*{0.19999987665076904`,{eps->0.19999987665076904`}}*)
 
 
 (* ::Input:: *)
-(*distance[flipnp ,flipp]*)
+Print["distance"]
+Print[distance[flipnp ,flipp]]
 
 
 (* ::Input:: *)
-tvd[flipnp,flipp,eps>=-0.1 && eps <=0.9,-100,100]
+Print["tvd"]
+Print[tvd[flipnp,flipp,eps>=-0.1 && eps <=0.9,-100,100]]
 
 
 (* ::Input:: *)
-kl[flipp,flipnp,eps>=-0.1 && eps <=0.9,0,100]
+Print["kl"]
+Print[kl[flipp,flipnp,eps>=-0.1 && eps <=0.9,0,100]]
 
 
 (* ::Input:: *)
@@ -77,8 +83,8 @@ kl[flipp,flipnp,eps>=-0.1 && eps <=0.9,0,100]
 
 
 (* ::Input:: *)
-Print[NMaximize[{Abs[Boole[-(1/10)-eps<=0] Boole[-(9/10)+eps<=0] ((1/10+eps) Boole[1-x<=0]+(9/10-eps) Boole[-x<=0])-(1/10 Boole[1-x<=0]+9/10 Boole[-x<=0])],eps>=-0.1 && eps <=0.9 &&(x==0 || x==1)},{Element[x,Integers],eps}]]
-
+(*Print[NMaximize[{Abs[Boole[-(1/10)-eps<=0] Boole[-(9/10)+eps<=0] ((1/10+eps) Boole[1-x<=0]+(9/10-eps) Boole[-x<=0])-(1/10 Boole[1-x<=0]+9/10 Boole[-x<=0])],eps>=-0.1 && eps <=0.9 &&(x==0 || x==1)},{Element[x,Integers],eps}]]
+*)
 
 (* ::Input:: *)
 (**)
