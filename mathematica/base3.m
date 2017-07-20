@@ -52,7 +52,7 @@ pks[p_,q_,cons_] := Module[
 	Print[""]
 ]
 ptvd[p_,q_,cons_] := Module[
-	{tvdres := tvd[p,q,cons,0,1],
+	{tvdres := tvd[p,q,cons,0,1]
 	},
 	Print["tvd"];
 	Print[tvdres];
