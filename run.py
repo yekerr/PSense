@@ -30,9 +30,6 @@ def create_dirs_from_path(path):
         except:
             raise
 
-def get_file_path(filedir, filename):
-    return filedir + '/' + filename
-
 def get_newname(function_pre):
     num = len(function_pre.split(','))
     newname = ''
@@ -44,19 +41,23 @@ def get_newname(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def main():
-    parser = argparse.ArgumentParser(description='PSI Epsilon Generator')
-    parser.add_argument('-f', required=True, help='PSI file')
-    parser.add_argument('-o', nargs='?', help='Optional output file')
-    argv = parser.parse_args(sys.argv[1:])
-    if not os.path.exists(argv.f):
-        print('PSI file doesn\'t exist')
-        return 0
-    output_file = argv.o
-    if output_file and os.path.exists(output_file):
-        os.remove(output_file)
+def get_math_exp(f_name, f_eps_name, f_num_param):
+    condition = '(-1<eps<1'
+    var = ''
+    for i in range(1, f_num_param + 1):
+        condition += ' && (r' + str(i) + '==0' + ' || ' + 'r' + str(i) + '==1)'
+        if i == 1:
+            var += '{r' + str(i)
+        else:
+            var += ', r' + str(i)
+    condition += ')'
+    var += ', eps}'
+    exp = '{Abs[' + f_name + '-' + f_eps_name + '],' + condition +'}'
+    result = 'Print[Maximize[' + exp + ', '+ var + ']]'
+    return result
 
-    psi_file = argv.f
+def run_file(file, output_file):
+    psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file)
 
@@ -70,7 +71,7 @@ def main():
     psi_out = sp.run(['psi', psi_file, '--cdf', '--mathematica'], stdout=sp.PIPE)
     psi_out = parse_psi_output(psi_out.stdout.decode('utf-8'))
     founction_newname = get_newname(psi_out.split(':=')[0].strip())
-
+    founction_num_param = len(founction_newname.split(','))
 
     
     def replace(nth):
@@ -95,8 +96,8 @@ def main():
     create_dirs_from_path(psi_eps_dir)
     create_dirs_from_path(math_dir)
     for i in range(num_eps):
-        psi_eps_file = get_file_path(psi_eps_dir, psi_eps_file_basename + str(i+1) + '.psi')
-        math_file = get_file_path(math_dir, math_file_basename + str(i+1) + '.txt')
+        psi_eps_file = os.path.join(psi_eps_dir, psi_eps_file_basename + str(i+1) + '.psi')
+        math_file = os.path.join(math_dir, math_file_basename + str(i+1) + '.txt')
         
         with open(psi_eps_file, 'w') as f:
             f.write(codes_eps[i])
@@ -112,7 +113,7 @@ def main():
         with open(math_file, 'w') as f:
             f.write(psi_out + '\n')
             f.write(psi_eps_out + '\n')
-            math_max = 'Print[Maximize[{Abs[' + founction_newname + '-' + founction_eps_newname + '], (-1<eps<1 && (r1==0 || r1==1) && (r2==0 || r2==1))}, {r1, r2, eps}]]'
+            math_max = get_math_exp(founction_newname, founction_eps_newname, founction_num_param)
             f.write(math_max + '\n')
 
         math_out = sp.run(['MathematicaScript', '-script', math_file], stdout=sp.PIPE)
@@ -124,6 +125,37 @@ def main():
                 f.write('Changed parameter' + str(i+1) + ':' + math_out + '\n')
         else:
             print('Changed parameter', i+1, ':', math_out)
+
+def main():
+    parser = argparse.ArgumentParser(description='PSI Epsilon Generator')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', help='PSI file')
+    group.add_argument('-r', help='Directory containing PSI files')
+    parser.add_argument('-o', nargs='?', help='Optional output file')
+    argv = parser.parse_args(sys.argv[1:])
+    if argv.f and not os.path.isfile(argv.f):
+        print('PSI file doesn\'t exist')
+        return 0
+    if argv.r and not os.path.isdir(argv.r):
+        print('Directory doesn\'t exist')
+        return 0
+
+    output_file = argv.o
+    if output_file and os.path.exists(output_file):
+        os.remove(output_file)
+
+    if argv.f:
+        run_file(argv.f, output_file)
+    else:
+        for filename in os.listdir(argv.r):
+            if filename.endswith(".psi"):
+                file = os.path.join(argv.r, filename)
+                if output_file:
+                    with open(output_file, "a") as f:
+                        f.write('\n' + file + ':\n')
+                else:
+                    print('\n' + file + ':')
+                run_file(file, output_file)
 
 if __name__ == "__main__":
     main()
