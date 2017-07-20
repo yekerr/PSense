@@ -29,8 +29,20 @@ def create_dirs_from_path(path):
             os.makedirs(path)
         except:
             raise
+
 def get_file_path(filedir, filename):
     return filedir + '/' + filename
+
+def get_newname(function_pre):
+    num = len(function_pre.split(','))
+    newname = ''
+    function_name = function_pre.split('[')[0] + '['
+    for i in range(num):
+        if i == 0: 
+            function_name += 'r' + str(i+1)
+        else:
+            function_name += ',r'+str(i+1)
+    return function_name + ']'
 
 def main():
     parser = argparse.ArgumentParser(description='PSI Epsilon Generator')
@@ -57,7 +69,8 @@ def main():
 
     psi_out = sp.run(['psi', psi_file, '--cdf', '--mathematica'], stdout=sp.PIPE)
     psi_out = parse_psi_output(psi_out.stdout.decode('utf-8'))
-    founction_pre = psi_out.split(':=')[0].strip().replace('_', '')
+    founction_newname = get_newname(psi_out.split(':=')[0].strip())
+
 
     
     def replace(nth):
@@ -83,7 +96,7 @@ def main():
     create_dirs_from_path(math_dir)
     for i in range(num_eps):
         psi_eps_file = get_file_path(psi_eps_dir, psi_eps_file_basename + str(i+1) + '.psi')
-        math_file = get_file_path(math_dir, math_file_basename + str(i+1) + '.psi')
+        math_file = get_file_path(math_dir, math_file_basename + str(i+1) + '.txt')
         
         with open(psi_eps_file, 'w') as f:
             f.write(codes_eps[i])
@@ -93,13 +106,13 @@ def main():
         psi_eps_out = psi_eps_out.split(':=')
         founction_eps_pre = 'Eps['.join(psi_eps_out[0].split('['))
         psi_eps_out = founction_eps_pre + ':=' + psi_eps_out[-1]
-        founction_eps_pre = founction_eps_pre.strip().replace('_', '')
+        founction_eps_newname = get_newname(founction_eps_pre.strip())
 
         
         with open(math_file, 'w') as f:
             f.write(psi_out + '\n')
             f.write(psi_eps_out + '\n')
-            math_max = 'Print[Maximize[{Abs[' + founction_pre + '-' + founction_eps_pre + '], (-1<eps<1 && (r1==0 || r1==1) && (r2==0 || r2==1))}, {r1, r2, eps}]]'
+            math_max = 'Print[Maximize[{Abs[' + founction_newname + '-' + founction_eps_newname + '], (-1<eps<1 && (r1==0 || r1==1) && (r2==0 || r2==1))}, {r1, r2, eps}]]'
             f.write(math_max + '\n')
 
         math_out = sp.run(['MathematicaScript', '-script', math_file], stdout=sp.PIPE)
