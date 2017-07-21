@@ -15,14 +15,6 @@ def parse_psi_output(output):
         print('error')
     return result
 
-def create_dirs_from_file(file):
-    file_dir = os.path.dirname(file)
-    if file_dir and not os.path.exists(file_dir):
-        try:
-            os.makedirs(os.path.dirname(file))
-        except:
-            raise
-
 def create_dirs_from_path(path):
     if path and not os.path.exists(path):
         try:
@@ -136,7 +128,6 @@ def run_file(file, output_file):
         math_out = math_out.stdout.decode('utf-8').strip()
 
         if output_file:
-            create_dirs_from_file(output_file)
             with open(output_file, "a") as f:
                 f.write('Changed parameter' + str(i+1) + ':' + math_out + '\n')
         else:
@@ -157,9 +148,10 @@ def main():
         return 0
 
     output_file = argv.o
-    if output_file and os.path.exists(output_file):
-        os.remove(output_file)
-
+    if output_file:
+        create_dirs_from_path(os.path.dirname(output_file))
+        if os.path.exists(output_file):
+            os.remove(output_file)
     if argv.f:
         run_file(argv.f, output_file)
     else:
