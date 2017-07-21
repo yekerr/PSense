@@ -62,7 +62,7 @@ ptvd[p_,q_,cons_] := Module[
 	Print[""]
 ]
 pkl[p_,q_,cons_] := Module[
-	{klres := kl[p,q,cons,0,1],
+	{klres := kl[p,q,cons,0,1]
 	},
 	Print["kl"];
 	Print[klres];
