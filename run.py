@@ -20,7 +20,7 @@ def create_dirs_from_file(file):
     if file_dir and not os.path.exists(file_dir):
         try:
             os.makedirs(os.path.dirname(file))
-        except :
+        except:
             raise
 
 def create_dirs_from_path(path):
@@ -73,29 +73,53 @@ def run_file(file, output_file):
     founction_newname = get_newname(psi_out.split(':=')[0].strip())
     founction_num_param = len(founction_newname.split(','))
 
-    parse_dis = re.compile(r'bernoulli\((.+?)\)')
+    distribution = ['bernoulli', 'gauss']
+    bernoulli = r'(bernoulli\((?P<bernoulli>.+?)\))'
+    gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
+    parse_dis = re.compile(bernoulli + r'|' + gauss)
+
+    param2_flag = False
     def replace(nth):
         count = 0
+        def check_eps(count):
+            return '+?eps' if count == nth else ''
         def replace_counter(match):
             nonlocal count
             count += 1
-            if count == nth:
-                return r'bernoulli('+ match.group(1) +'+?eps)'
-            else:
-                return r'bernoulli('+ match.group(1) +')'
+            if match.group('bernoulli'):
+                result = 'bernoulli(' + match.group('bernoulli') + check_eps(count)
+            elif match.group('gauss1'):
+                if not param2_flag:
+                result = 'gauss(' + match.group('gauss1') + check_eps(count) + ',' + match.group('gauss2') + check_p2_eps(count)
+            result += ')'
+            return result
         return replace_counter
+    
+    def get_num_eps(matches):
+        extra = 0
+        for match in matches:
+            for group in match:
+                if group.startswith('gauss'):
+                    extra += 1
+                    break
+        return len(matches) + extra
 
     codes_eps = []
     with open(psi_file, 'r') as f:
-        codes = f.read()
-        num_eps = len(parse_dis.findall(codes))
+        code = f.read()
+        num_eps = get_num_eps(parse_dis.findall(code))
+        print(num_eps)
         for i in range(1, num_eps + 1):
-            codes_eps.append(parse_dis.sub(replace(nth=i), codes))
-    
+            print(111)
+            codes_eps.append(parse_dis.sub(replace(nth=i), code))
+    for code in codes_eps:
+        print(code)
+    return 
+
 
     create_dirs_from_path(psi_eps_dir)
     create_dirs_from_path(math_dir)
-    for i in range(num_eps):
+    for i in range(len(codes_eps)):
         psi_eps_file = os.path.join(psi_eps_dir, psi_eps_file_basename + str(i+1) + '.psi')
         math_file = os.path.join(math_dir, math_file_basename + str(i+1) + '.txt')
         
