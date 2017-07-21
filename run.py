@@ -78,19 +78,17 @@ def run_file(file, output_file):
     gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
     parse_dis = re.compile(bernoulli + r'|' + gauss)
 
-    param2_flag = False
     def replace(nth):
         count = 0
-        def check_eps(count):
-            return '+?eps' if count == nth else ''
-        def replace_counter(match):
+        def check_eps():
             nonlocal count
             count += 1
+            return '+?eps' if count == nth else ''
+        def replace_counter(match):
             if match.group('bernoulli'):
-                result = 'bernoulli(' + match.group('bernoulli') + check_eps(count)
+                result = 'bernoulli(' + match.group('bernoulli') + check_eps()
             elif match.group('gauss1'):
-                if not param2_flag:
-                result = 'gauss(' + match.group('gauss1') + check_eps(count) + ',' + match.group('gauss2') + check_p2_eps(count)
+                result = 'gauss(' + match.group('gauss1') + check_eps() + ',' + match.group('gauss2') + check_eps()
             result += ')'
             return result
         return replace_counter
@@ -108,14 +106,8 @@ def run_file(file, output_file):
     with open(psi_file, 'r') as f:
         code = f.read()
         num_eps = get_num_eps(parse_dis.findall(code))
-        print(num_eps)
         for i in range(1, num_eps + 1):
-            print(111)
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
-    for code in codes_eps:
-        print(code)
-    return 
-
 
     create_dirs_from_path(psi_eps_dir)
     create_dirs_from_path(math_dir)
