@@ -200,9 +200,9 @@ def run_file(file, output_file):
         math_out = run_math(math_files[i])
         if output_file:
             with open(output_file, "a") as f:
-                f.write('Changed parameter' + str(i+1) + ':' + math_out + '\n')
+                f.write('Changed parameter' + str(i+1) + ':\n' + math_out + '\n')
         else:
-            print('Changed parameter', i+1, ':', math_out)
+            print('Changed parameter', i+1, ':\n', math_out)
 
 def main():
     parser = argparse.ArgumentParser(description='PSI Epsilon Generator')
