@@ -48,28 +48,13 @@ def get_math_exp(f_name, f_eps_name, f_num_param):
     result = 'Print[Maximize[' + exp + ', '+ var + ']]'
     return result
 
-def run_file(file, output_file):
-    psi_file = file
-    psi_file_name = os.path.basename(psi_file)
-    psi_file_dir = os.path.dirname(psi_file)
+def create_psi_expectation():
+    pass
 
-    psi_eps_dir = psi_file_dir + '_eps'
-    math_dir = psi_file_dir + '_math'
-
-    psi_eps_file_basename = ''.join(psi_file_name.split('.')[:-1]) + '_eps'
-    math_file_basename = ''.join(psi_file_name.split('.')[:-1]) + '_math'    
-    
-
-    psi_out = sp.run(['psi', psi_file, '--cdf', '--mathematica'], stdout=sp.PIPE)
-    psi_out = parse_psi_output(psi_out.stdout.decode('utf-8'))
-    founction_newname = get_newname(psi_out.split(':=')[0].strip())
-    founction_num_param = len(founction_newname.split(','))
-
-    distribution = ['bernoulli', 'gauss']
+def create_psi_epsilon(psi_file):
     bernoulli = r'(bernoulli\((?P<bernoulli>.+?)\))'
     gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
     parse_dis = re.compile(bernoulli + r'|' + gauss)
-
     def replace(nth):
         count = 0
         def check_eps():
@@ -100,17 +85,43 @@ def run_file(file, output_file):
         num_eps = get_num_eps(parse_dis.findall(code))
         for i in range(1, num_eps + 1):
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
+    return codes_eps
 
-    create_dirs_from_path(psi_eps_dir)
-    create_dirs_from_path(math_dir)
-    for i in range(len(codes_eps)):
-        psi_eps_file = os.path.join(psi_eps_dir, psi_eps_file_basename + str(i+1) + '.psi')
-        math_file = os.path.join(math_dir, math_file_basename + str(i+1) + '.txt')
-        
-        with open(psi_eps_file, 'w') as f:
-            f.write(codes_eps[i])
+def name_extend_file(base_dir, base_name, extend_name, extension, n):
+    extend_dir = base_dir + extend_name
+    extend_file_basename = ''.join(base_name.split('.')[:-1]) + extend_name
+    create_dirs_from_path(extend_dir)
+    extend_files = []
+    for i in range(n):
+        extend_files.append(os.path.join(extend_dir, extend_file_basename + str(i+1) + '.' + extension))
+    return extend_files
 
-        psi_eps_out = sp.run(['psi', psi_eps_file, '--cdf', '--mathematica'], stdout=sp.PIPE)
+def store_files_to_disk(files, codes):
+    for i in range(len(codes)):
+        with open(files[i], 'w') as f:
+            f.write(codes[i])
+
+def run_file(file, output_file):
+    working_dir = os.getcwd()
+
+    psi_file = file
+    psi_file_name = os.path.basename(psi_file)
+    psi_file_dir = os.path.dirname(psi_file) 
+
+    psi_out = sp.run(['psi', psi_file, '--cdf', '--mathematica'], stdout=sp.PIPE)
+    psi_out = parse_psi_output(psi_out.stdout.decode('utf-8'))
+    founction_newname = get_newname(psi_out.split(':=')[0].strip())
+    founction_num_param = len(founction_newname.split(','))
+    
+    codes_eps = create_psi_epsilon(psi_file)
+    
+    psi_eps_files = name_extend_file(psi_file_dir, psi_file_name, '_eps', 'psi', len(codes_eps))
+    math_files = name_extend_file(psi_file_dir, psi_file_name, '_eps', 'm', len(codes_eps))
+    store_files_to_disk(psi_eps_files, codes_eps)
+
+    for i in range(len(psi_eps_files)):
+
+        psi_eps_out = sp.run(['psi', psi_eps_files[i], '--cdf', '--mathematica'], stdout=sp.PIPE)
         psi_eps_out = parse_psi_output(psi_eps_out.stdout.decode('utf-8'))
         psi_eps_out = psi_eps_out.split(':=')
         founction_eps_pre = 'Eps['.join(psi_eps_out[0].split('['))
@@ -118,13 +129,13 @@ def run_file(file, output_file):
         founction_eps_newname = get_newname(founction_eps_pre.strip())
 
         
-        with open(math_file, 'w') as f:
+        with open(math_files[i], 'w') as f:
             f.write(psi_out + '\n')
             f.write(psi_eps_out + '\n')
             math_max = get_math_exp(founction_newname, founction_eps_newname, founction_num_param)
             f.write(math_max + '\n')
 
-        math_out = sp.run(['MathematicaScript', '-script', math_file], stdout=sp.PIPE)
+        math_out = sp.run(['MathematicaScript', '-script', math_files[i]], stdout=sp.PIPE)
         math_out = math_out.stdout.decode('utf-8').strip()
 
         if output_file:
@@ -149,9 +160,10 @@ def main():
 
     output_file = argv.o
     if output_file:
-        create_dirs_from_path(os.path.dirname(output_file))
         if os.path.exists(output_file):
             os.remove(output_file)
+        else:
+            create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
         run_file(argv.f, output_file)
     else:
