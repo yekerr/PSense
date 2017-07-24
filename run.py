@@ -127,8 +127,11 @@ def store_codes_to_files(codes, files):
         with open(files[i], 'w') as f:
             f.write(codes[i])
 
-def run_psi(file, output_file):
-    psi_out = sp.run(['psi', file, '--cdf', '--mathematica'], stdout=sp.PIPE)
+def run_psi(file, output_file, option):
+    if option:
+        psi_out = sp.run(['psi', file, option, '--mathematica'], stdout=sp.PIPE)
+    else:
+        psi_out = sp.run(['psi', file, '--mathematica'], stdout=sp.PIPE)    
     return parse_psi_output(psi_out.stdout.decode('utf-8'), output_file)
 
 def run_math(file):
@@ -146,7 +149,7 @@ def run_file(file, output_file):
     psi_file_dir = os.path.dirname(psi_file) 
 
 
-    psi_out = run_psi(psi_file, output_file)
+    psi_out = run_psi(psi_file, output_file, '--cdf')
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
     psi_func_num_param = len(psi_func_name.split(','))
 
@@ -160,7 +163,7 @@ def run_file(file, output_file):
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, '_exp', 'psi')    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file, output_file)
+        psi_exp_out = run_psi(psi_exp_file, output_file, '')
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
         psi_exp_func_name = rename_func(psi_exp_out.split(':=')[0].strip())
 
@@ -175,12 +178,12 @@ def run_file(file, output_file):
 
     for i in range(len(psi_eps_files)):
 
-        psi_eps_out = run_psi(psi_eps_files[i], output_file)
+        psi_eps_out = run_psi(psi_eps_files[i], output_file, '--cdf')
         psi_eps_out = rename_psi_out(psi_eps_out, 'Eps')
         psi_eps_func_name = rename_func(psi_eps_out.split(':=')[0].strip())
 
         if code_exp:
-            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], output_file)
+            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], output_file, '')
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, 'ExpEps')
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
