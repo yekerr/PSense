@@ -3,7 +3,7 @@ import subprocess as sp
 import re
 import argparse
 
-def parse_psi_output(output):
+def parse_psi_output(output, output_file):
     result = ''
     for valid_output in output.split('\n'):
         if valid_output:
@@ -11,7 +11,11 @@ def parse_psi_output(output):
                 result = valid_output.strip()
                 break;
     else:
-        print('Error in parsing: ' + result)
+        if output_file:
+            with open(output_file, "a") as f:
+                f.write('Error in parsing PSI output: ' + result + '\n')
+        else:
+            print('Error in parsing PSI output: ' + result)
     return result
 
 def create_dirs_from_path(path):
@@ -123,9 +127,9 @@ def store_codes_to_files(codes, files):
         with open(files[i], 'w') as f:
             f.write(codes[i])
 
-def run_psi(file):
+def run_psi(file, output_file):
     psi_out = sp.run(['psi', file, '--cdf', '--mathematica'], stdout=sp.PIPE)
-    return parse_psi_output(psi_out.stdout.decode('utf-8'))
+    return parse_psi_output(psi_out.stdout.decode('utf-8'), output_file)
 
 def run_math(file):
     math_out = sp.run(['MathematicaScript', '-script', file], stdout=sp.PIPE)
@@ -142,7 +146,7 @@ def run_file(file, output_file):
     psi_file_dir = os.path.dirname(psi_file) 
 
 
-    psi_out = run_psi(psi_file)
+    psi_out = run_psi(psi_file, output_file)
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
     psi_func_num_param = len(psi_func_name.split(','))
 
@@ -156,24 +160,27 @@ def run_file(file, output_file):
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, '_exp', 'psi')    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file)
+        psi_exp_out = run_psi(psi_exp_file, output_file)
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
         psi_exp_func_name = rename_func(psi_exp_out.split(':=')[0].strip())
 
         codes_exp_eps = generate_psi_epsilon(psi_exp_file)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_exp_eps', 'psi', len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
+    elif output_file:
+        with open(output_file, "a") as f:
+            f.write('Expectation is not supported' + '\n')
     else:
-        print("Expectation is not supported")
+        print('Expectation is not supported')
 
     for i in range(len(psi_eps_files)):
 
-        psi_eps_out = run_psi(psi_eps_files[i])
+        psi_eps_out = run_psi(psi_eps_files[i], output_file)
         psi_eps_out = rename_psi_out(psi_eps_out, 'Eps')
         psi_eps_func_name = rename_func(psi_eps_out.split(':=')[0].strip())
 
         if code_exp:
-            psi_exp_eps_out = run_psi(psi_exp_eps_files[i])
+            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], output_file)
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, 'ExpEps')
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
