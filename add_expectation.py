@@ -24,7 +24,7 @@ def run_file(file):
         nonlocal flag
         if match.group('result').strip().startswith('('):
             flag = True
-        result = 'main' + match.group('code') + 'return Expectation[' + match.group('result').strip() + '];'
+        result = 'main' + match.group('code') + 'return Expectation(' + match.group('result').strip() + ');'
         return result
 
     parse_psi = re.compile(r'main(?P<code>.+?)return(?P<result>.+?);', re.S)
