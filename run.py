@@ -3,7 +3,7 @@ import subprocess as sp
 import re
 import argparse
 
-def parse_psi_output(output, output_file):
+def parse_psi_output(output):
     result = ''
     for valid_output in output.split('\n'):
         if valid_output:
@@ -11,11 +11,7 @@ def parse_psi_output(output, output_file):
                 result = valid_output.strip()
                 break;
     else:
-        if output_file:
-            with open(output_file, "a") as f:
-                f.write('Error in parsing PSI output: ' + result + '\n')
-        else:
-            print('Error in parsing PSI output: ' + result)
+        print('Error in parsing PSI output: ' + result)
     return result
 
 def create_dirs_from_path(path):
@@ -93,7 +89,7 @@ def generate_psi_epsilon(psi_file):
                 result = 'bernoulli(' + match.group('bernoulli') + check_eps()
             elif match.group('gauss1'):
                 if nth == 1:
-                    codes_eps_params.add(match.group('gauss1')).add(match.group('gauss2') )
+                    codes_eps_params.extend([match.group('gauss1'), match.group('gauss2')])
                 result = 'gauss(' + match.group('gauss1') + check_eps() + ',' + match.group('gauss2') + check_eps()
             result += ')'
             return result
@@ -137,29 +133,50 @@ def store_codes_to_files(codes, files):
         with open(files[i], 'w') as f:
             f.write(codes[i])
 
-def run_psi(file, output_file, option):
-    if option:
-        psi_out = sp.run(['psi', file, option, '--mathematica'], stdout=sp.PIPE)
-    else:
-        psi_out = sp.run(['psi', file, '--mathematica'], stdout=sp.PIPE)    
-    return parse_psi_output(psi_out.stdout.decode('utf-8'), output_file)
+def run_psi(file, option, timeout):
+    if timeout:
+        timeout = int(timeout)
+    cmd = ['psi', file, '--mathematica', option] if option else ['psi', file, '--mathematica']
+    try:
+        psi_out = sp.run(cmd, stdout=sp.PIPE, timeout=timeout)
+    except sp.TimeoutExpired:
+        return None
+    return parse_psi_output(psi_out.stdout.decode('utf-8'))
 
-def run_math(file):
-    math_out = sp.run(['MathematicaScript', '-script', file], stdout=sp.PIPE)
+def run_math(file, timeout):
+    if timeout:
+        timeout = int(timeout)
+    try:
+        math_out = sp.run(['MathematicaScript', '-script', file], stdout=sp.PIPE, timeout=timeout)
+    except sp.TimeoutExpired:
+        return None
     return math_out.stdout.decode('utf-8').strip()
+
+def check_psi_out(file, output_file, result):
+    if not result:
+        if output_file:
+            with open(output_file, "a") as f:
+                f.write('PSI runs out of time: ' + file + '\n')
+        else:
+            print('PSI runs out of time: ' + file)
+        return False
+    else:
+        return True
 
 def rename_psi_out(exp, extend_name):
     parts = exp.split(':=')
     newname = parts[0].replace('[', extend_name + '[')
     return newname + ':=' + parts[-1]
 
-def run_file(file, output_file):
+def run_file(file, output_file, psi_timeout, math_timeout):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
 
 
-    psi_out = run_psi(psi_file, output_file, '--cdf')
+    psi_out = run_psi(psi_file, '--cdf', psi_timeout)
+    if not check_psi_out(psi_file, output_file, psi_out):
+        return 1
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
     psi_func_num_param = len(psi_func_name.split(','))
 
@@ -173,7 +190,9 @@ def run_file(file, output_file):
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, '_exp', 'psi')    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file, output_file, '')
+        psi_exp_out = run_psi(psi_exp_file, '', psi_timeout)
+        if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
+            return 1
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
         psi_exp_func_name = rename_func(psi_exp_out.split(':=')[0].strip())
 
@@ -188,12 +207,16 @@ def run_file(file, output_file):
 
     for i in range(len(psi_eps_files)):
 
-        psi_eps_out = run_psi(psi_eps_files[i], output_file, '--cdf')
+        psi_eps_out = run_psi(psi_eps_files[i], '--cdf', psi_timeout)
+        if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out):
+            continue
         psi_eps_out = rename_psi_out(psi_eps_out, 'Eps')
         psi_eps_func_name = rename_func(psi_eps_out.split(':=')[0].strip())
 
         if code_exp:
-            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], output_file, '')
+            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], '', psi_timeout)
+            if not check_psi_out(psi_exp_eps_files[i], output_file, psi_exp_eps_out):
+                continue
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, 'ExpEps')
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
@@ -210,18 +233,26 @@ def run_file(file, output_file):
                 math_run = generate_math_exp(psi_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
             f.write(math_run + '\n')
 
-        math_out = run_math(math_files[i])
+        math_out = run_math(math_files[i], math_timeout)
         if output_file:
             with open(output_file, "a") as f:
-                f.write('Changed parameter' + str(i+1) + ':\n' + math_out + '\n')
+                if math_out:
+                    f.write('Changed parameter' + str(i+1) + ':\n' + math_out + '\n')
+                else:
+                    f.write('Mathematica runs out of time: ' + math_files[i] + '\n')
         else:
-            print('Changed parameter', i+1, ':\n', math_out)
+            if math_out:
+                print('Changed parameter', i+1, ':\n', math_out)
+            else:
+                print('Mathematica runs out of time: ' + math_files[i])
 
 def main():
     parser = argparse.ArgumentParser(description='PSI Epsilon Generator')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', help='PSI file')
     group.add_argument('-r', help='Directory containing PSI files')
+    parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
+    parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
     parser.add_argument('-o', nargs='?', help='Optional output file')
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
@@ -230,15 +261,23 @@ def main():
     if argv.r and not os.path.isdir(argv.r):
         print('Directory doesn\'t exist')
         return 0
+    if argv.tm and not argv.tm.isdigit():
+        print('Timeout parameter is invalid')
+        return 0
+    if argv.tp and not argv.tp.isdigit():
+        print('Timeout parameter is invalid')
+        return 0
 
     output_file = argv.o
+    math_timeout = argv.tm
+    psi_timeout = argv.tp
     if output_file:
         if os.path.exists(output_file):
             os.remove(output_file)
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file)
+        run_file(argv.f, output_file, psi_timeout, math_timeout)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -249,7 +288,7 @@ def main():
                         f.write('\n' + file + ':\n')
                 else:
                     print('\n' + file + ':')
-                run_file(file, output_file)
+                run_file(file, output_file, psi_timeout, math_timeout)
 
 if __name__ == "__main__":
     main()
