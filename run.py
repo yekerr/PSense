@@ -55,7 +55,7 @@ def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_para
     if f_exp_name and f_exp_eps_name:
         exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition])
     else:
-        exp = ','.join([f_name, f_eps_name, ' ', ' ', var_minmax, eps_range, condition])
+        exp = ','.join([f_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition])
     runall = 'runall[' + exp + ']'
     return runall
 
