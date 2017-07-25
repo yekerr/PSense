@@ -36,7 +36,7 @@ def rename_func(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param):
+def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
     var_minmax = '{'
     condition = ''
     for i in range(1, f_num_param + 1):
@@ -47,10 +47,15 @@ def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_para
             var_minmax += '{r' + str(i) + ', 0, 1}, '
             condition += ' (r' + str(i) + '== 0' + ' || ' + 'r' + str(i) + '== 1) && '
     var_minmax += '}'
+    try:
+        eps_param = float(f_eps_param)*0.1
+        eps_range = '(' + str(-eps_param) + '<=eps<=' + str(eps_param) + ')'
+    except ValueError:
+         eps_range = '(-0.1<=eps<=0.1)'
     if f_exp_name and f_exp_eps_name:
-        exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, '(-0.1<=eps<=0.1)', condition])
+        exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition])
     else:
-        exp = ','.join([f_name, f_eps_name, ' ', ' ', var_minmax, '(-0.1<=eps<=0.1)', condition])
+        exp = ','.join([f_name, f_eps_name, ' ', ' ', var_minmax, eps_range, condition])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -74,6 +79,7 @@ def generate_psi_epsilon(psi_file):
     bernoulli = r'(bernoulli\((?P<bernoulli>.+?)\))'
     gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
     parse_dis = re.compile(bernoulli + r'|' + gauss)
+    codes_eps_params = []
     def replace(nth):
         count = 0
         def check_eps():
@@ -82,8 +88,12 @@ def generate_psi_epsilon(psi_file):
             return '+?eps' if count == nth else ''
         def replace_counter(match):
             if match.group('bernoulli'):
+                if nth == 1:
+                    codes_eps_params.append(match.group('bernoulli'))
                 result = 'bernoulli(' + match.group('bernoulli') + check_eps()
             elif match.group('gauss1'):
+                if nth == 1:
+                    codes_eps_params.add(match.group('gauss1')).add(match.group('gauss2') )
                 result = 'gauss(' + match.group('gauss1') + check_eps() + ',' + match.group('gauss2') + check_eps()
             result += ')'
             return result
@@ -104,7 +114,7 @@ def generate_psi_epsilon(psi_file):
         num_eps = get_num_eps(parse_dis.findall(code))
         for i in range(1, num_eps + 1):
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
-    return codes_eps
+    return codes_eps, codes_eps_params
 
 def extend_n_files_name(base_dir, base_name, extend_name, extension, n):
     extend_dir = base_dir + extend_name
@@ -153,7 +163,7 @@ def run_file(file, output_file):
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
     psi_func_num_param = len(psi_func_name.split(','))
 
-    codes_eps = generate_psi_epsilon(psi_file)
+    codes_eps, code_eps_params = generate_psi_epsilon(psi_file)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_eps', 'psi', len(codes_eps))
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, '_math', 'm', len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
@@ -167,7 +177,7 @@ def run_file(file, output_file):
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
         psi_exp_func_name = rename_func(psi_exp_out.split(':=')[0].strip())
 
-        codes_exp_eps = generate_psi_epsilon(psi_exp_file)
+        codes_exp_eps, _ = generate_psi_epsilon(psi_exp_file)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_exp_eps', 'psi', len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
     elif output_file:
@@ -195,9 +205,9 @@ def run_file(file, output_file):
             if code_exp:
                 f.write(psi_exp_out + '\n')
                 f.write(psi_exp_eps_out + '\n')
-                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param)
+                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
             else:
-                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, '1', '1', psi_func_num_param)
+                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
             f.write(math_run + '\n')
 
         math_out = run_math(math_files[i])
@@ -234,6 +244,7 @@ def main():
             if filename.endswith(".psi"):
                 file = os.path.join(argv.r, filename)
                 if output_file:
+                    print('Processing: '+ file + '\n')
                     with open(output_file, "a") as f:
                         f.write('\n' + file + ':\n')
                 else:
