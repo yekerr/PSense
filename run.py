@@ -44,7 +44,7 @@ def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_para
             condition += ' (r' + str(i) + '== 0' + ' || ' + 'r' + str(i) + '== 1) && '
     var_minmax += '}'
     try:
-        eps_param = float(f_eps_param)*0.1
+        eps_param = float(f_eps_param['value'])*0.1
         eps_range = '(' + str(-eps_param) + '<=eps<=' + str(eps_param) + ')'
     except ValueError:
          eps_range = '(-0.1<=eps<=0.1)'
@@ -74,7 +74,8 @@ def generate_psi_expectation(psi_file):
 def generate_psi_epsilon(psi_file):
     bernoulli = r'(bernoulli\((?P<bernoulli>.+?)\))'
     gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
-    parse_dis = re.compile(bernoulli + r'|' + gauss)
+    uniformInt = r'(uniformInt\((?P<uniformInt1>.+?),(?P<uniformInt2>.+?)\))'
+    parse_dis = re.compile(bernoulli + r'|' + gauss + r'|' + uniformInt)
     codes_eps_params = []
     def replace(nth):
         count = 0
@@ -85,12 +86,16 @@ def generate_psi_epsilon(psi_file):
         def replace_counter(match):
             if match.group('bernoulli'):
                 if nth == 1:
-                    codes_eps_params.append(match.group('bernoulli'))
+                    codes_eps_params.append({'type': 'bernoulli', 'value': match.group('bernoulli')})
                 result = 'bernoulli(' + match.group('bernoulli') + check_eps()
             elif match.group('gauss1'):
                 if nth == 1:
-                    codes_eps_params.extend([match.group('gauss1'), match.group('gauss2')])
+                    codes_eps_params.extend([{'type': 'gauss', 'value': match.group('gauss1')}, {'type': 'gauss', 'value': match.group('gauss2')}])
                 result = 'gauss(' + match.group('gauss1') + check_eps() + ',' + match.group('gauss2') + check_eps()
+            elif match.group('uniformInt1'):
+                if nth == 1:
+                    codes_eps_params.extend([{'type': 'uniformInt', 'value': match.group('uniformInt1')}, {'type': 'uniformInt', 'value': match.group('uniformInt2')}])
+                result = 'uniformInt(' + match.group('uniformInt1') + check_eps() + ',' + match.group('uniformInt2') + check_eps()
             result += ')'
             return result
         return replace_counter
@@ -99,7 +104,7 @@ def generate_psi_epsilon(psi_file):
         extra = 0
         for match in matches:
             for group in match:
-                if group.startswith('gauss'):
+                if group.startswith('gauss') or group.startswith('uniformInt'):
                     extra += 1
                     break
         return len(matches) + extra
