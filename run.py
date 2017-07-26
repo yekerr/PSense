@@ -72,10 +72,35 @@ def generate_psi_expectation(psi_file):
     return code_exp if supported else None
     
 def generate_psi_epsilon(psi_file):
-    bernoulli = r'(bernoulli\((?P<bernoulli>.+?)\))'
-    gauss = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
-    uniformInt = r'(uniformInt\((?P<uniformInt1>.+?),(?P<uniformInt2>.+?)\))'
-    parse_dis = re.compile(bernoulli + r'|' + gauss + r'|' + uniformInt)
+    distribution_1p = {}
+    distribution_1p['bernoulli'] = r'(bernoulli\((?P<bernoulli>.+?)\))'
+    distribution_1p['geometric'] = r'(geometric\((?P<geometric>.+?)\))'
+    distribution_1p['poisson'] = r'(poisson\((?P<poisson>.+?)\))'
+    distribution_1p['categorical'] = r'(categorical\((?P<categorical>.+?)\))'
+    distribution_1p['exponential'] = r'(exponential\((?P<exponential>.+?)\))'
+    distribution_1p['studentT'] = r'(studentT\((?P<studentT>.+?)\))'
+    distribution_1p['rayleigh'] = r'(rayleigh\((?P<rayleigh>.+?)\))'
+
+    distribution_2p = {}
+    distribution_2p['gauss'] = r'(gauss\((?P<gauss1>.+?),(?P<gauss2>.+?)\))'
+    distribution_2p['uniform'] = r'(uniform\((?P<uniform1>.+?),(?P<uniform2>.+?)\))'
+    distribution_2p['uniformInt'] = r'(uniformInt\((?P<uniformInt1>.+?),(?P<uniformInt2>.+?)\))'
+    distribution_2p['beta'] = r'(beta\((?P<beta1>.+?),(?P<beta2>.+?)\))'
+    distribution_2p['gamma'] = r'(gamma\((?P<gamma1>.+?),(?P<gamma2>.+?)\))'
+    distribution_2p['laplace'] = r'(laplace\((?P<laplace1>.+?),(?P<laplace2>.+?)\))'
+    distribution_2p['cauchy'] = r'(cauchy\((?P<cauchy1>.+?),(?P<cauchy2>.+?)\))'
+    distribution_2p['pareto'] = r'(pareto\((?P<pareto1>.+?),(?P<pareto2>.+?)\))'
+    distribution_2p['weibull'] = r'(weibull\((?P<weibull1>.+?),(?P<weibull2>.+?)\))'
+    distribution_2p['binomial'] = r'(binomial\((?P<binomial1>.+?),(?P<binomial2>.+?)\))'
+    distribution_2p['negBinomial'] = r'(negBinomial\((?P<negBinomial1>.+?),(?P<negBinomial2>.+?)\))'
+    
+    reg = ''
+    for dist in distribution_1p.values():
+        reg += dist + r'|'
+    for dist in distribution_2p.values():
+        reg += dist + r'|'
+    reg = reg.strip('|')
+    parse_dis = re.compile(reg)
     codes_eps_params = []
     def replace(nth):
         count = 0
@@ -84,18 +109,18 @@ def generate_psi_epsilon(psi_file):
             count += 1
             return '+?eps' if count == nth else ''
         def replace_counter(match):
-            if match.group('bernoulli'):
-                if nth == 1:
-                    codes_eps_params.append({'type': 'bernoulli', 'value': match.group('bernoulli')})
-                result = 'bernoulli(' + match.group('bernoulli') + check_eps()
-            elif match.group('gauss1'):
-                if nth == 1:
-                    codes_eps_params.extend([{'type': 'gauss', 'value': match.group('gauss1')}, {'type': 'gauss', 'value': match.group('gauss2')}])
-                result = 'gauss(' + match.group('gauss1') + check_eps() + ',' + match.group('gauss2') + check_eps()
-            elif match.group('uniformInt1'):
-                if nth == 1:
-                    codes_eps_params.extend([{'type': 'uniformInt', 'value': match.group('uniformInt1')}, {'type': 'uniformInt', 'value': match.group('uniformInt2')}])
-                result = 'uniformInt(' + match.group('uniformInt1') + check_eps() + ',' + match.group('uniformInt2') + check_eps()
+            for dist_name_1p in distribution_1p.keys():
+                if match.group(dist_name_1p):
+                    if nth == 1:
+                        codes_eps_params.append({'type': dist_name_1p, 'value': match.group(dist_name_1p)})
+                    result = dist_name_1p + '(' + match.group(dist_name_1p) + check_eps()
+                    break
+            else:
+                for dist_name_2p in distribution_2p.keys():
+                    if match.group(dist_name_2p + '1'):
+                        if nth == 1:
+                            codes_eps_params.extend([{'type': dist_name_2p, 'value': match.group(dist_name_2p+'1')}, {'type': dist_name_2p, 'value': match.group(dist_name_2p+'2')}])
+                        result = dist_name_2p + '(' + match.group(dist_name_2p+'1') + check_eps() + ',' + match.group(dist_name_2p+'2') + check_eps()
             result += ')'
             return result
         return replace_counter
@@ -104,8 +129,13 @@ def generate_psi_epsilon(psi_file):
         extra = 0
         for match in matches:
             for group in match:
-                if group.startswith('gauss') or group.startswith('uniformInt'):
-                    extra += 1
+                flag_2p = False
+                for dist_name_2p in distribution_2p.keys():
+                    if group.startswith(dist_name_2p):
+                        extra += 1
+                        flag_2p = True
+                        break
+                if flag_2p:
                     break
         return len(matches) + extra
 
