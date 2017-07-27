@@ -7,7 +7,7 @@ subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params
 distancemax[p_,q_,cons_,vars_] := FindMaximum[{FullSimplify[Abs[p-q],cons],cons},vars]
 distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars]
 (*distancemax3[p_,q_,cons_] := Maximize[{Abs[p-q],cons},{eps,Element[r1,Integers]}]*)
-edistance[p_,q_,cons_]:=distance2[extract[f2[p]],extract[f2[FullSimplify[q,cons]]]]
+edistance[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
 edistance2[p_,q_,cons_]:=distance2[extract[f2[p]],extract[f2[FullSimplify[q,cons]]]]
 extract[f_] := Values[f][[1]]
 edistancemax[p_, q_, cons_] := 
@@ -29,12 +29,12 @@ runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),vars
 	{vars := Prepend[Map[First,varsminmax],eps]
 	},
 	single := (Length[vars]==2);
-	If[single, runsingle[p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[p,np,(epscons&&varscons),vars,varsminmax]]
+	If[single, runsingle[p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[p,np,(epscons),vars,varsminmax]]
 	Print[""]
 ]
 
 runsingle[p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
-	{cons := epscons&&varscons
+	{cons := epscons
 	},
 	pedist[e,ne,epscons,vars];
 	pks[p,np,cons,vars];

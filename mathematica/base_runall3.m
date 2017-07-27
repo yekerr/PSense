@@ -7,8 +7,8 @@ subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params
 distancemax[p_,q_,cons_,vars_] := FindMaximum[{FullSimplify[Abs[p-q],cons],cons},vars]
 distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars]
 (*distancemax3[p_,q_,cons_] := Maximize[{Abs[p-q],cons},{eps,Element[r1,Integers]}]*)
-edistance[p_,q_,cons_]:=distance2[extract[f2[p]],extract[f2[FullSimplify[q,cons]]]]
-edistance2[p_,q_,cons_]:=distance2[extract[f2[p]],extract[f2[FullSimplify[q,cons]]]]
+edistance[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
+edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[q]]][[1]]
 extract[f_] := Values[f][[1]]
 edistancemax[p_, q_, cons_] := 
 distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
@@ -54,11 +54,17 @@ pedist[p_,q_,cons_,vars_] := Module[
 	f[_ DiracDelta[point_]] := Solve[point==0,vars[[2]]];
 	f2[DiracDelta[point_]] := Solve[point==0,vars[[2]]];
 	edistanceres := edistance[p,q,cons][[1]];
+	edistanceres2 := edistance2[p,q,cons][[1]];
 	Print["edistance"];
 	Print[edistanceres];
 	Print["edistanceMax"];
 	Print[FindMaximum[{edistanceres,cons},vars]];
 	Print[Maximize[{edistanceres,cons},vars]];
+	Print["edistance2"];
+	Print[edistanceres2];
+	Print["edistanceMax2"];
+	Print[FindMaximum[{edistanceres2,cons},vars]];
+	Print[Maximize[{edistanceres2,cons},vars]];
 	Print[""]
 ]
 
