@@ -32,7 +32,7 @@ def rename_func(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
+def generate_math_exp(file, f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
     var_minmax = '{'
     condition = ''
     for i in range(1, f_num_param + 1):
@@ -49,9 +49,9 @@ def generate_math_exp(f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_para
     except ValueError:
          eps_range = '(-0.1<=eps<=0.1)'
     if f_exp_name and f_exp_eps_name:
-        exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition])
+        exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     else:
-        exp = ','.join([f_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition])
+        exp = ','.join([f_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -220,6 +220,8 @@ def run_file(file, output_file, psi_timeout, math_timeout):
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, '_math', 'm', len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
 
+    math_output_files = extend_n_files_name(psi_file_dir, psi_file_name, '_math_out', 'csv', len(codes_eps))
+
     code_exp = generate_psi_expectation(psi_file)
 
     if code_exp:
@@ -263,9 +265,9 @@ def run_file(file, output_file, psi_timeout, math_timeout):
             if code_exp:
                 f.write(psi_exp_out + '\n')
                 f.write(psi_exp_eps_out + '\n')
-                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
             else:
-                math_run = generate_math_exp(psi_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
             f.write(math_run + '\n')
 
         math_out = run_math(math_files[i], math_timeout)
