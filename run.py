@@ -74,6 +74,7 @@ def generate_psi_expectation(psi_file):
     
 def generate_psi_epsilon(psi_file):
     distribution_1p = {}
+    distribution_1p['flip'] = r'(flip\((?P<flip>.+?)\))'
     distribution_1p['bernoulli'] = r'(bernoulli\((?P<bernoulli>.+?)\))'
     distribution_1p['geometric'] = r'(geometric\((?P<geometric>.+?)\))'
     distribution_1p['poisson'] = r'(poisson\((?P<poisson>.+?)\))'
