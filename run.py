@@ -76,7 +76,7 @@ def generate_psi_epsilon(psi_file):
     distribution_1p['bernoulli'] = r'(bernoulli\((?P<bernoulli>.+?)\))'
     distribution_1p['geometric'] = r'(geometric\((?P<geometric>.+?)\))'
     distribution_1p['poisson'] = r'(poisson\((?P<poisson>.+?)\))'
-    distribution_1p['categorical'] = r'(categorical\((?P<categorical>.+?)\))'
+    # distribution_1p['categorical'] = r'(categorical\((?P<categorical>.+?)\))'
     distribution_1p['exponential'] = r'(exponential\((?P<exponential>.+?)\))'
     distribution_1p['studentT'] = r'(studentT\((?P<studentT>.+?)\))'
     distribution_1p['rayleigh'] = r'(rayleigh\((?P<rayleigh>.+?)\))'
