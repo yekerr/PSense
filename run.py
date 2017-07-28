@@ -33,6 +33,7 @@ def rename_func(function_pre):
     return function_name + ']'
 
 def generate_math_exp(file, f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
+    file = '\"' + file + '\"'
     var_minmax = '{'
     condition = ''
     for i in range(1, f_num_param + 1):
