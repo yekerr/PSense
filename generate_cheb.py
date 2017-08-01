@@ -17,11 +17,9 @@ def format_poly(coef):
     return res
 x = cheb_nodes(-4, 4, 1000)
 y = special.erf(x)
-print(x[0],x[-1])
-print(y)
 y[0] = 1
 y[-1] = -1
 cheb_coef = chebyshev.chebfit(x, y, 10)
 coef = np.polynomial.chebyshev.cheb2poly(cheb_coef)
-poly = np.polynomial.Polynomial(coef)
-print(format_poly(coef))
+# poly = np.polynomial.Polynomial(coef)
+print(format_poly(coef).replace('e', '*^'))
