@@ -37,7 +37,7 @@ runsingle[p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
 	{cons := epscons&&varscons
 	},
 	(*pedist[e,ne,epscons,vars];*)
-	pks[p,np,cons,vars];
+	pks[p,np,cons,vars,varsminmax];
 	(*ptvd[p,np,cons,vars,varsminmax];
 	pkl[p,np,cons,vars,varsminmax];*)
 ]
@@ -62,16 +62,24 @@ pedist[p_,q_,cons_,vars_] := Module[
 	Print[""]
 ]
 
-pks[p_,q_,cons_,vars_] := Module[
+pks[p_,q_,cons_,vars_,varsminmax_] := Module[
 	{},
-	disres = FullSimplify[distance[p,q,cons],cons];
+	disres := FullSimplify[distance[p,q,cons],cons];
+	table = Table[(disres /. {r1->v})<=0.01, {v,0,1}];
+	(*sortedTable = Sort[table,Refine[#1 > #2, Element[eps, Reals]] &];
+	Print[sortedTable];
+	Print[supremum = sortedTable[[1]]];*)
 	distancemaxres = distancemax[p,q,cons,vars];
 	distancemax2res = distancemax2[p,q,cons,vars];
 	(*Print["distance"];
 	Print[disres];*)
-	Print["eps range for ks<=0.1"];
-	Print[epsmax=Maximize[{eps, disres <= 0.1,cons}, vars]];
-	Print[epsmin=Minimize[{eps, disres <= 0.1,cons}, vars]];
+	Print["eps range for ks<=0.01"];
+	Print[table];
+	consMax = True;
+	Print[epsmax = Maximize @@ {Append[Prepend[table, eps], consMax], vars}];
+	Print[epsmin = Minimize @@ {Append[Prepend[table, eps], consMax], vars}];
+	(*Print[epsmax=Maximize[{eps, supremum <= 0.1,r1 == 0 || r1 == 1}, vars]];
+	Print[epsmin=Minimize[{eps, supremum <= 0.1,r1 == 0 || r1 == 1}, vars]];*)
 	Print["(", epsmin[[1]], ", ", epsmax[[1]], ")"];
 	(*Print["ksmax(distancemax)"];
 	Print[distancemaxres];

@@ -30,6 +30,7 @@ runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),vars
 	{vars := Prepend[Map[First,varsminmax],eps]
 	},
 	single := (Length[vars]==2);
+	Print["run single"];
 	If[single, runsingle[p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[p,np,(epscons&&varscons),vars,varsminmax]]
 	Print[""]
 ]
@@ -37,8 +38,9 @@ runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),vars
 runsingle[p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
 	{cons := epscons&&varscons
 	},
-	pedist[e,ne,epscons,vars];
-	pks[p,np,cons,vars];
+	(*pedist[e,ne,epscons,vars];
+	pks[p,np,cons,vars];*)
+	Print["start tvd"];
 	ptvd[p,np,cons,vars,varsminmax];
 ]
 
@@ -56,14 +58,14 @@ pedist[p_,q_,cons_,vars_] := Module[
 ]
 
 pks[p_,q_,cons_,vars_] := Module[
-	{disres := FullSimplify[distance[p,q,cons],cons],
-	distancemaxres := distancemax[p,q,cons,vars],
-	distancemax2res := distancemax2[p,q,cons,vars]
-	},
+	{},
 	Print["distance"];
+	disres := FullSimplify[distance[p,q,cons],cons];
 	Print[disres];
 	Print["ksmax(distancemax)"];
+	distancemaxres := distancemax[p,q,cons,vars];
 	Print[distancemaxres];
+	distancemax2res := distancemax2[p,q,cons,vars];
 	Print[distancemax2res];
 	Print[""]
 ]
@@ -71,10 +73,17 @@ ptvd[p_,q_,cons_,vars_,varsminmax_] := Module[
 	{
 	},
 	Print["tvd"];
-	xsample := Table[x, {x, 0.01, 0.1, 0.01}];
+	xsample = Table[x, {x, 0.01, 0.1, 0.01}];
 	Print[xsample];
-	table := sample[p, q, cons, varsminmax];
+	table = sample[p, q, cons, varsminmax];
 	Print[table];
+	data = Transpose[{xsample,table}];
+	lm = LinearModelFit[data,x,x];
+	k = lm["ParameterTableEntries"][[2]][[1]];
+	bmax = Max[table - k*xsample];
+	bmin = Min[table - k*xsample];
+	Print[k*x+bmin];
+	Print[k*x+bmax];
 	Print["tvdMax"];
 	maxSample := Max[table];
 	Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"];
