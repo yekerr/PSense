@@ -205,13 +205,13 @@ def rename_psi_out(exp, extend_name):
     newname = parts[0].replace('[', extend_name + '[')
     return newname + ':=' + parts[-1]
 
-def run_file(file, output_file, psi_timeout, math_timeout):
+def run_file(file, output_file, psi_timeout, math_timeout, distribution_form):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
 
 
-    psi_out = run_psi(psi_file, '--cdf', psi_timeout)
+    psi_out = run_psi(psi_file, distribution_form, psi_timeout)
     if not check_psi_out(psi_file, output_file, psi_out):
         return 1
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
@@ -246,7 +246,7 @@ def run_file(file, output_file, psi_timeout, math_timeout):
 
     for i in range(len(psi_eps_files)):
 
-        psi_eps_out = run_psi(psi_eps_files[i], '--cdf', psi_timeout)
+        psi_eps_out = run_psi(psi_eps_files[i], distribution_form, psi_timeout)
         if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out):
             continue
         psi_eps_out = rename_psi_out(psi_eps_out, 'Eps')
@@ -260,7 +260,7 @@ def run_file(file, output_file, psi_timeout, math_timeout):
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
         with open(math_files[i], 'w') as f:
-            base_file = os.path.join(os.getcwd(), 'mathematica', 'base_runall.m')
+            base_file = os.path.join(os.getcwd(), 'mathematica', 'base_runall_csv3.m')
             f.write('Get[\"' + base_file + '\"]\n')
             f.write(psi_out + '\n')
             f.write(psi_eps_out + '\n')
@@ -290,6 +290,9 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', help='PSI file')
     group.add_argument('-r', help='Directory containing PSI files')
+    group2 = parser.add_mutually_exclusive_group(required=True)
+    group2.add_argument('-pdf', action='store_true', help='Analyze PDF')
+    group2.add_argument('-cdf', action='store_true', help='Analyze CDF')
     parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
     parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
     parser.add_argument('-o', nargs='?', help='Optional output file')
@@ -306,7 +309,8 @@ def main():
     if argv.tp and not argv.tp.isdigit():
         print('Timeout parameter is invalid')
         return 0
-
+    
+    distribution_form = "--cdf" if argv.cdf else None
     output_file = argv.o
     math_timeout = argv.tm
     psi_timeout = argv.tp
@@ -316,7 +320,7 @@ def main():
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file, psi_timeout, math_timeout)
+        run_file(argv.f, output_file, psi_timeout, math_timeout, distribution_form)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -327,7 +331,7 @@ def main():
                         f.write('\n' + file + ':\n')
                 else:
                     print('\n' + file + ':')
-                run_file(file, output_file, psi_timeout, math_timeout)
+                run_file(file, output_file, psi_timeout, math_timeout, distribution_form)
 
 if __name__ == "__main__":
     main()

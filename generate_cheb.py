@@ -15,11 +15,11 @@ def format_poly(coef):
         else:
             res += '+' + str(coef[i]) + '*x^' + str(i)
     return res
-x = cheb_nodes(-4, 4, 1000)
+x = cheb_nodes(0, 4, 1000)
 y = special.erf(x)
 y[0] = 1
 y[-1] = -1
-cheb_coef = chebyshev.chebfit(x, y, 10)
+cheb_coef = chebyshev.chebfit(x, y, 4)
 coef = np.polynomial.chebyshev.cheb2poly(cheb_coef)
 # poly = np.polynomial.Polynomial(coef)
 print(format_poly(coef).replace('e', '*^'))
