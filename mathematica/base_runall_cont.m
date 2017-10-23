@@ -26,7 +26,7 @@ islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))
 		AllTrue[islinearlist, NumberQ]
   ]*)
 
-runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
+inrunall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
 	{vars := Prepend[Map[First,varsminmax],eps]
 	},
 	single := (Length[vars]==2);
@@ -38,8 +38,8 @@ runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),vars
 runsingle[p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
 	{cons := epscons&&varscons
 	},
-	(*pedist[e,ne,epscons,vars];
-	pks[p,np,cons,vars];*)
+	pedist[e,ne,epscons,vars];
+	pks[p,np,cons,vars];
 	Print["start tvd"];
 	ptvd[p,np,cons,vars,varsminmax];
 ]
