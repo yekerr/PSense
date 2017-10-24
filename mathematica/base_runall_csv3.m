@@ -7,7 +7,7 @@ subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params
 distancemax[p_,q_,cons_,vars_] := FindMaximum[{FullSimplify[Abs[p-q],cons],cons},vars]
 distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars]
 (*distancemax3[p_,q_,cons_] := Maximize[{Abs[p-q],cons},{eps,Element[r1,Integers]}]*)
-edistance[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
+edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
 edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[q]]][[1]]
 extract[f_] := Values[f][[1]]
 edistancemax[p_, q_, cons_] := 
@@ -17,7 +17,8 @@ entropy[p_,q_] := q*Log2[q/p]
 kl[p_,q_,cons_,varsminmax_]:=Sum@@(Prepend[varsminmax,FullSimplify[entropy[p,q],cons]])
 gtd[p_] := D[FullSimplify[ComplexExpand[p],eps>0],eps]
 ltd[p_] := D[FullSimplify[ComplexExpand[p],eps<0],eps]
-islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))
+islinear[p_] := (((NumberQ[gtd[p]])
+)&&(NumberQ[ltd[p]]))
 (*islinear2[p_] := Module[
 		{islinearlist := {}},
 		Do[AppendTo[islinearlist,D[FullSimplify[p[i],eps>0],eps]];AppendTo[islinearlist,D[FullSimplify[p[i],eps<0],eps]],{i,-5,5}];
@@ -28,7 +29,7 @@ runall[p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),vars
 	{vars := Prepend[Map[First,varsminmax],eps]
 	},
 	Print["mathematica start"];
-	$stream = OpenAppend["ch0x.csv",BinaryFormat->True];
+	$stream = OpenAppend["trait_attribution_results.csv",BinaryFormat->True];
 	WriteString[$stream,$ScriptCommandLine[[1]]];
 	WriteString[$stream,","];
 	single := (Length[vars]==2);
@@ -140,7 +141,9 @@ pks[p_,q_,cons_,vars_] := Module[
 	WriteString[$stream,","];
 	If[Not[StringQ[disres]],
 		(disresr2[r2_] = (disres /. r1->r2);
-		addquote[islinear2[disresr2]];
+		Print[disresr2[r2_]];
+		Print[islinear2[disresr2[r2]]]
+		addquote[islinear2[disresr2[r2]]];
 		WriteString[$stream,","];
 		distancemaxres := Check[distancemax[p,q,cons,vars],"error"];
 		distancemax2res := Check[distancemax2[p,q,cons,vars],"error"];
