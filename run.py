@@ -23,7 +23,6 @@ def create_dirs_from_path(path):
 
 def rename_func(function_pre):
     num = len(function_pre.split(','))
-    newname = ''
     function_name = function_pre.split('[')[0] + '['
     for i in range(num):
         if i == 0: 
@@ -32,7 +31,7 @@ def rename_func(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def generate_math_exp(file, f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
+def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
     file = '\"' + file + '\"'
     var_minmax = '{'
     condition = ''
@@ -50,9 +49,9 @@ def generate_math_exp(file, f_name, f_eps_name, f_exp_name, f_exp_eps_name, f_nu
     except ValueError:
          eps_range = '(-0.1<=eps<=0.1)'
     if f_exp_name and f_exp_eps_name:
-        exp = ','.join([f_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
+        exp = ','.join([f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     else:
-        exp = ','.join([f_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition, file])
+        exp = ','.join([f_name, f_pdf_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -178,6 +177,7 @@ def run_psi(file, option, timeout):
         psi_out = sp.run(cmd, stdout=sp.PIPE, timeout=timeout)
     except sp.TimeoutExpired:
         return None
+    print(psi_out.stdout.decode('utf-8'))
     return parse_psi_output(psi_out.stdout.decode('utf-8'))
 
 def run_math(file, timeout):
@@ -205,17 +205,23 @@ def rename_psi_out(exp, extend_name):
     newname = parts[0].replace('[', extend_name + '[')
     return newname + ':=' + parts[-1]
 
-def run_file(file, output_file, psi_timeout, math_timeout, distribution_form):
+def run_file(file, output_file, psi_timeout, math_timeout):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
 
 
-    psi_out = run_psi(psi_file, distribution_form, psi_timeout)
+    psi_out = run_psi(psi_file, "--cdf", psi_timeout)
     if not check_psi_out(psi_file, output_file, psi_out):
         return 1
     psi_func_name = rename_func(psi_out.split(':=')[0].strip())
     psi_func_num_param = len(psi_func_name.split(','))
+
+    psi_pdf_out = run_psi(psi_file, None, psi_timeout)
+    if not check_psi_out(psi_file, output_file, psi_pdf_out):
+        return 1
+    psi_pdf_out = rename_psi_out(psi_pdf_out, 'PDF')
+    psi_pdf_func_name = rename_func(psi_pdf_out.split(':=')[0].strip())
 
     codes_eps, code_eps_params = generate_psi_epsilon(psi_file)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_eps', 'psi', len(codes_eps))
@@ -229,7 +235,7 @@ def run_file(file, output_file, psi_timeout, math_timeout, distribution_form):
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, '_exp', 'psi')    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file, '', psi_timeout)
+        psi_exp_out = run_psi(psi_exp_file, None, psi_timeout)
         if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
             return 1
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
@@ -245,15 +251,14 @@ def run_file(file, output_file, psi_timeout, math_timeout, distribution_form):
         print('Expectation is not supported')
 
     for i in range(len(psi_eps_files)):
-
-        psi_eps_out = run_psi(psi_eps_files[i], distribution_form, psi_timeout)
+        psi_eps_out = run_psi(psi_eps_files[i], "--cdf", psi_timeout)
         if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out):
             continue
         psi_eps_out = rename_psi_out(psi_eps_out, 'Eps')
         psi_eps_func_name = rename_func(psi_eps_out.split(':=')[0].strip())
 
         if code_exp:
-            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], '', psi_timeout)
+            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout)
             if not check_psi_out(psi_exp_eps_files[i], output_file, psi_exp_eps_out):
                 continue
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, 'ExpEps')
@@ -263,13 +268,14 @@ def run_file(file, output_file, psi_timeout, math_timeout, distribution_form):
             base_file = os.path.join(os.getcwd(), 'mathematica', 'base_runall_csv3.m')
             f.write('Get[\"' + base_file + '\"]\n')
             f.write(psi_out + '\n')
+            f.write(psi_pdf_out + '\n')
             f.write(psi_eps_out + '\n')
             if code_exp:
                 f.write(psi_exp_out + '\n')
                 f.write(psi_exp_eps_out + '\n')
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
             else:
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
             f.write(math_run + '\n')
 
         math_out = run_math(math_files[i], math_timeout)
@@ -290,9 +296,6 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', help='PSI file')
     group.add_argument('-r', help='Directory containing PSI files')
-    group2 = parser.add_mutually_exclusive_group(required=True)
-    group2.add_argument('-pdf', action='store_true', help='Analyze PDF')
-    group2.add_argument('-cdf', action='store_true', help='Analyze CDF')
     parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
     parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
     parser.add_argument('-o', nargs='?', help='Optional output file')
@@ -310,7 +313,6 @@ def main():
         print('Timeout parameter is invalid')
         return 0
     
-    distribution_form = "--cdf" if argv.cdf else None
     output_file = argv.o
     math_timeout = argv.tm
     psi_timeout = argv.tp
@@ -320,7 +322,7 @@ def main():
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file, psi_timeout, math_timeout, distribution_form)
+        run_file(argv.f, output_file, psi_timeout, math_timeout)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -331,7 +333,7 @@ def main():
                         f.write('\n' + file + ':\n')
                 else:
                     print('\n' + file + ':')
-                run_file(file, output_file, psi_timeout, math_timeout, distribution_form)
+                run_file(file, output_file, psi_timeout, math_timeout)
 
 if __name__ == "__main__":
     main()
