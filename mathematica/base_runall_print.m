@@ -13,8 +13,10 @@ extract[f_] := Values[f][[1]]
 edistancemax[p_, q_, cons_] := 
 distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
 tvd[p_,q_,cons_,varsminmax_] :=1/2*(Sum@@(Prepend[varsminmax,FullSimplify[distance2[p,q],cons]]))
+tvdsingle[p_,q_,cons_,varscons_] := 1/2*(Sum@@{FullSimplify[distance2[p,q],cons],{(Variables@Level[varscons,{-1}])[[1]],Map[First,Map[Values,Solve[varscons,(Variables@Level[varscons,{-1}])[[1]]]]]}})
 entropy[p_,q_] := q*Log2[q/p]
 kl[p_,q_,cons_,varsminmax_]:=Sum@@(Prepend[varsminmax,FullSimplify[entropy[p,q],cons]])
+klsingle[p_,q_,cons_,varscons_] := 1/2*(Sum@@{FullSimplify[entropy[p,q],cons],{(Variables@Level[varscons,{-1}])[[1]],Map[First,Map[Values,Solve[varscons,(Variables@Level[varscons,{-1}])[[1]]]]]}})
 gtd[p_] := D[FullSimplify[ComplexExpand[p],eps>0],eps]
 ltd[p_] := D[FullSimplify[ComplexExpand[p],eps<0],eps]
 islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))
@@ -42,18 +44,19 @@ runsingle[p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
 	{cons := epscons&&varscons,
 	 varsnoeps = Map[First,varsminmax]
 	},
-	time = Timing[pedist[e,ne,epscons,vars]];
-	WriteString[$stream, time[[1]]];
-	ksres = pks[p,np,cons,vars];
+	pedist[e,ne,epscons,vars];
+	pks[p,np,cons,vars];
 	(*revkseps[ksres,varsnoeps];*) 
-	ptvd[p,np,cons,vars,varsminmax];
-	pkl[p,np,cons,vars,varsminmax];
+	(*ptvd[p,np,cons,vars,varsminmax];
+	pkl[p,np,cons,vars,varsminmax];*)
+	ptvdsingle[p,np,cons,vars,varscons];
+	pklsingle[p,np,cons,vars,varscons];
 ]
 
 runmulti[p_,np_,cons_,vars_,varsminmax_] := Module[
 	{},
 	varsnoeps = Map[First,varsminmax]
-	ksres := pks[p,np,cons,vars];
+	pks[p,np,cons,vars];
 	(*revkseps[ksres,varsnoeps];*)
 	ptvd[p,np,cons,vars,varsminmax];
 	pkl[p,np,cons,vars,varsminmax];
@@ -76,7 +79,7 @@ pedist[p_,q_,cons_,vars_] := Module[
 	(*Print[edistanceres[[1]]];*)
 	Print[edistance2[p,q,cons][[1]]];
 	Print["edistanceMax"];
-	Print[FindMaximum[{edistanceres,cons},vars]];
+	(*Print[FindMaximum[{edistanceres,cons},vars]];*)
 	Print[Maximize[{edistanceres,cons},vars]];
 	Print[""]
 ]
@@ -90,9 +93,19 @@ pks[p_,q_,cons_,vars_] := Module[
 	Print[disres];
 	(*Print["ksmax(distancemax)"];
 	Print[distancemaxres];
-	Print[distancemax2res];
-	Print[""];*)
+	Print[distancemax2res];*)
+	Print[""];
 	disres
+]
+ptvdsingle[p_,q_,cons_,vars_,varscons_] := Module[
+	{tvdres := tvdsingle[p,q,cons,varscons]
+	},
+	Print["tvd"];
+	Print[tvdres];
+	Print["tvdMax"];
+	(*Print[FindMaximum[{tvdres,cons},vars]];*)
+	Print[Maximize[{tvdres,cons},vars]];
+	Print[""]
 ]
 ptvd[p_,q_,cons_,vars_,varsminmax_] := Module[
 	{tvdres := tvd[p,q,cons,varsminmax]
@@ -100,7 +113,7 @@ ptvd[p_,q_,cons_,vars_,varsminmax_] := Module[
 	Print["tvd"];
 	Print[tvdres];
 	Print["tvdMax"];
-	Print[FindMaximum[{tvdres,cons},vars]];
+	(*Print[FindMaximum[{tvdres,cons},vars]];*)
 	Print[Maximize[{tvdres,cons},vars]];
 	Print[""]
 ]
@@ -110,7 +123,17 @@ pkl[p_,q_,cons_,vars_,varsminmax_] := Module[
 	Print["kl"];
 	Print[klres];
 	Print["klMax"];
-	Print[FindMaximum[{klres,cons},vars]];
+	(*Print[FindMaximum[{klres,cons},vars]];*)
+	Print[Maximize[{klres,cons},vars]];
+	Print[""]
+]
+pklsingle[p_,q_,cons_,vars_,varscons_] := Module[
+	{klres := klsingle[p,q,cons,varscons]
+	},
+	Print["kl"];
+	Print[klres];
+	Print["klMax"];
+	(*Print[FindMaximum[{klres,cons},vars]];*)
 	Print[Maximize[{klres,cons},vars]];
 	Print[""]
 ]
