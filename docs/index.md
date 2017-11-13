@@ -1,3 +1,7 @@
-## PSense Index Page
+## Welcome to PSense Homepage
 
-- [readme](https://yekerr.github.io/pSensitivity/README.html)
+- [Getting Started](https://yekerr.github.io/pSensitivity/manual.html)
+- [Manual](https://yekerr.github.io/pSensitivity/manual.html)
+- [Tutorial](https://yekerr.github.io/pSensitivity/tutorial.html)
+- [Publications](https://yekerr.github.io/pSensitivity/publications.html)
+- [About us](https://yekerr.github.io/pSensitivity/about.html)
