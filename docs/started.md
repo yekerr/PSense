@@ -1,3 +1,8 @@
+---
+title: Started
+layout: post
+---
+
 ## Setting up Environment
 
 ## Installing PSense

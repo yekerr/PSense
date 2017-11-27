@@ -1,3 +1,8 @@
+---
+title: Tutorial
+layout: post
+---
+
 #### Build Models in PSI
 
 [PSI](http://psisolver.org) is a solver that does exact probabilistic inference. Here is a bernoulli distibution modeled in the source language of PSI.
