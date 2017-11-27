@@ -1,1 +1,12 @@
 theme: jekyll-theme-cayman
+authors:
+  Zhenbang:
+    name: Zhenbang Wang
+    display_name: Zhenbang
+    email: zw11@illinois.edu
+    github: kevinzbw
+  Zixin:
+    name: Zixin HUang
+    display_name: Zixin
+    email: zixinh2@illinois.edu
+    github: yekerr
