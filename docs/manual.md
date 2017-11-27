@@ -1,7 +1,7 @@
 
 ## Commmand Options
 
-You can use following options for PSense.  
+You can use the following options for PSense.  
 
 
 | Command    | Type           | Description                            |

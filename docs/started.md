@@ -10,13 +10,15 @@ Mathematica 11
 
 ## Downloading PSense
 
-Download a copy of our repository. `psense.py` and  `mathematica/*.m` are essential parts of PSense.
+Download a copy of our repository.  
+`psense.py` and  `mathematica/*.m` are essential parts of PSense.
 
 ## Configuring Psense
 
-
+Add directories that contain `psi` and `MathematicaScript` to your system `PATH`.
 
 ## Running Psense
 
-Use command "python3 psense.py" to analyze probablistic programs.
+Use command "python3 psense.py -f model.psi" to analyze probablistic programs.  
+More options can be found in the [Manual](manual.html).
 
