@@ -1,7 +1,3 @@
----
-title: Manual
-layout: post
----
 
 ## Commmand Options
 

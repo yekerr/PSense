@@ -1,7 +1,3 @@
----
-title: Started
-layout: post
----
 
 ## Setting up Environment
 

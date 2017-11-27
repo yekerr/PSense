@@ -1,7 +1,3 @@
----
-title: Publications
-layout: post
----
 
 ## We are working on publications.
 

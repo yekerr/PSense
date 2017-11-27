@@ -1,7 +1,3 @@
----
-title: Tutorial
-layout: post
----
 
 #### Build Models in PSI
 

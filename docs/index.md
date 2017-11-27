@@ -1,7 +1,3 @@
----
-title: Index
-layout: post
----
 
 ## Welcome to PSense Homepage
 
