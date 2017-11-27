@@ -1,11 +1,11 @@
 
 ## Welcome to PSense Homepage
 
-- [Getting Started](https://yekerr.github.io/PSense/started.html)
-- [Manual](https://yekerr.github.io/PSense/manual.html)
-- [Tutorial](https://yekerr.github.io/PSense/tutorial.html)
-- [Publications](https://yekerr.github.io/PSense/publications.html)
-- [About us](https://yekerr.github.io/PSense/about.html)
+- [Getting Started](started.html)
+- [Manual](manual.html)
+- [Tutorial](tutorial.html)
+- [Publications](publications.html)
+- [About us](about.html)
 
 ### What is PSense?
 
