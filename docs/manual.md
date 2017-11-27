@@ -3,7 +3,9 @@ title: Manual
 layout: post
 ---
 
-##Commmand Options
+## Commmand Options
+
+You can use following options for PSense.  
 
 | Command    | Type           | Description                            |
 | ---------- | -------------- | -------------------------------------- |
@@ -18,4 +20,4 @@ layout: post
 
 
 ## PSense Workflow
-![Workflow of PSense](image/workflow.png?raw=true "Workflow of PSense")
+![Workflow of PSense](image/workflow.png "Workflow of PSense")
