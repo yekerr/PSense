@@ -18,7 +18,7 @@ The code snippet can be found [here](https://github.com/yekerr/PSense/blob/maste
 
 #### Find Sensitivity of the Probabilistic Program with PSense
 
-To find the sensitivity of this probabilistic program, run `python3 run.py -f bernoulli_example1.psi` in terminal.
+To find the sensitivity of this probabilistic program, run `python3 psense.py -f bernoulli_example1.psi` in terminal.
 You'll the following outputs:
 
 ```

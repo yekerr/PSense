@@ -1,5 +1,9 @@
-## Welcome to PSense Homepage
+---
+title: Index
+layout: post
+---
 
+## Welcome to PSense Homepage
 
 - [Getting Started](https://yekerr.github.io/PSense/started.html)
 - [Manual](https://yekerr.github.io/PSense/manual.html)
