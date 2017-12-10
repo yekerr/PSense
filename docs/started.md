@@ -15,7 +15,8 @@ Download a copy of our repository.
 
 ## Configuring Psense
 
-Add directories that contain `psi` and `MathematicaScript` to your system `PATH`.
+Add directories that contain `psi` and `MathematicaScript` to your system `PATH`.  
+We have provided `add_mathscirpt.sh` to help you add `MathematicaScript` to your system `PATH`.  
 
 ## Running Psense
 
