@@ -3,7 +3,7 @@
 
 [PSI](http://psisolver.org) is a solver that does exact probabilistic inference. Here is a bernoulli distibution modeled in the source language of PSI.
 
-```d
+```{d}
 def main(){
         x := bernoulli(0.1);
         return x;
@@ -40,3 +40,6 @@ kl
 klMax
 {0.007253402460404782, {eps -> -0.010000000000000002, r1 -> 0}}
 ```
+
+***
+[Return to Homepage](https://yekerr.github.io/PSense/)
