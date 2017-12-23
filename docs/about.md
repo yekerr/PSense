@@ -1,11 +1,11 @@
 ## PSense Development Team
 
-**Zixin Huang** 
+**Zixin Huang**  
 Student at the Department of Computer Science  
 University of Illinois at Urbana-Champaign  
 [zixinh2@illinois.edu](mailto:zixinh2@illinois.edu)
 
-**Zhenbang Wang**
+**Zhenbang Wang**  
 Student at the Department of Computer Science  
 University of Illinois at Urbana-Champaign  
 [zw11@illinois.edu](mailto:zw11@illinois.edu)
