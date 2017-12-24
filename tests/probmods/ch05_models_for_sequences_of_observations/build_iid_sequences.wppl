@@ -1,0 +1,5 @@
+var words = ['chef', 'omelet', 'soup', 'eat', 'work', 'bake', 'stop']
+var probs = [0.0032, 0.4863, 0.0789, 0.0675, 0.1974, 0.1387, 0.0277]
+var thunk = function() {return categorical({ps: probs, vs: words})};
+
+repeat(10, thunk)

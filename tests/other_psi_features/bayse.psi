@@ -1,0 +1,8 @@
+def main(){
+	a := bernoulli(0.5);
+	b := 0;
+	if(a == 0){b = bernoulli(0.1);}
+	else {b = bernoulli(0.5);}
+	observe(b == 1);
+	return a;
+}

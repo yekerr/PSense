@@ -1,0 +1,35 @@
+///fold:
+var actionPrior = Categorical({vs: ['a', 'b'], ps: [.5, .5]})
+
+var chooseAction = function(goalSatisfied, transition, state) {
+  return Infer({method: 'enumerate'}, function() {
+    var action = sample(actionPrior)
+    condition(goalSatisfied(transition(state, action)))
+    return action;
+  })
+}
+///
+var makeVendingMachine = function(aEffects, bEffects) {
+  return function(state, action) {
+    return (action == 'a' ? categorical({vs: ['bagel', 'cookie'], ps: aEffects}) :
+            action == 'b' ? categorical({vs: ['bagel', 'cookie'], ps: bEffects}) :
+            'nothing');
+  }
+};
+
+var goalPosterior = Infer({method: 'MCMC', samples: 50000}, function() {
+  var aEffects = dirichlet(Vector([1,1]))
+  var bEffects = dirichlet(Vector([1,1]));
+
+  var vendingMachine = makeVendingMachine(aEffects, bEffects);
+  
+  var goal = categorical({vs: ['bagel', 'cookie'], ps: [.5, .5]})
+  var goalSatisfied = function(outcome) {return outcome == goal};
+  
+  condition(goal == 'cookie' &&
+            sample(chooseAction(goalSatisfied, vendingMachine, 'state')) == 'b');
+  return T.get(bEffects, 1);
+})
+
+print("probability of action 'b' giving cookie")
+viz.auto(goalPosterior);

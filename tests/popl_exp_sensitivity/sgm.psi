@@ -1,0 +1,10 @@
+def main(){
+  w := 0.5;
+  a := 0.5;
+  g := 0;
+  for t in [0..4){
+    g = //gradient operation on l(w)
+    w = w - a*g;
+  }
+  return w;
+}

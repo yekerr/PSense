@@ -1,0 +1,13 @@
+var sequenceCondDist = function(firstVal) {
+  return Infer({method: 'enumerate'},
+    function() {
+      var prob = flip() ? 0.2 : 0.7
+      var thunk = function() {return flip(prob)}
+      var s = repeat(2, thunk)
+      condition(s[0] == firstVal)
+      return {second: s[1]}
+  });
+};
+
+viz(sequenceCondDist(true))
+viz(sequenceCondDist(false))

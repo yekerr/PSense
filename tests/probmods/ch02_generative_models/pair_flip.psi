@@ -1,0 +1,4 @@
+def main(){ 
+	return (bernoulli(0.5), bernoulli(0.5)); // expected: (1/2·δ[-r₁+1]+1/2·δ[r₁])·(1/2·δ[-r₂+1]+1/2·δ[r₂])
+}
+ 

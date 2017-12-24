@@ -1,0 +1,21 @@
+var observedData = [{C:true, E:true}, {C:true, E:true}, {C:false, E:false}, {C:true, E:true}]
+
+var causalPowerPost = Infer({method: 'MCMC', samples: 10000}, function() {
+  // Causal power of C to cause E
+  var cp = uniform(0, 1)
+
+  // Background probability of E
+  var b = uniform(0, 1)
+
+  var obsFn = function(datum) {
+    // The noisy causal relation to get E given C
+    var E = (datum.C && flip(cp)) || flip(b)
+    condition( E == datum.E)
+  }
+
+  mapData({data: observedData}, obsFn)
+
+  return {causal_power: cp}
+});
+
+viz(causalPowerPost);

@@ -1,0 +1,4 @@
+def main(){
+	p := uniform(0,1);
+	return binomial(10, p);
+}

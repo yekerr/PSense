@@ -1,0 +1,22 @@
+observedData := [1,1,1,1,0,0,0,0];
+def coinToWeight(){
+        return uniform(0,1);
+}
+def main(){
+        coins_num := 1;
+        coins_weight := [coinToWeight()];
+        if(!bernoulli(0.5)){
+                coins_num = 2;
+                coins_weight = coins_weight ~ [coinToWeight()];
+                for i in [0..8){
+                        observe(bernoulli(coins_weight[bernoulli(0.5)])==observedData[i]);
+                }
+        }
+        else{
+                for i in [0..8){
+                        observe(bernoulli(coins_weight[0])==observedData[i]);
+                }
+        }
+        return coins_num; //expected: 128/321·δ[-coins_num+1]+193/321·δ[-coins_num+2]
+}
+

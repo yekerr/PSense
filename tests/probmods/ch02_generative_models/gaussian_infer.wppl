@@ -1,0 +1,9 @@
+//a complex function, that specifies a complex sampling process:
+var foo = function(){gaussian(0,1)*gaussian(0,1)}
+
+//make the marginal distributions on return values explicit:
+var d = Infer({method: 'forward', samples: 1000}, foo)
+
+//now we can use d as we would any other distribution:
+print( sample(d) )
+viz(d)

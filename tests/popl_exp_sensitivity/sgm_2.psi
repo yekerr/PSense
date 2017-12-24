@@ -1,0 +1,16 @@
+def main(){
+  x := [1,2,3,4,5,6,7,8,9,10];
+  y := [2,4,6,8,10,12,14,16,18,20];
+  w1 := 0; //uniform(0+?eps,1+?eps);
+  w2 := uniform(0, 1);
+  a := 0.01;
+  for t in [0..10){
+    i := t;
+    xi := x[i];
+    yi := y[i];
+    w1 = w1 - a*2*(w1+w2*xi-yi);
+    w2 = w2 - a*2*(xi*(w1+w2*xi-yi));
+  }
+  return Expectation(w2);//should be close to 2
+}
+

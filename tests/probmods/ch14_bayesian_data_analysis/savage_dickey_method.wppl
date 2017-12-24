@@ -1,0 +1,17 @@
+var k = 7, n = 20;
+
+var complexModelPrior = Infer({method: "forward", samples: 10000}, function(){
+  var p = uniform(0, 1);
+  return p
+})
+
+var complexModelPosterior = Infer({method: "rejection", samples: 10000}, function(){
+  var p = uniform(0, 1);
+  observe(Binomial({p: p, n: n}), k);
+  return p
+})
+
+var savageDickeyDenomenator = expectation(complexModelPrior, function(x){return Math.abs(x- 0.5)<0.05})
+var savageDickeyNumerator = expectation(complexModelPosterior, function(x){return Math.abs(x- 0.5)<0.05})
+var savageDickeyRatio = savageDickeyNumerator / savageDickeyDenomenator
+print( savageDickeyRatio )

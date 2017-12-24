@@ -1,0 +1,9 @@
+var makeCoin = function(weight) { return function() { flip(weight) ? 'h' : 't' } };
+var bend = function(coin) {
+  return function() {
+    (coin() == 'h') ? makeCoin(0.7)() : makeCoin(0.1)()
+  }
+}
+var fairCoin = makeCoin(0.5)
+var bentCoin = bend(fairCoin)
+viz(repeat(100,bentCoin))

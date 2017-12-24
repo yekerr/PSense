@@ -1,0 +1,34 @@
+var options = {method: 'rejection', samples: 1000}
+
+var lazinessPrior = 0.3;
+var lazyPulling = 0.5;
+
+var model = function() {
+
+  var strength = mem(function(person){
+    return gaussian(0, 1)
+  })
+  var lazy = function(person){
+    return flip(lazinessPrior)
+  }
+  var pulling = function(person) {
+    return lazy(person) ?
+            strength(person) * lazyPulling :
+            strength(person)
+  }
+  var totalPulling = function(team){return sum(map(pulling, team)) }
+  var winner = function(team1, team2){
+    totalPulling(team1) > totalPulling(team2) ? team1 : team2
+  }
+  var beat = function(team1,team2){winner(team1,team2) == team1}
+
+  condition(beat(["bob", "mary"], ["tom", "sue"]))
+
+  return strength("bob")
+}
+
+var posterior = Infer(options, model)
+print("Bob's strength, given that he and Mary beat Tom and Sue")
+
+print("Expected value = " + expectation(posterior))
+viz(posterior)

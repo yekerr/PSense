@@ -1,0 +1,41 @@
+def main(){
+	model_selector := bernoulli(0.5);
+	if(model_selector){
+	        ind := [1,1,1,2,2,2];
+	        demands := [[104,104,104],[0,100,104]];
+	        data_y := [[1,1,0],[0,4,2]];
+	        sigma := 1/gamma(0.001,1000);
+	        alpha := [gauss(0,sigma),gauss(0,sigma)];
+	        b := gauss(0, 10^6);
+	        mu := gauss(0, 10^6);
+	        gamma1 := gauss(0, 10^6);
+	        gamma2 := gauss(0, 10^6);
+	        gamma3 := gauss(0, 10^6);
+	        z1 := 1;//vendor A
+	        z2 := 0;
+	        z3 := 0;
+	        for j in [0..2){//jth plant
+	                for t in [0..3){
+	                        p_i := exp(mu + alpha[ind[j * 3 + t]] + b * t +gamma1 * z1 + gamma2 * z2 + gamma3 * z3) / (1 + exp(mu + alpha[ind[j * 3 + t]] + b * t +gamma1 * z1 + gamma2 * z2 + gamma3 * z3));
+	                        observe(binomial(demands[j][t],p_i) == data_y[j][t]);
+	                }
+	        }
+	}
+	else{
+	        ind := [1,2];
+	        demands := [[104,104,104],[0,100,104]];
+	        data_y := [[1,1,0],[0,4,2]];
+	        sigma := 1/gamma(0.001,1000);
+	        alpha := [gauss(0,sigma),gauss(0,sigma)];
+	        b := gauss(0, 10^6);
+	        mu := gauss(0, 10^6);
+	        for j in [0..2){//jth plant
+	                for t in [0..3){
+		                p_i := exp(mu + alpha[ind[j]]) / (1 + exp(mu + alpha[ind[j]]));
+		        	observe(binomial(demands[j][t],p_i) == data_y[j][t]);
+			}
+	        }
+		
+	}	
+        return model_selector;
+}

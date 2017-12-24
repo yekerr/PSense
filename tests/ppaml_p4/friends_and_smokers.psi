@@ -1,0 +1,23 @@
+def main(){
+	//All the people have a prior probability of smoking of 0.2 
+	node_1 := bernoulli(0.2);
+	node_2 := bernoulli(0.2);
+	node_3 := bernoulli(0.2);
+	node_4 := bernoulli(0.2);
+	node_5 := bernoulli(0.2);
+	node_6 := bernoulli(0.2);
+	node_7 := bernoulli(0.2);
+	node_8 := bernoulli(0.2);
+	node_9 := bernoulli(0.2);
+	node_10 := bernoulli(0.2);
+	//3 times as likely that two friends have the same smoking habits
+	observe((node_3==node_6)==bernoulli(0.75));
+	observe((node_3==node_7)==bernoulli(0.75));
+	observe((node_3==node_8)==bernoulli(0.75));
+	observe((node_4==node_6)==bernoulli(0.75));
+	observe((node_2==node_4)==bernoulli(0.75));
+	observe((node_1==node_10)==bernoulli(0.75));
+
+	//observed smoking status
+	return(node_1 == 1);
+}

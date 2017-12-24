@@ -1,0 +1,13 @@
+var BcondA = function(Aval) {
+  return Infer({method: 'enumerate'}, function() {
+    var C = flip()
+    var B = C ? flip(.5) : flip(.9)
+    var A = C ? flip(.1) : flip(.4)
+    condition(C)
+    condition(A == Aval)
+    return {B: B}
+  })
+}
+
+viz(BcondA(true))
+viz(BcondA(false))

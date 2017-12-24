@@ -1,0 +1,10 @@
+var markov = function(prevObs, n) {
+  if(n == 0) {
+    return [];
+  } else {
+    var nextObs = prevObs ? flip(0.9) : flip(0.1);
+    return [nextObs].concat(markov(nextObs, n - 1));
+  }
+};
+
+markov(true, 10)

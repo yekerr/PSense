@@ -1,0 +1,17 @@
+var observedData = ['h', 'h', 'h', 'h', 'h']
+var fairPrior = 0.999
+var makeCoin = function(weight) {
+  return function() {
+    return flip(weight) ? 'h' : 't'
+  }
+}
+
+var fairnessPosterior = Infer({method: 'enumerate'}, function() {
+  var fair = flip(fairPrior)
+  var coin = makeCoin(fair ? 0.5 : 0.95)
+  var obsFn = function(datum){condition(datum == coin())}
+  mapData({data: observedData}, obsFn)
+  return {fair: fair}
+})
+
+print(fairnessPosterior)

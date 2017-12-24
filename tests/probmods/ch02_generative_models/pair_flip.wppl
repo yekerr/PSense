@@ -1,0 +1,2 @@
+var randomPair = function () { return [flip(), flip()]; };
+viz.hist(repeat(1000, randomPair), 'return values');

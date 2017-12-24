@@ -1,0 +1,4 @@
+var lungCancer = flip(0.01);
+var cold = flip(0.2);
+var cough = cold || lungCancer;
+cough;

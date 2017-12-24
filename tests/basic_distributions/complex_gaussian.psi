@@ -1,0 +1,5 @@
+def main(){
+	a := gauss(0,1);
+	observe(a>0);
+	return a; 
+}

@@ -1,0 +1,12 @@
+var options = {method: 'enumerate'}
+var model = function () {
+  var A = flip()
+  var B = flip()
+  var C = flip()
+  var D = A + B + C
+  //add the desired assumption:
+  condition(D >= 2)
+  return A
+};
+var dist = Infer(options, model)
+viz(dist)

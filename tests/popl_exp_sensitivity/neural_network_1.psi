@@ -1,0 +1,38 @@
+def act(x) {
+    if(x <= 0){
+        return 0;
+    }
+    else {
+        return x;
+    }
+}
+
+def main(){                                       
+  xs1 := [1, 1, 0, 0];
+  xs2 := [1, 0, 1, 0]; 
+  ys := [0, 1, 1, 0];
+  w11 := 1;
+  w22 := 1;
+  w13 := 1;
+  w23 := 1;
+  b1 := 1;
+  b2 := 1;
+  b3 := 1;
+  a := 0.01;
+  for t in [0..2) {                                
+    i := t; 
+    x1 := xs1[i];
+    x2 := xs2[i];                             
+    y := ys[i];
+    o1 := act(w11*x1+b1);
+    o2 := act(w22*x2+b2);
+    o3 := act(w13*o1 + w23*o2 + b3);
+    loss := y - o3;
+    if(o3 > 0){
+        b3 = b3 - a*loss*(-1);
+        w13 = w13 - a*loss*(-o1);
+        w23 = w23 - a*loss*(-o2);
+    }
+  }
+  return act(w11);
+}

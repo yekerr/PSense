@@ -1,0 +1,16 @@
+def vendingMachine(action){
+	if(action == 0) {return bernoulli(0.9) }
+	else{return bernoulli(0.5);} 
+}
+
+def chooseAction(goal){
+	action := bernoulli(0.5);
+	observe (goal == vendingMachine(action));
+	return action;
+}
+def main(){
+	goal := bernoulli(0.5);
+	actionDist := chooseAction(goal);
+	observe (actionDist == 1);
+	return goal;
+}

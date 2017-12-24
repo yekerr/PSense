@@ -1,0 +1,30 @@
+// observed data
+var k = 1 // number of people who support candidate A
+var n = 20  // number of people asked
+
+var model = function() {
+
+   // true population proportion who support candidate A
+   var p = uniform(0, 1);
+
+   // Observed k people support "A"
+   // Assuming each person's response is independent of each other
+   observe(Binomial({p : p, n: n}), k);
+
+   // predict what the next n will say
+   var posteriorPredictive = binomial(p, n);
+
+   // recreate model structure, without observe
+   var prior_p = uniform(0, 1);
+   var priorPredictive = binomial(prior_p, n);
+
+   return {
+       prior: prior_p, priorPredictive : priorPredictive,
+       posterior : p, posteriorPredictive : posteriorPredictive
+    };
+}
+
+var opts = {method: "rejection", samples: 2000};
+var posterior = Infer(opts, model);
+
+viz.marginals(posterior)

@@ -1,0 +1,9 @@
+def function(x){
+        if(bernoulli(0.5)){return x;}
+        else{return x+x;}
+}
+
+def main(){
+        return function(3); // expected: 1/2·δ[-r₁+3]+1/2·δ[-r₁+6]
+}
+

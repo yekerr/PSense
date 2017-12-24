@@ -1,0 +1,21 @@
+dat markov{
+        prevObs: R;
+        def markov(prevObs){
+                this.prevObs = prevObs;
+        }
+        def nextObs(){
+                if(prevObs){
+                        prevObs = bernoulli(0.9);
+                        return prevObs;
+                }
+                else{
+                        prevObs = bernoulli(0.1);
+                        return prevObs;
+                }
+        }
+}
+
+def main(){
+        markov1 := markov(1);
+        return (markov1.nextObs(), markov1.nextObs(), markov1.nextObs(), markov1.nextObs()); //expected: ((1/10000·δ[-r₄+1]+9/10000·δ[r₄])·δ[r₃]+(81/10000·δ[-r₄+1]+9/10000·δ[r₄])·δ[-r₃+1])·δ[-r₂+1]·δ[r₁]+((6561/10000·δ[-r₄+1]+729/10000·δ[r₄])·δ[-r₃+1]+(729/10000·δ[r₄]+81/10000·δ[-r₄+1])·δ[r₃])·δ[-r₁+1]·δ[-r₂+1]+((729/10000·δ[r₄]+81/10000·δ[-r₄+1])·δ[r₃]+(81/10000·δ[-r₄+1]+9/10000·δ[r₄])·δ[-r₃+1])·δ[-r₁+1]·δ[r₂]+((729/10000·δ[r₄]+81/10000·δ[-r₄+1])·δ[r₃]+(81/10000·δ[-r₄+1]+9/10000·δ[r₄])·δ[-r₃+1])·δ[r₁]·δ[r₂]
+}

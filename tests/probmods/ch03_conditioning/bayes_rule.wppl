@@ -1,0 +1,13 @@
+var observedData = true;
+var prior = function () { flip() }
+var likelihood = function (h) { h ? flip(0.9) : flip(0.1) }
+
+var posterior = Infer({method: "enumerate"},
+  function () {
+    var hypothesis = prior()
+    var data = likelihood(hypothesis)
+    condition(data == observedData)
+    return {hypothesis: hypothesis}
+})
+
+viz(posterior)

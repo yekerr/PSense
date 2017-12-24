@@ -1,0 +1,17 @@
+var examPosterior = Infer({method: 'enumerate'}, function() {
+  var examFair = mem(function(exam){return flip(0.8)})
+  var doesHomework = mem(function(student){return flip(0.8)})
+
+  var pass = function(student, exam) {
+    return flip(examFair(exam) ?
+                (doesHomework(student) ? 0.9 : 0.4) :
+                (doesHomework(student) ? 0.6 : 0.2))
+  };
+
+  condition(!pass('bill', 'exam1'))
+
+  return {doesHomework: doesHomework('bill'), examFair: examFair('exam1')}
+})
+
+viz.marginals(examPosterior)
+viz(examPosterior)

@@ -1,0 +1,27 @@
+var observedData = [{x: 0.40, y: 0.70}, {x: 0.50, y: 0.40}, {x: 0.46, y: 0.63}, {x: 0.43, y: 0.51}]
+
+var post = Infer(
+  {method: 'MCMC', samples: 150, lag: 100, burn: 100},
+  function () {
+    var x1 = uniform(0, 1), x2 = uniform(0, 1)
+    var y1 = uniform(0, 1), y2 = uniform(0, 1)
+    mapData({data: observedData}, function(example) {
+      observe(Uniform({a: x1, b: x2}), example.x)
+      observe(Uniform({a: y1, b: y2}), example.y)
+    })
+    return {x1: x1, x2: x2, y1: y1, y2: y2}
+  }
+)
+
+var img = Draw(500, 500, true);
+
+//  draw rectangles
+map(function(r) {
+  var r = r.value
+  img.rectangle(r.x1 * 500, r.y1 * 500, r.x2 * 500, r.y2 * 500, '#cccccc', '#aaaaaa', 0.01)
+}, post.samples)
+
+//  draw data points
+map(function(obs) {
+  img.circle(obs.x * 500, obs.y * 500, 5, 'black', 'black')
+}, observedData);
