@@ -273,7 +273,7 @@ def run_file(file, output_file, explict_eps, psi_timeout, math_timeout, verbose)
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
         with open(math_files[i], 'w') as f:
-            base_file = os.path.join(os.getcwd(), 'mathematica', 'base_runall_support.m')
+            base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'mathematica', 'base_runall_support.m')
             f.write('Get[\"' + base_file + '\"]\n')
             f.write(psi_out + '\n')
             f.write(psi_pdf_out + '\n')
