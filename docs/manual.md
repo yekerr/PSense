@@ -8,10 +8,11 @@ You can use the following options for PSense.
 | ---------- | -------------- | -------------------------------------- |
 | `-f`       | Required -f/-r | the PSI program to analyze sensitivity |
 | `-r`       | Required -f/-r | the directory containing PSI programs  |
-| `-verbose` | Optional       | display all hiden information          |
+| `-o`       | Optional       | store results to a specified file      |
+| `-e`       | Optional       | use user-provided numerical interference for sensitivity analysis       |
 | `-tp`      | Optional       | set a time limit for PSI               |
 | `-tm`      | Optional       | set a time limit for Mathematica       |
-| `-o`       | Optional       | store results to a specified file      |
+| `-verbose` | Optional       | display all hiden information          |
 | `-h`       | Optional       | display the help informaiton           |
 
 
