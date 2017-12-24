@@ -31,7 +31,7 @@ def rename_func(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param):
+def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps):
     file = '\"' + file + '\"'
     var_minmax = '{'
     condition = ''
@@ -48,10 +48,11 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
         eps_range = '(' + str(-eps_param) + '<=eps<=' + str(eps_param) + ')'
     except ValueError:
          eps_range = '(-0.1<=eps<=0.1)'
-    if f_exp_name and f_exp_eps_name:
-        exp = ','.join([f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
-    else:
-        exp = ','.join([f_name, f_pdf_name, f_eps_name, 'Null', 'Null', var_minmax, eps_range, condition, file])
+    if not f_exp_name or not f_exp_eps_name:
+        f_exp_name = "Null"
+        f_exp_eps_name = "Null"
+    flag_eps = "True" if explict_eps else "False"
+    exp = ','.join([f_name, f_pdf_name, f_eps_name, flag_eps, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -71,7 +72,7 @@ def generate_psi_expectation(psi_file):
         code_exp = parse_psi.sub(replace, code)
     return code_exp if supported else None
     
-def generate_psi_epsilon(psi_file):
+def generate_psi_epsilon(psi_file, explict_eps):
     distribution_1p = {}
     distribution_1p['flip'] = r'(flip\((?P<flip>.+?)\))'
     distribution_1p['bernoulli'] = r'(bernoulli\((?P<bernoulli>.+?)\))'
@@ -108,7 +109,14 @@ def generate_psi_epsilon(psi_file):
         def check_eps():
             nonlocal count
             count += 1
-            return '+?eps' if count == nth else ''
+            if count == nth:
+                if explict_eps:
+                    rt =  "+"+explict_eps
+                else:
+                    rt = "+?eps"
+            else:
+                rt = ""
+            return rt
         def replace_counter(match):
             for dist_name_1p in distribution_1p.keys():
                 if match.group(dist_name_1p):
@@ -206,11 +214,10 @@ def rename_psi_out(exp, extend_name):
     newname = parts[0].replace('[', extend_name + '[')
     return newname + ':=' + parts[-1]
 
-def run_file(file, output_file, psi_timeout, math_timeout, verbose):
+def run_file(file, output_file, explict_eps, psi_timeout, math_timeout, verbose):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
-
 
     psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose)
     if not check_psi_out(psi_file, output_file, psi_out):
@@ -224,7 +231,7 @@ def run_file(file, output_file, psi_timeout, math_timeout, verbose):
     psi_pdf_out = rename_psi_out(psi_pdf_out, 'PDF')
     psi_pdf_func_name = rename_func(psi_pdf_out.split(':=')[0].strip())
 
-    codes_eps, code_eps_params = generate_psi_epsilon(psi_file)
+    codes_eps, code_eps_params = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_eps', 'psi', len(codes_eps))
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, '_math', 'm', len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
@@ -242,7 +249,7 @@ def run_file(file, output_file, psi_timeout, math_timeout, verbose):
         psi_exp_out = rename_psi_out(psi_exp_out, 'Exp')
         psi_exp_func_name = rename_func(psi_exp_out.split(':=')[0].strip())
 
-        codes_exp_eps, _ = generate_psi_epsilon(psi_exp_file)
+        codes_exp_eps, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, '_exp_eps', 'psi', len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
     elif output_file:
@@ -274,9 +281,9 @@ def run_file(file, output_file, psi_timeout, math_timeout, verbose):
             if code_exp:
                 f.write(psi_exp_out + '\n')
                 f.write(psi_exp_eps_out + '\n')
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i], explict_eps)
             else:
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i])
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps)
             f.write(math_run + '\n')
         math_out = run_math(math_files[i], math_timeout)
         if output_file:
@@ -296,10 +303,11 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', help='PSI file')
     group.add_argument('-r', help='Directory containing PSI files')
-    parser.add_argument('-verbose', action='store_true', help='Print all outputs of PSI')
+    parser.add_argument('-o', nargs='?', help='Optional output file')
+    parser.add_argument('-e', nargs='?', help='Explicit numerical interfrance in all prior distribution')
     parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
     parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
-    parser.add_argument('-o', nargs='?', help='Optional output file')
+    parser.add_argument('-verbose', action='store_true', help='Print all outputs of PSI')
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
         print('PSI file doesn\'t exist')
@@ -313,8 +321,14 @@ def main():
     if argv.tp and not argv.tp.isdigit():
         print('Timeout parameter is invalid')
         return 0
-    
+    if argv.e:
+        try:
+            float(argv.e)
+        except:
+            print('Explicit numerical interfrance is invalid')
+            return 0
     output_file = argv.o
+    explict_eps = argv.e
     math_timeout = argv.tm
     psi_timeout = argv.tp
     verbose = argv.verbose
@@ -324,7 +338,7 @@ def main():
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file, psi_timeout, math_timeout, verbose)
+        run_file(argv.f, output_file, explict_eps, psi_timeout, math_timeout, verbose)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -335,7 +349,7 @@ def main():
                         f.write('\n' + file + ':\n')
                 else:
                     print('\n' + file + ':')
-                run_file(file, output_file, psi_timeout, math_timeout, verbose)
+                run_file(file, output_file, explict_eps, psi_timeout, math_timeout, verbose)
 
 if __name__ == "__main__":
     main()
