@@ -81,6 +81,8 @@ pedist[p_,q_,cons_,vars_] := Module[
 	Print["edistanceMax"];
 	(*Print[FindMaximum[{edistanceres,cons},vars]];*)
 	Print[Maximize[{edistanceres,cons},vars]];
+    Print["Is Linear?"];
+    Print[islinear2[edistanceres]];
 	Print[""]
 ]
 
@@ -94,6 +96,9 @@ pks[p_,q_,cons_,vars_] := Module[
 	(*Print["ksmax(distancemax)"];
 	Print[distancemaxres];
 	Print[distancemax2res];*)
+    Print["Is Linear?"];
+    disresr2[r2_] = (disres /. r1->r2);
+	Print[islinear2[disresr2[r2]]];
 	Print[""];
 	disres
 ]
@@ -105,6 +110,8 @@ ptvdsingle[p_,q_,cons_,vars_,varscons_] := Module[
 	Print["tvdMax"];
 	(*Print[FindMaximum[{tvdres,cons},vars]];*)
 	Print[Maximize[{tvdres,cons},vars]];
+    Print["Is Linear?"];
+    Print[islinear2[tvdres]];
 	Print[""]
 ]
 ptvd[p_,q_,cons_,vars_,varsminmax_] := Module[
@@ -115,6 +122,8 @@ ptvd[p_,q_,cons_,vars_,varsminmax_] := Module[
 	Print["tvdMax"];
 	(*Print[FindMaximum[{tvdres,cons},vars]];*)
 	Print[Maximize[{tvdres,cons},vars]];
+    Print["Is Linear?"];
+    Print[islinear2[tvdres]];
 	Print[""]
 ]
 pkl[p_,q_,cons_,vars_,varsminmax_] := Module[
@@ -125,6 +134,8 @@ pkl[p_,q_,cons_,vars_,varsminmax_] := Module[
 	Print["klMax"];
 	(*Print[FindMaximum[{klres,cons},vars]];*)
 	Print[Maximize[{klres,cons},vars]];
+    Print["Is Linear?"];
+    Print[islinear2[klres]];
 	Print[""]
 ]
 pklsingle[p_,q_,cons_,vars_,varscons_] := Module[
@@ -135,12 +146,14 @@ pklsingle[p_,q_,cons_,vars_,varscons_] := Module[
 	Print["klMax"];
 	(*Print[FindMaximum[{klres,cons},vars]];*)
 	Print[Maximize[{klres,cons},vars]];
+    Print["Is Linear?"];
+    Print[islinear2[klres]];
 	Print[""]
 ]
 islinear2[p_] := Module[
 		{islinearlist := {}},
 		Do[AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],{i,-5,5}];
-		Print[islinearlist];
+        (*Print[islinearlist];*)
 		NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
   ]
 		
