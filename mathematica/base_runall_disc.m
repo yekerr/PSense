@@ -36,7 +36,7 @@ inrunall[flageps_,p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<
 	WriteString[$stream,","];*)
 	single = (Length[vars]==1);
     If[!flageps,vars=Prepend[vars,eps]];
-	If[single, runsingle[flageps,p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[flageps,p,np,(epscons&&varscons),vars,varsminmax]]
+	If[single, runsingle[flageps,p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[flageps,p,np,epscons,vars,varsminmax]]
     (*Close[$stream]*)
 	Print[""]
 ]
@@ -117,7 +117,7 @@ ptvdsingle[flageps_,p_,q_,cons_,vars_,varscons_] := Module[
 	Print["TVD"];
 	Print[tvdres];
     If[!flageps,
-	    Print["tvdMax"];
+	    Print["TVD Max"];
 	    (*Print[FindMaximum[{tvdres,cons},vars]];*)
 	    Print[Maximize[{tvdres,cons},vars]];
         Print["Is Linear?"];
@@ -127,39 +127,40 @@ ptvdsingle[flageps_,p_,q_,cons_,vars_,varscons_] := Module[
 ptvd[flageps_,p_,q_,cons_,vars_,varsminmax_] := Module[
 	{tvdres := tvd[p,q,cons,varsminmax]
 	},
-    Print[cons];
-	Print["tvd"];
+	Print["TVD"];
 	Print[tvdres];
     If[!flageps,
-	    Print["tvdMax"];
+	    Print["TVD Max"];
 	    (*Print[FindMaximum[{tvdres,cons},vars]];*)
 	    Print[Maximize[{tvdres,cons},vars]];
         Print["Is Linear?"];
         Print[islinear2[tvdres]]];
 	Print[""]
 ]
-pkl[p_,q_,cons_,vars_,varsminmax_] := Module[
+pkl[flageps_,p_,q_,cons_,vars_,varsminmax_] := Module[
 	{klres := kl[p,q,cons,varsminmax]
 	},
-	Print["kl"];
+	Print["KL Divergence"];
 	Print[klres];
-	Print["klMax"];
-	(*Print[FindMaximum[{klres,cons},vars]];*)
-	Print[Maximize[{klres,cons},vars]];
-    Print["Is Linear?"];
-    Print[islinear2[klres]];
+    If[!flageps,
+	    Print["KL Max"];
+	    (*Print[FindMaximum[{klres,cons},vars]];*)
+	    Print[Maximize[{klres,cons},vars]];
+        Print["Is Linear?"];
+        Print[islinear2[klres]]];
 	Print[""]
 ]
-pklsingle[p_,q_,cons_,vars_,varscons_] := Module[
+pklsingle[flageps_,p_,q_,cons_,vars_,varscons_] := Module[
 	{klres := klsingle[p,q,cons,varscons]
 	},
-	Print["kl"];
+	Print["KL Divergence"];
 	Print[klres];
-	Print["klMax"];
-	(*Print[FindMaximum[{klres,cons},vars]];*)
-	Print[Maximize[{klres,cons},vars]];
-    Print["Is Linear?"];
-    Print[islinear2[klres]];
+    If[!flageps,
+	    Print["KL Max"];
+	    (*Print[FindMaximum[{klres,cons},vars]];*)
+	    Print[Maximize[{klres,cons},vars]];
+        Print["Is Linear?"];
+        Print[islinear2[klres]]];
 	Print[""]
 ]
 islinear2[p_] := Module[
