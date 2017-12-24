@@ -30,17 +30,23 @@ cd PSense
 
 ## Configuring PSense
 
-Add the directory containing `MathematicaScript` to your system `PATH` with:
+Add `psense` and `MathematicaScript` to your System by running the following:
+
 ```{shell}
-./add_mathscript.sh
+cd PSense
+chmod +x build.sh
+./build.sh
 cd ..
 ```
 
-Add the directory containing `psi` with: 
+Add  `psi` to your System `PATH` by the following: 
+
 ```{shell}
 cd psi #if you named the directory containing psi differently, replace 'psi' with your path to psi
 export PATH=$PATH:`pwd`
 ```
+
+*NOTE: build.sh has been tested on Linux and Mac systems.
 
 ## Running PSense
 
