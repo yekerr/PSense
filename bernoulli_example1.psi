@@ -1,4 +1,0 @@
-def main(){
-        x := bernoulli(0.1);
-        return x;
-}
