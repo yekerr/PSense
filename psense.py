@@ -52,7 +52,7 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
         f_exp_name = "Null"
         f_exp_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
-    modules_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules')
+    modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules') + "\""
     exp = ','.join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
