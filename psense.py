@@ -52,7 +52,8 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
         f_exp_name = "Null"
         f_exp_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
-    exp = ','.join([f_name, f_pdf_name, f_eps_name, flag_eps, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
+    modules_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules')
+    exp = ','.join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -273,7 +274,7 @@ def run_file(file, output_file, explict_eps, psi_timeout, math_timeout, verbose)
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(':=')[0].strip())
         
         with open(math_files[i], 'w') as f:
-            base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'mathematica', 'base_runall_support.m')
+            base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules', 'base_runall_support.m')
             f.write('Get[\"' + base_file + '\"]\n')
             f.write(psi_out + '\n')
             f.write(psi_pdf_out + '\n')
