@@ -52,4 +52,4 @@ psense -f examples/coins.psi
 Detailed options can be found in the [Manual](manual.html).
 
 ***
-[Return to Homepage](https://yekerr.github.io/PSense/)
+[Return to Homepage](index.html)

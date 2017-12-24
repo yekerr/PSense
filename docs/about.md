@@ -5,7 +5,7 @@ Student at the Department of Computer Science
 University of Illinois at Urbana-Champaign  
 [zixinh2@illinois.edu](mailto:zixinh2@illinois.edu)
 
-[**Sasa Misailovic**](http://zhenbangw.me)   
+[**Zhenbang Wang**](http://zhenbangw.me)   
 Student at the Department of Computer Science  
 University of Illinois at Urbana-Champaign  
 [zw11@illinois.edu](mailto:zw11@illinois.edu)
@@ -16,4 +16,4 @@ University of Illinois at Urbana-Champaign
 [misailo@illinois.edu](mailto:misailo@illinois.edu)
 
 ***
-[Return to Homepage](https://yekerr.github.io/PSense/)
+[Return to Homepage](index.html)
