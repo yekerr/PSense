@@ -27,7 +27,6 @@ git clone https://github.com/yekerr/PSense.git
 cd PSense
 ```
 
-`psense.py` and  `mathematica/*.m` are essential parts of PSense.
 
 ## Configuring PSense
 
@@ -51,7 +50,6 @@ psense -f examples/coins.psi
 ```
 
 Detailed options can be found in the [Manual](manual.html).
-
 
 ***
 [Return to Homepage](https://yekerr.github.io/PSense/)
