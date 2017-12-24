@@ -1,0 +1,36 @@
+//  a0 +  a1*x +  a2*x^2 +  ...
+var makePoly = function(as) {
+  return function(x) {
+    return sum(mapIndexed(function(i,a) { return a * Math.pow(x, i) }, as))
+  }
+}
+
+var observedData = [{"x":-4,"y":69.76636938284166},{"x":-3,"y":36.63586217969598},{"x":-2,"y":19.95244368751754},{"x":-1,"y":4.819485497724985},{"x":0,"y":4.027631414787425},{"x":1,"y":3.755022418210824},{"x":2,"y":6.557548104903805},{"x":3,"y":23.922485493795072},{"x":4,"y":50.69924692420815}]
+
+var inferOptions = {method: 'optimize', samples: 1000, steps: 2000, optMethod: {adam: {stepSize: .01}}}
+// can also use MCMC, but takes longer to achieve stable results:
+// var inferOptions = {method: 'MCMC', samples: 400, lag: 200}
+
+var post = Infer(inferOptions,
+  function() {
+    var coeffs = repeat(4, function() {return gaussian(0,2)})
+    var order = discrete([0.25,0.25,0.25,0.25]) // uniformDraw([0,1,2,3])
+    var f = makePoly(coeffs.slice(0,order+ 1))
+
+    var obsFn = function(datum){
+      observe(Gaussian({mu: f(datum.x), sigma: 2}), datum.y)
+    }
+    mapData({data: observedData}, obsFn)
+
+    return {order: order,
+            coeff0: coeffs[0],
+            coeff1: coeffs[1],
+            coeff2: coeffs[2],
+            coeff3: coeffs[3]}
+  }
+)
+
+print("observed data:")
+viz.scatter(observedData)
+print("degree and coefficient marginals:")
+viz.marginals(post)

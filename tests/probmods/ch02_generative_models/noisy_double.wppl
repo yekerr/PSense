@@ -1,0 +1,2 @@
+var noisyDouble = function(x) { flip() ? x+x : x }
+noisyDouble(3)

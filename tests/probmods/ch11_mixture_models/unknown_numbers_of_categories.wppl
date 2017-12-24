@@ -1,0 +1,12 @@
+var observedData = [true, true, true, true, false, false, false, false]
+// var observedData = [true, true, true, true, true, true, true, true]
+
+var results = Infer({method: 'rejection', samples: 100}, function(){
+  var coins = flip() ? ['c1'] : ['c1', 'c2'];
+  var coinToWeight = mem(function(c) {return uniform(0,1)})
+  mapData({data: observedData},
+          function(d){observe(Bernoulli({p: coinToWeight(uniformDraw(coins))}),d)})
+  return {numCoins: coins.length}
+})
+
+viz(results)

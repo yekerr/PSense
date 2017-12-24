@@ -1,0 +1,22 @@
+//  fair coin, probability of H = 0.5
+// var observedData = ['h', 'h', 't', 'h', 't', 'h', 'h', 'h', 't', 'h']
+
+//  definitely unfair coin, probability of H near 1
+//  var observedData = repeat(20, function(){return 'h'})
+
+//  unfair coin, probability of H = 0.85
+var observedData = repeat(54, function(){return flip(.85) ? 'h' : 't'})
+
+var fairPrior = .999;
+var pseudoCounts = {a: 1, b: 1}
+
+var results = Infer({method: 'MCMC', samples: 10000}, function(){
+  var fair = flip(fairPrior);
+  var coinWeight = fair ? .5 : beta(pseudoCounts.a, pseudoCounts.b);
+  mapData({data: observedData}, function(d){observe(Bernoulli({p: coinWeight}), d==='h')})
+  return {prior: flip(fairPrior) ? .5 : beta(pseudoCounts.a, pseudoCounts.b),
+          fair : fair,
+          weight: coinWeight}
+})
+
+viz.marginals(results)

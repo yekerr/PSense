@@ -1,0 +1,19 @@
+def hypothesisToDist(hyp){//0 is A, 1 is B
+	if(hyp == 0){return categorical([0.375, 0.375, 0.125, 0.125]);}
+	else{return categorical([0.25, 0.25, 0.25, 0.25]);}
+}
+
+data := [0,1,0,1,2,3,1,1];// 0 is 'a', 1 is 'b', 2 is 'c', 3 is 'd'
+
+def post(){
+	hypothesis := 0;
+	if(!bernoulli(0.5)){hypothesis = 1;}
+	for i in [0..8){
+		observe(data[i] == hypothesisToDist(hypothesis));
+	}
+	return hypothesis;
+}
+
+def main(){
+	return post();
+}

@@ -1,0 +1,9 @@
+def main(){
+	node_1 := bernoulli(0.2);
+	node_2 := bernoulli(0.2);
+	node_3 := bernoulli(0.2);
+	observe((node_1 == node_3) == bernoulli(0.75));
+	observe((node_2 == node_3) == bernoulli(0.75));
+	observe(node_1==0);
+	return node_3;
+}

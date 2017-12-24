@@ -1,0 +1,27 @@
+//Error: recursive dependencies unsupported
+def main(){
+	blocks_array := [bernoulli(0.4),bernoulli(0.4)];
+	observe(machine(blocks_array, 0));
+	return blocks_array[0];
+}
+
+def machine(blocks: R[], start_index: R){
+	if(blocks.length == start_index){return bernoulli(0.05);}
+	else{ return bernoulli(power(blocks[start_index])||machine2(blocks, start_index + 1));}
+}
+
+def machine2(blocks: R[], start_index: R){
+	if(blocks.length == start_index){return bernoulli(0.05);}
+	else{ return bernoulli(power(blocks[start_index])||machine(blocks, start_index + 1));}
+}
+/*
+def machine3(blocks: R[], start_index: R){
+	if(blocks.length == start_index){return bernoulli(0.05);}
+	else{ return 0;}
+}*/
+
+
+def power(block){
+	if(block){return bernoulli(0.9);}
+	else{return bernoulli(0.05);}
+}

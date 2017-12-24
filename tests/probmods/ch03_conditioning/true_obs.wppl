@@ -1,0 +1,6 @@
+var model = function(){
+  var trueX = sample(Gaussian({mu: 0, sigma: 1}))
+  observe(Gaussian({mu: trueX, sigma: 0.1}), 0.2)
+  return trueX
+}
+viz(Infer({method: 'rejection', samples:1000, maxScore: 2}, model))

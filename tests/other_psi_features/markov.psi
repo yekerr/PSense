@@ -1,0 +1,21 @@
+dat markov{
+	prevObs: R;
+	def markov(prevObs){
+		this.prevObs = prevObs;
+	}
+	def nextObs(){
+		if(prevObs){
+			prevObs = bernoulli(0.9);
+			return prevObs;
+		}
+		else{
+			prevObs = bernoulli(0.1);
+			return prevObs;
+		}
+	}
+}
+
+def main(){
+	markov1 := markov(1);
+	return (markov1.nextObs(), markov1.nextObs(), markov1.nextObs());
+}

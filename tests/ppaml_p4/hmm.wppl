@@ -1,0 +1,41 @@
+var ones = function(n) {return Vector(repeat(n, function() {return 1}))};
+var states = [1, 2, 3, 4, 5];
+var obs = [1, 2, 3, 4, 5]
+
+var stateToObsModel = function(state) {
+  var obsps = [[0.6, 0.1, 0.1, 0.1, 0.1], [0.1, 0.6, 0.1, 0.1, 0.1], [0.1, 0.1, 0.6, 0.1, 0.1], [0.1, 0.1, 0.1, 0.6, 0.1], [0.1, 0.1, 0.1, 0.1, 0.6]]
+  return obsps[state - 1];
+}
+
+var observation = function(state) {
+  return categorical({ps: stateToObsModel(state), vs: obs})
+}
+
+var stateToTransitionModel = function(state) {
+  var transps = [[1/3, 1/3, 1/3, 0, 0], [0, 1/3, 1/3, 1/3, 0], [0, 0, 1/3, 1/3, 1/3], [1/3, 0, 0, 1/3, 1/3], [1/3, 1/3, 0, 0, 1/3]]
+  return transps[state - 1];
+}
+
+var transition = function(state) {
+  return categorical({ps: stateToTransitionModel(state), vs: states});
+}
+
+var sampleStates= function(lastState, n, sequence) {
+  if(n == 0){return []}
+  else{
+    var obsLastState = observation(lastState)
+    condition(obsLastState == sequence[sequence.length - n])
+    return ([obsLastState].concat(sampleStates(transition(lastState), n - 1, sequence)));
+  }
+}
+
+var lastStateIs = function(sequence) {
+  return Infer({method: 'MCMC', sample = 20000},
+    function () {
+      var sampleStateSequence = sampleStates(1, sequence.length, sequence)
+      //print(sampleStateSequence)
+      //condition(_.isEqual(sequence, sampleStateSequence));
+      return sampleStateSequence[sequence.length - 1]
+  })
+}
+viz(lastStateIs([3,2,3,5,5,1,2,5,2,4,4,1,2,2,1,4,2,3,5,1]))

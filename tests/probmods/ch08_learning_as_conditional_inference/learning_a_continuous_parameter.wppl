@@ -1,0 +1,18 @@
+///fold:
+var makeCoin = function(weight) {
+  return function() {
+    return flip(weight) ? 'h' : 't';
+  }
+};
+///
+var observedData = ['h', 'h', 'h', 'h', 'h']
+
+var weightPosterior = Infer({method: 'rejection', samples: 1000}, function() {
+  var coinWeight = sample(Uniform({a: 0, b: 1}))
+  var coin = makeCoin(coinWeight)
+  var obsFn = function(datum){condition(datum == coin())}
+  mapData({data: observedData}, obsFn)
+  return coinWeight
+})
+
+viz(weightPosterior)

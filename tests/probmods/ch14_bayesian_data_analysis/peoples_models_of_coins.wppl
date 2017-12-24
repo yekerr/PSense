@@ -1,0 +1,15 @@
+var observerModel = function(){
+  var p = uniform(0, 1)
+  var coinSpinner = Binomial({n:20, p:p})
+  observe(coinSpinner, 15)
+  return p
+  /*return {
+    nextOutcome: bernoulli(p),
+    nextTenOutcomes: binomial(p, 10)
+  }*/
+}
+
+var opts = {method: "rejection", samples: 5000}
+var posteriorBeliefs = Infer(opts, observerModel)
+print("Expected value = " +   expectation(posteriorBeliefs))
+viz.density(posteriorBeliefs, {bounds: [0,1]})

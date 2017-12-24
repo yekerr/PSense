@@ -1,0 +1,8 @@
+def main(){ 
+	A:=bernoulli(0.5); 
+	B:=bernoulli(0.5); 
+	C:=bernoulli(0.5); 
+	D:=A+B+C; 
+	observe(D>=2); 
+	return A; // expected: (1/2·[-A+1≤0]+1/4·[-A+2≤0]+1/4·[-A≤0])·(δ[-A+1]+δ[A])
+} 

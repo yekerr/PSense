@@ -1,0 +1,29 @@
+def pickStick(){
+	J := 0;
+	break := 0;
+	sticks := ([]:R[]);
+	for i in [0..4){
+		sticks ~= makeSticks(1);
+		if(bernoulli(sticks[i])){break = 1;}
+		if(!break){J += 1;}
+	}
+	return J+1;
+}
+
+
+def makeSticks(alpha){
+	return [beta(1, alpha)];
+}
+
+def augmentedProc(){
+	return gauss(0,1);
+}
+
+def DPthunk(){
+	DP := pickStick();
+	return (DP,sample(Marginal(augmentedProc())));
+}
+def main(){
+	return DPthunk()[1];
+}
+

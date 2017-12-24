@@ -1,0 +1,26 @@
+// skipped
+def observerModel(){
+	p := uniform(0,1);
+	coinSpinner := binomial(20,p);
+	observe(coinSpinner == 15);
+	return binomial(10,p);
+}
+
+def skepticalModel(){
+	sameAsFlipping := bernoulli(0.5);
+	p := 0.5;
+	if(!sameAsFlipping){p = uniform(0,1);}
+	coinSpinner := binomial(10,p);
+	observe(coinSpinner == 15);
+	return binomial(10,p);
+}
+
+experimentalData := [9,8,7,5,4,5,6,7,9,4,8,7,8,3,9,6,5,7,8,5];
+
+def main(){
+	theBetterModel_is_observerModel := bernoulli(0.5);
+	result_by_model := observerModel();
+	if(!theBetterModel_is_observerModel){result_by_model = skepticalModel();}
+	observe(result_by_model == experimentalData[0]);
+	return theBetterModel_is_observerModel; 
+}

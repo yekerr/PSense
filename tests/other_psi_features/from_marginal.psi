@@ -1,0 +1,14 @@
+//
+def main(){
+	b := bernoulli(0.5);
+	observe(b == sample(Marginal(bernoulli_add())));
+	return b;
+
+}
+
+def bernoulli_add(){
+	a := bernoulli(0.7);
+	c := bernoulli(0.7);
+	observe(a + c >= 1);
+	return c;
+}

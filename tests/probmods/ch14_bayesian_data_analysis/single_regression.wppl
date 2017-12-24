@@ -1,0 +1,30 @@
+//  alternative proposal distribution for metropolis-hastings algorithm
+var uniformKernel = function(prevVal) {
+  return Uniform({a: prevVal - 0.2, b: prevVal +  0.2});
+};
+
+var singleRegression = function(){
+  //  parameters of a simple linear regression
+  var b0 = sample(Uniform({a: -1, b: 1}), {driftKernel: uniformKernel})
+  var b1 = sample(Uniform({a: -1, b: 1}), {driftKernel: uniformKernel})
+  var sigma = sample(Uniform({a: 0, b: 2}), {driftKernel: uniformKernel})
+
+  map(function(d){
+
+    //  linear regression formula
+    var predicted_y = b0 +  d.nWins*b1
+
+    observe(Gaussian({mu: predicted_y, sigma: sigma}), d.ratingZ)
+
+  }, towData)
+
+  return {b0: b0, b1: b1, sigma: sigma}
+}
+
+var nSamples = 2500
+var opts = { method: "MCMC", callbacks: [editor.MCMCProgress()],
+             samples: nSamples, burn: nSamples/ 2 }
+
+var posterior = Infer(opts, singleRegression)
+
+editor.put("singleRegression", posterior)

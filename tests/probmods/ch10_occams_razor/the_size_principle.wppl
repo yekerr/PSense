@@ -1,0 +1,14 @@
+var hypothesisToDist = function(hyp) {
+  return (hyp == 'Big' ?
+          Categorical({vs: ['a', 'b', 'c', 'd', 'e', 'f'], ps: [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]}) :
+          Categorical({vs: ['a', 'b', 'c'], ps: [1/3, 1/3, 1/3]}));
+}
+
+var data = ['a']
+
+var post = Infer({method: 'enumerate'}, function(){
+  var hypothesis = flip() ? 'Big' : 'Small'
+  mapData({data: data}, function(d){observe(hypothesisToDist(hypothesis),d)})
+  return hypothesis
+})
+viz(post)

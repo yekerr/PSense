@@ -1,0 +1,16 @@
+// skipped
+
+k := 1;
+n := 20;
+def model(){
+	p := uniform(0,1);
+	observe(binomial(n, p) == k);
+	posteriorPredictive := binomial(n,p);
+	prior_p := uniform(0,1);
+	priorPredictive := binomial(n,prior_p);
+	return prior_p;
+	return p;
+}
+def main(){
+	return model();
+}

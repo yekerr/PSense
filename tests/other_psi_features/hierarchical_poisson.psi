@@ -1,0 +1,18 @@
+def main(){
+	plant1_y := [3,8,2,2,1];
+	plant1_T := [6250.0,7017.5,5536.7,7855.7,6156.6];
+	plant2_y := [12,9,5,2,2];
+	plant2_T := [7643.3,6383.0,6370.0,7715.4,6032.0];
+        sigma := 1/gamma(0.001,1000);
+        w1 := gauss(0,sigma);
+        w2 := gauss(0,sigma);
+        b0 := gauss(0, 10^6);
+        b1 := gauss(0, 10^6);
+        for t in [0..5){
+        	lambda1 := exp(b0 + b1 * (t + 1) + w1);
+                observe(poisson(lambda1 * plant1_T[t]/1000) == plant1_y[t]);
+        	lambda2 := exp(b0 + b1 * (t + 1) + w2);
+                observe(poisson(lambda2 * plant2_T[t]/1000) == plant2_y[t]);
+        }
+        return exp(b0 + b1 * 1 + w1);
+}

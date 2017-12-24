@@ -1,0 +1,26 @@
+//paratmeters
+x := [1.1,2.3];
+y := [0.2,0.8];
+time := [1,2];
+mu_x := 1.5;
+mu_y := 0.6;
+mu_sx := 2.0;
+mu_sy := 2.0;
+sigma_sq := 2.0;
+Thresh := 0.6;
+def main(){
+	x_other := gauss(mu_x, sigma_sq);
+	y_other := gauss(mu_y, sigma_sq);
+	sx_other := gauss(mu_sx, sigma_sq);
+	sy_other := gauss(mu_sy, sigma_sq);
+	isSafe := 1;
+	for i in [0..2){
+		Xdistance := x[i] - (x_other + time[i]*sx_other);
+		Ydistance := y[i] - (y_other + time[i]*sy_other);
+		SafeInX := (Xdistance > Thresh) || (Xdistance < -Thresh);
+		SafeInY := (Ydistance > Thresh) || (Ydistance < -Thresh);
+		isSafeNow := (SafeInX || SafeInY);
+		isSafe = isSafe && isSafeNow;
+	}
+	return isSafe;
+}

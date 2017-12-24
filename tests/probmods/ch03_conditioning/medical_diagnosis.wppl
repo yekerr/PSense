@@ -1,0 +1,32 @@
+var dist = Infer({method: 'enumerate'},
+  function () {
+    var worksInHospital = flip(0.01)
+    var smokes = flip(0.2)
+    var lungCancer = flip(0.01) || (smokes && flip(0.02))
+    var TB = flip(0.005) || (worksInHospital && flip(0.01))
+    var cold = flip(0.2) || (worksInHospital && flip(0.25))
+    var stomachFlu = flip(0.1)
+    var other = flip(0.1)
+    var cough = ((cold && flip(0.5)) ||
+                 (lungCancer && flip(0.3)) ||
+                 (TB && flip(0.7)) ||
+                 (other && flip(0.01)))
+
+    var fever = ((cold && flip(0.3)) ||
+                 (stomachFlu && flip(0.5)) ||
+                 (TB && flip(0.2)) ||
+                 (other && flip(0.01)))
+
+    var chestPain = ((lungCancer && flip(0.4)) ||
+                     (TB && flip(0.5)) ||
+                     (other && flip(0.01)))
+
+    var shortnessOfBreath = ((lungCancer && flip(0.4)) ||
+                             (TB && flip(0.5)) ||
+                             (other && flip(0.01)))
+
+    condition(cough && chestPain && shortnessOfBreath)
+    return {lungCancer: lungCancer, TB: TB}
+})
+
+viz(dist)

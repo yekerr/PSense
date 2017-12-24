@@ -1,0 +1,13 @@
+var urnSeq = function(urn, samples) {
+  if(samples == 0) {
+    return []
+  } else {
+    var ball = uniformDraw(urn)
+    return [ball].concat(urnSeq(urn.concat([ball]), samples-1))
+  }
+}
+
+var urnDist = Infer({method: 'enumerate'},
+                    function(){return urnSeq(['b', 'w'],3).join("")})
+
+viz(urnDist)
