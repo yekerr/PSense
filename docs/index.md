@@ -3,7 +3,7 @@
 
 - [Getting Started](started.html)
 - [Manual](manual.html)
-- [Tutorial](tutorial.html)
+- [Tutorials](tutorial.html)
 - [Publications](publications.html)
 - [About us](about.html)
 

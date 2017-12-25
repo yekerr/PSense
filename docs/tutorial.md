@@ -5,7 +5,7 @@
 
     This tutorial introduces the basic features of PSense.
 
-* [Tutorial 2: Unknown Vender Machine](tutorial_continuous.html)
+* [Tutorial 2: Unknown Vending Machine](tutorial_continuous.html)
 
     This tutorial introduces how to analyze a cognition model that outputs a continuous distribution.
 
