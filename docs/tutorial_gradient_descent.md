@@ -1,4 +1,4 @@
-## Tutorial 4: Modeling Conditional Distribution
+## Tutorial 3: Modeling Conditional Distribution
 
 ### Build Models in PSI
 
