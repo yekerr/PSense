@@ -99,7 +99,7 @@ We can see the maximum value of the Expectation Distance is quite small. This is
 <img src="image/popl_gradient_descent_iterations.png" alt="Drawing" style="width: 400px;"/>
 
 
-The more iterations the gredient descent algorithm take, the less likely that `eps` in the prior parameter affects the output. 
+The more iterations the gredient descent algorithm takes, the less likely that `eps` in the prior parameter affects the output. 
 
 * Kolmogorov–Smirnov Statistic
     
@@ -115,7 +115,7 @@ False
 
 * Total Variation Distance
     
-It is defined as $D_{TVD}=\frac{1}{2}\int_{r\in support}|p_{eps}(r)-p(r)|$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
+$D_{TVD}=\frac{1}{2}\int_{r\in support}|p_{eps}(r)-p(r)|$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
     
 ```
 TVD
