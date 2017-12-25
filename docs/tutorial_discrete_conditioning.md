@@ -69,7 +69,7 @@ To automatically find the sensitivity of this probabilistic program, run the fol
 ```{shell}
 psense -f examples/conditioning.psi
 ```
-PSense will change each parameter and results for different metrics:
+PSense will change each parameter and get the results for different metrics:
 
 * Expectation Distance
     
@@ -78,8 +78,6 @@ $\mathbb{E}[p_{eps}(r)]$ and $\mathbb{E}[p(r)]$ are expectations of the output d
 ```
 Expectation Distance
 (3*Abs[eps])/(4*(1 + eps))
-Is Linear?
-False
 ```
 PSense finds the maximum value of the Expectation Distance with respect to the disturbance `eps` within $\pm 10\%$ of the original parameter: 
 ```
@@ -96,7 +94,7 @@ In this example the Expectation Distance is not linear so PSense outputs `False`
 
 * Kolmogorov–Smirnov Statistic
 
-    It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance |p_{eps}(r)-p(r)| and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
+    It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance $|p_{eps}(r)-p(r)|$ and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
 ```
 Distance
 (3*Abs[(eps*(-1 + Boole[r1 >= 1]))/(1 + eps)])/4
@@ -132,4 +130,4 @@ False
 ```
     
 ***
-[Return to Homepage](https://yekerr.github.io/PSense/) | [Return to Tutorials](tutorial.html)
+[Return to Homepage](index.html) | [Return to Tutorials](tutorial.html)
