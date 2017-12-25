@@ -1,3 +1,4 @@
+{% include head.html %}
 ## Tutorial 2: Unknown Vending Machine
 
 ### Build Models in PSI

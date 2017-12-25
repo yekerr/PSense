@@ -1,3 +1,4 @@
+{% include head.html %}
 ## Tutorial 1: Modeling Conditional Distribution
 
 ### Build Models in PSI
