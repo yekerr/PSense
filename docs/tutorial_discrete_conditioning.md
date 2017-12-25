@@ -94,7 +94,7 @@ In this example the Expectation Distance is not linear so PSense outputs `False`
 
 * Kolmogorov–Smirnov Statistic
 
-    It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance $|p_{eps}(r)-p(r)|$ and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
+    It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where p_{eps}(r) and p(r) are cumulative density functions, and $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance $|p_{eps}(r)-p(r)|$ and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
 ```
 Distance
 (3*Abs[(eps*(-1 + Boole[r1 >= 1]))/(1 + eps)])/4
