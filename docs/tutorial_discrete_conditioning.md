@@ -132,4 +132,4 @@ False
 ```
     
 ***
-[Return to Homepage](https://yekerr.github.io/PSense/) | [Return to Tutorials](https://yekerr.github.io/PSense/)
+[Return to Homepage](https://yekerr.github.io/PSense/) | [Return to Tutorials](tutorial.html)
