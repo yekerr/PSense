@@ -41,7 +41,7 @@ p[A_] := (1/2*Boole[-A+1<=0]+1/4*Boole[-A+2<=0]+1/4*Boole[-A<=0])*(DiracDelta[-A
 ```
 which is the probability density function of the posterior distribution of `A`.
 
-The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/bernoulli_example1.psi).
+The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/examples/conditioning.psi).
 
 
 
