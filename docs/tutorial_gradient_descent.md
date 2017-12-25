@@ -1,4 +1,4 @@
-## Tutorial 3: Modeling Conditional Distribution
+## Tutorial 3: Gradient Descent
 
 ### Build Models in PSI
 
