@@ -9,7 +9,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons
 	If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,newepscons=(-0.01<=eps<=0.01),newepscons=epscons]];
 	pReplace := pdf /. DiracDelta -> MyDiracDelta;
 	newvarscons := FunctionDomain[1/Boole[0 != pReplace], Map[First,varsminmax][[1]]];
-	continuous := TrueQ[newvarscons]||MatchQ[newvarscons, Inequality_];
+	continuous := TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
 	Print[""];
 	Print["Start Mathematica"];
 	Print[""];
