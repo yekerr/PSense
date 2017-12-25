@@ -115,7 +115,7 @@ False
 
 * Total Variation Distance
     
-$D_{TVD}=\frac{1}{2}\int_{r\in support}|p_{eps}(r)-p(r)|$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
+$D_{TVD}=\frac{1}{2}\int_{r\in support}\mid p_{eps}(r)-p(r)\mid$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
     
 ```
 TVD
