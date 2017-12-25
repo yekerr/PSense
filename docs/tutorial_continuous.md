@@ -80,15 +80,16 @@ This model is modified from one example in [Probabilistic Models of Cognition (2
 
 
 Notice that we suppose the probability that pressing the button giving bagels follows the distribution is given by `beta(1,1)`. There are two constant parameters `1` in the Beta distribution, changing which would give us different results.
-We want to analyze the sensitivity of this program if we change the parameters of the prior, so we model the change with `?eps`. For example, we can change the first parameter of `aEffects[0]`'s prior by:
+We want to analyze the sensitivity of this program if we change the parameters of the prior. Specifically, we model the change with `?eps`. For example, we can change the first parameter of `aEffects[0]`'s prior by:
 
 ```{d}
         aEffects := [beta(1+?eps,1), 0];
         ...
 ```
 
-Detailed definition of *Sensitivity* is in [Tutorial 1](tutorial_discrete_conditioning.html).
+The change in the prior distribution (when `?eps` = 0.1) is shown in the following figure. We want to know how does this change affects the output distribution.
 
+<img src="image/beta.jpeg" alt="Drawing" style="width: 500px;"/>
 
 PSense can automatically add `?eps` to each constant parameters and find the sensitivity of the probabilistic program. 
 Run the following in shell prompt:
