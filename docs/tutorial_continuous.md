@@ -73,7 +73,7 @@ p[r1_] := -6/7*Boole[-1+r1<=0]*Boole[-r1<=0]*r1+10/7*Boole[-1+r1<=0]*Boole[-r1<=
 ```
 which is the probability density function of the posterior of `bEffects[0]`. `r1` represents the value of `bEffects[0]`.
 
-The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/examples/conditioning.psi).
+The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/examples/unknown_vending_machine.psi).
 This model is modified from one example in [Probabilistic Models of Cognition (2nd Edition) Chapter 06](https://probmods.org/chapters/06-inference-about-inference.html). 
 
 ### Find Sensitivity with PSense
