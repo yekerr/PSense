@@ -1,4 +1,5 @@
 theme: jekyll-theme-cayman
+markdown: kramdown
 authors:
   Zhenbang:
     name: Zhenbang Wang
