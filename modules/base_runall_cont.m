@@ -20,12 +20,19 @@ kl[p_,q_,cons_,varsminmax_]:=NIntegrate[FullSimplify[entropy[p,q],cons],varsminm
 gtd[p_] := D[FullSimplify[ComplexExpand[p],eps>0],eps]
 ltd[p_] := D[FullSimplify[ComplexExpand[p],eps<0],eps]
 (*islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))*)
-islinear2[p_] := Module[
+islinear2ks[p_] := Module[
 		{islinearlist := {}},
-		Do[AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],{i,-5,5}];
-        (*Print[islinearlist];*)
+		Do[
+            AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];
+            AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],
+        {i,-5,5}
+        ];
 		NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
   ]
+islinear2[p_]:= Module[
+    {},
+    !MemberQ[DeleteDuplicates@Cases[D[FullSimplify[p,eps>0],eps],_Symbol,Infinity],Symbol["eps"]]
+]
 (*islinear2[p_] := Module[
 		{islinearlist := {}},
 		Do[AppendTo[islinearlist,D[FullSimplify[p[i],eps>0],eps]];AppendTo[islinearlist,D[FullSimplify[p[i],eps<0],eps]],{i,-5,5}];

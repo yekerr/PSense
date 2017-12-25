@@ -163,10 +163,14 @@ pklsingle[flageps_,p_,q_,cons_,vars_,varscons_] := Module[
         Print[islinear2[klres]]];
 	Print[""]
 ]
-islinear2[p_] := Module[
-		{islinearlist := {}},
-		Do[AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],{i,-5,5}];
-        (*Print[islinearlist];*)
-		NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
-  ]
-		
+islinear2[p_]:= Module[
+    {},
+    !MemberQ[DeleteDuplicates@Cases[D[FullSimplify[p,eps>0],eps],_Symbol,Infinity],Symbol["eps"]]
+]
+islinear2ks[p_] := Module[
+            {islinearlist := {}},
+        Do[AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps>0],eps],_Symbol,Infinity]];AppendTo[islinearlist,DeleteDuplicates@Cases[D[FullSimplify[p[i],eps<0],eps],_Symbol,Infinity]],{i,-5,5}];
+        Print[islinearlist];
+        NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
+]
+
