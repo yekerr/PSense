@@ -1,3 +1,4 @@
+{% include head.html %}
 ## Tutorial 3: Gradient Descent
 
 ### Build Models in PSI
