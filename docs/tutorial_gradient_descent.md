@@ -126,7 +126,7 @@ TVD Max
 {0., {eps -> 0.01}}
 ```
 
-Yes, after 8 iterations, the TVD approches 0. If we try only 4 iterations, we would a TVD not zero, but still small:
+Yes, after 8 iterations, the TVD approches 0. If we try only 4 iterations, we would get a TVD which is not zero, but still small:
 
 ```
 TVD

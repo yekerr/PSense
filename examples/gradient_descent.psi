@@ -11,5 +11,5 @@ def main(){
     w1 = w1 - a*2*(w1+w2*xi-yi);
     w2 = w2 - a*2*(xi*(w1+w2*xi-yi));
   }
-  return Expectation(w2); //should be close to 2
+  return w2;
 }
