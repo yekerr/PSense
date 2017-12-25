@@ -57,6 +57,7 @@ To make the model simpler, we only consider the prediction at a single value `xi
 p[w2_] := 59604644775390625000000/1832427479823270972979*Boole[-117376862070957979027021/59604644775390625000000+w2<=0]*Boole[-w2+57772217295567354027021/29802322387695312500000<=0]
 ```
 If we plot `p[w2_]` above, which is the probability density function of `w2`, we can see the value of `w2` approaches to 2:
+
 <img src="image/popl_gradient_descent_uniform.jpeg" alt="Drawing" style="width: 500px;"/>
 
 The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/examples/gradient_descent.psi).
@@ -96,7 +97,7 @@ True
 ```
 We can see the maximum value of the Expectation Distance is quite small. This is because after 8 iterations, the disturbance in the prior has little effects on the output distribution. We can try different iterations in PSense and plot the iterations against the maximum value of the Expectation Distance as:
 
-<img src="image/popl_gradient_descent_iterations.png" alt="Drawing" style="width: 400px;"/>
+<img src="image/popl_gradient_descent_iterations.png" alt="Drawing" align="center" style="width: 500px;"/>
 
 
 The more iterations the gredient descent algorithm takes, the less likely that `eps` in the prior parameter affects the output. 
