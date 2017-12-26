@@ -74,7 +74,7 @@ p[r1_] := -6/7*Boole[-1+r1<=0]*Boole[-r1<=0]*r1+10/7*Boole[-1+r1<=0]*Boole[-r1<=
 ```
 which is the probability density function of the posterior of `bEffects[0]`. `r1` represents the value of `bEffects[0]`.
 
-The code snippet can be found [here](https://github.com/yekerr/PSense/blob/master/examples/unknown_vending_machine.psi).
+The code snippet can be found [here](/PSense/blob/master/examples/unknown_vending_machine.psi).
 This model is modified from one example in [Probabilistic Models of Cognition (2nd Edition) Chapter 06](https://probmods.org/chapters/06-inference-about-inference.html). 
 
 ### Find Sensitivity with PSense
@@ -110,7 +110,7 @@ Then PSense gives the results for different metrics:
 * Expectation Distance
 
      It is defined as $D_{Exp}=|\mathbb{E}[p_{eps}(r)]-\mathbb{E}[p(r)]|$, where
-$\mathbb{E}[p_{eps}(r)]$ and $\mathbb{E}[p(r)]$ are expectations of the output distributions with and without disturbance. After changing the first parameter, PSense genterates the symbolic expression for Expectation Distance as:
+     $\mathbb{E}[p_{eps}(r)]$ and $\mathbb{E}[p(r)]$ are expectations of the output distributions with and without disturbance. After changing the first parameter, PSense genterates the symbolic expression for Expectation Distance as:
 ```
 Expectation Distance
 Abs[5/12 - (5 + eps)/(3*(4 + eps))]
@@ -186,7 +186,6 @@ Changed parameter 2 :
 ...
 ```
 Notice now that `eps` becomes a concrete value, PSense directly outputs the numerical distances instead of a symbolic expression containing `eps`. For KS statistic, PSense further outputs which $r$ results in the maximum value.
-
 
 ***
 [Return to Homepage](index.html) | [Return to Tutorials](tutorial.html)
