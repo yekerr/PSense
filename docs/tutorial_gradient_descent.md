@@ -68,7 +68,7 @@ The code snippet can be found [here](https://github.com/yekerr/PSense/blob/maste
 Notice that we initially suppose `w2` follows a Uniform distribution with support $w2\in [0,1]$ (`uniform(0,1)`).
 We want to find out how the output distribution of `w2` changes if we perturb the parameter of the prior distibution. 
 
-To estimate the change in the output distribution, we can add disturbance `?eps` to each of our prior `bernoulli(0.5)`. Conceptually, we may have:
+To estimate the change in the output distribution, we can add disturbance `?eps` to each of our prior `flip(0.5)`. Conceptually, we may have:
 ```{d}
 w2 := uniform(0+?eps, 1);     //Or, w2 := uniform(0, 1+?eps); 
 ```

@@ -24,7 +24,7 @@ def main(){
         bEffects := [beta(1,1), 0];
         aEffects[1] = 1-aEffects[0];
         bEffects[1] = 1-bEffects[0];
-        goal := bernoulli(0.5);
+        goal := flip(0.5);
         observe(goal == 1 && sample(Marginal(chooseAction(goal, aEffects, bEffects)== b)));
         return bEffects[0];
 }
@@ -38,7 +38,7 @@ Here is what the program does:
         bEffects := [beta(1,1), 0];
         aEffects[1] = 1-aEffects[0];
         bEffects[1] = 1-bEffects[0];
-        goal := bernoulli(0.5);
+        goal := flip(0.5);
 ```
 We don't know how button `a` and `b` works, so we suppose the probability that they give bagels follows a Beta distribution with two parameters $\alpha=1$ and $\beta=1$. `beta(1,1)` samples the probability that `a` gives bagel and is stored in `aEffects[0]`; the probability that `a` gives cookie would be  `1-aEffects[0]` and is stored in aEffects[1]. The same is for `b`. 
 We suppose Sally's goal follows a Bernoulli distribution with 0.5 probability to be `bagel` (encoded as `0`) or `cookie` (encoded as `1`).

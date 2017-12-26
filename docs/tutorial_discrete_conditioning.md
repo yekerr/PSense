@@ -6,9 +6,9 @@
 [PSI](http://psisolver.org) is a solver that does exact probabilistic inference. Here is a conditional probabilistic distribution modeled with the source language of PSI.
 ```{d}
 def main(){
-    A:=bernoulli(0.5);
-    B:=bernoulli(0.5);
-    C:=bernoulli(0.5);
+    A:=flip(0.5);
+    B:=flip(0.5);
+    C:=flip(0.5);
     D:=A+B+C;
     observe(D>=2);
     return A;
@@ -18,11 +18,11 @@ Here is what the program does:
   
 * The first three lines in the main function simulate the process of tossing three coins (encoded as `1` for head and `0` for tail).
 ```{d}
-A:=bernoulli(0.5);
-B:=bernoulli(0.5);
-C:=bernoulli(0.5);
+A:=flip(0.5);
+B:=flip(0.5);
+C:=flip(0.5);
 ```
-    `bernoulli(0.5)` samples from a Bernoulli distribution with 0.5 probability to be `1` or `0`. `A`, `B`, and `C` are three independent samples each with the prior distribution of `bernoulli(0.5)`. Currently the parameter `0.5` is a constant value; different values of the parameter will give different distributions.
+    `flip(0.5)` samples from a Bernoulli distribution with 0.5 probability to be `1` or `0`. `A`, `B`, and `C` are three independent samples each with the prior distribution of `flip(0.5)`. Currently the parameter `0.5` is a constant value; different values of the parameter will give different distributions.
 * Adding the sampled numbers from the Bernoulli distribution:
 ```{d}
 D:=A+B+C;
@@ -50,19 +50,19 @@ The code snippet can be found [here](https://github.com/yekerr/PSense/blob/maste
 
 #### *Sensitivity* Definition
 
-The result of probabilistic inference depends on the distribution parameters. In our example above, the prior `bernoulli(0.5)` depends on the constant parameter `0.5`. 
+The result of probabilistic inference depends on the distribution parameters. In our example above, the prior `flip(0.5)`(Bernoulli distribution with $p = 0.5$) depends on the constant parameter `0.5`. 
 We are interested in the question: what happens for the distribution output if we perturb the parameter of the prior distibution?
 Notice that our example has 3 constant parameters:
 ```{d}
-A:=bernoulli(0.5);
-B:=bernoulli(0.5);
-C:=bernoulli(0.5);
+A:=flip(0.5);
+B:=flip(0.5);
+C:=flip(0.5);
 ```
-To estimate the change in the output distribution, we can add disturbance `?eps` to each of our prior `bernoulli(0.5)`. Conceptually, we may have:
+To estimate the change in the output distribution, we can add disturbance `?eps` to each of our prior `flip(0.5)`. Conceptually, we may have:
 ```{d}
-A:=bernoulli(0.5+?eps);
-B:=bernoulli(0.5);      //Or, B:=bernoulli(0.5+?eps2);
-C:=bernoulli(0.5);      //    C:=bernoulli(0.5+?eps3);
+A:=flip(0.5+?eps);
+B:=flip(0.5);      //Or, B:=flip(0.5+?eps2);
+C:=flip(0.5);      //    C:=flip(0.5+?eps3);
 ```
 
 #### PSense for Sensitivity Analysis
