@@ -3,7 +3,7 @@
 
 ### Build Models in PSI
 
-The following program models the behavior of an unknown vending machine with two buttons `a` and `b` selling only bagels and cookies. We do not know which button is for bagel, but we observe Sally, who wants a cookie, presses button `b`. Suppose Sally knows the how the machine works, how can we infer the probability that `b` gives bagel from Sally's action?
+The following program models the behavior of an unknown vending machine with two buttons `a` and `b` selling only bagels and cookies. We do not know which button is for bagels, but we observe Sally, who wants a cookie, presses button `b`. Suppose Sally knows the how the machine works, how can we infer the probability that `b` gives bagels from Sally's action?
 
 ```{d}
 a := 0;
