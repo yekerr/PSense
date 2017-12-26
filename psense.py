@@ -45,7 +45,7 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
     var_minmax += '}'
     try:
         eps_param = float(f_eps_param['value'])*0.1
-        eps_range = '(' + str(-eps_param) + '<=eps<=' + str(eps_param) + ')'
+        eps_range = '(' + str(-eps_param) + '<=eps<=' + f'{eps_param:.16f}' + ')'
     except ValueError:
          eps_range = '(-0.1<=eps<=0.1)'
     if not f_exp_name or not f_exp_eps_name:
