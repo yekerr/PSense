@@ -27,7 +27,7 @@ C:=flip(0.5);
 ```{d}
 D:=A+B+C;
 ```
-* Suppose we have observed the sum `D` is greater or equal to 2 (which means at least two are heads), we can add the condition as:
+* Suppose we have observed the sum `D` is greater or equal to 2 (which means at least two coints are heads), we can add the condition as:
 ```{d}
 observe(D>=2);
 ```
@@ -51,7 +51,7 @@ The code snippet can be found [here](https://github.com/yekerr/PSense/blob/maste
 #### *Sensitivity* Definition
 
 The result of probabilistic inference depends on the distribution parameters. In our example above, the prior `flip(0.5)`(Bernoulli distribution with $p = 0.5$) depends on the constant parameter `0.5`. 
-We are interested in the question: what happens for the distribution output if we perturb the parameter of the prior distibution?
+We are interested in the question: what happens to the distribution output if we perturb the parameter of the prior distibution?
 Notice that our example has 3 constant parameters:
 ```{d}
 A:=flip(0.5);
@@ -70,7 +70,7 @@ To automatically find the sensitivity of this probabilistic program, run the fol
 ```{shell}
 psense -f examples/conditioning.psi
 ```
-PSense will change each parameter and get the results for different metrics:
+PSense changes each parameter and gets the results for different metrics:
 
 * Expectation Distance
     
@@ -85,13 +85,13 @@ PSense finds the maximum value of the Expectation Distance with respect to the d
 Expectation Distance Max
 {0.039473684210526314, {eps -> -0.05, r1 -> 0}}
 ```
-The result above shows the maximum value `0.0395` is obtained when `eps` $= -0.05$.
+The result above shows that the maximum value `0.0395` is obtained when `eps` $= -0.05$.
 PSense further analyzes whether the distance grows linearly when the disturbance |`eps`| increases:
 ```
 Is Linear?
 False
 ```
-In this example the Expectation Distance is not linear so PSense outputs `False`.
+In this example the Expectation Distance does not grow linearly so PSense outputs `False`.
 
 * Kolmogorov–Smirnov Statistic
 

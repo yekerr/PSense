@@ -43,7 +43,7 @@ Here is what the program does:
 We don't know how button `a` and `b` works, so we suppose the probability that they give bagels follows a Beta distribution with two parameters $\alpha=1$ and $\beta=1$. `beta(1,1)` samples the probability that `a` gives bagel and is stored in `aEffects[0]`; the probability that `a` gives cookie would be  `1-aEffects[0]` and is stored in aEffects[1]. The same is for `b`. 
 We suppose Sally's goal follows a Bernoulli distribution with 0.5 probability to be `bagel` (encoded as `0`) or `cookie` (encoded as `1`).
 
-* If `a` is pressed, whether the vending machine gives bagel or cookie follows the probabilities stored in aEffects. We use `categorical(aEffects)` to sample `bagel` or `cookie` and return as the vending machine releases. The same for `b`. If other buttons are pressed, return `nothing` (encoded as `2`).
+* If `a` is pressed, whether the vending machine gives bagel or cookie follows the probabilities stored in `aEffects`. We use `categorical(aEffects)` to sample bagel or cookie and return the result as what the vending machine releases. The result is encoded as `0` for `bagel` and `1` for `cookie`. The same is for `b`. If other buttons are pressed, return `nothing` (encoded as `2`).
 ```{d}
 def vendingMachine(action: R, aEffects: R[], bEffects: R[]){
         if(action == a) {return categorical(aEffects);}
@@ -52,7 +52,7 @@ def vendingMachine(action: R, aEffects: R[], bEffects: R[]){
 }
 ```
 
-* When Sally decides her action, she anticipates her action would allow vending machine to release the thing that fulfills her goal. So we can suppose Sally's action follows some prior distribution `actionPrior` and use `observe` to condition what the machine returns meets her goal.
+* When Sally decides her action, she anticipates her action would allow the vending machine to release something that fulfills her goal. We can suppose Sally's action follows some prior distribution `actionPrior` and use `observe` to condition the fact that what the machine returns meets her goal.
 ```{d}
 def chooseAction(goal: R, aEffects: R[], bEffects: R[]){
         action := categorical(actionPrior);
@@ -61,14 +61,14 @@ def chooseAction(goal: R, aEffects: R[], bEffects: R[]){
 }
 ```
 
-* Sally's behavior follows the distribution given by `chooseAction(goal, aEffects, bEffects) == b)`. We can model her pressing `b` by sampling from her behavior distribution and `observe` the sampled result equal to `b`. Also, we know Sally's goal is to get a cookie (`1`).
+* Sally's behavior follows the distribution given by `chooseAction(goal, aEffects, bEffects) == b)`. We can model her pressing `b` by sampling from her behavior function `chooseAction`. The function `Marginal` around `chooseAction` gives the marginal distribution of Sally's behavior. The function `sample` samples from this distribution.  We `observe` the sampled result is equal to `b`. Also, we know Sally's goal is to get a cookie (`1`). Combining our knowledge about Sally together, we have:
 ```{d}
 observe(goal == 1 && sample(Marginal(chooseAction(goal, aEffects, bEffects) == b)));
 ```
 
-* We want to know what is the posterior distribution of pressing `b` giving bagel, so we `return bEffects[0]` in the `main` function.
+* Given these knowledge about Sally, we want to know what is the posterior distribution of pressing `b` giving bagel, so we `return bEffects[0]` in the `main` function.
 
-* The result given by PSI in Wolfram Language should be:
+* The result given by PSI in Wolfram Language is:
 ```
 p[r1_] := -6/7*Boole[-1+r1<=0]*Boole[-r1<=0]*r1+10/7*Boole[-1+r1<=0]*Boole[-r1<=0]
 ```
@@ -158,13 +158,13 @@ TVD Max
 ### User Specified Disturbance
 
 You can set a value for the disturbance `eps`.
-Running the following to set `0.01` for `eps`:
+Running the following to set `eps` to:
 
 ```{shell}
 psense -f examples/unknown_vender_machine.psi -e 0.01
 ```
-
-PSense outputs the following:
+PSense would add `0.01` to each parameter in this program.
+It outputs the following:
 ```
 Changed parameter 1 :
  Function Type:
@@ -185,7 +185,7 @@ Finish All Metrics
 Changed parameter 2 :
 ...
 ```
-Notice now that `eps` becomes a concrete value, PSense directly outputs the numerical distances instead of a symbolic expression containing `eps`. For KS statistic, PSense further outputs which $r$ results in the maximum value.
+Notice now that `eps` becomes a concrete value, PSense directly outputs the numerical distances instead of a symbolic expression containing `eps`. For KS statistic, PSense further outputs which $r1$ value results in the maximum value.
 
 ***
 [Return to Homepage](index.html) | [Return to Tutorials](tutorial.html)
