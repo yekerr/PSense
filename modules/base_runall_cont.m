@@ -103,8 +103,8 @@ ptvd[flageps_,p_,q_,cons_,vars_,varsminmax_] := Module[
 	    table = sample[p, q, cons, varsminmax];
 	    (*Print[table];*)
 	    data = Transpose[{xsample,table}];
-	    lm = LinearModelFit[data,eps,eps];
-	    k = lm["ParameterTableEntries"][[2]][[1]];
+	    lm = Quiet[LinearModelFit[data,eps,eps]];
+	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
 	    Print[" TVD Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
