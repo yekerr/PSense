@@ -40,21 +40,43 @@ islinear2[p_]:= Module[
 		AllTrue[islinearlist, NumberQ]
   ]*)
 
-inrunall[flageps_,p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
+inrunall[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
 	{vars:=Map[First,varsminmax]
 	},
 	single=(Length[vars]==1);
     If[!flageps,vars=Prepend[vars,eps]];
-	If[single,runsingle[flageps,p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[flageps,p,np,(epscons&&varscons),vars,varsminmax]];
+	If[single,
+        runsingle[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,e,ne,epscons,varscons,vars,varsminmax],
+        runmulti[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,(epscons&&varscons),vars,varsminmax]
+    ];
 	Print[""]
 ]
-runsingle[flageps_,p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
+runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
     {},
 	If[!flageps,cons:=epscons&&varscons,cons:=varscons];
-	pedist[flageps,e,ne,epscons,vars];
-	pks[flageps,p,np,cons,vars];
-	ptvd[flageps,p,np,cons,vars,varsminmax];
+	If[flagexpdist,
+        pedist[flageps,e,ne,epscons,vars]
+    ];
+    If[flagks,
+	    pks[flageps,p,np,cons,vars]
+    ];
+    If[flagtvd,
+	    ptvd[flageps,p,np,cons,vars,varsminmax]
+    ];
+    If[flagkl,
+        Print["KL Divergence is not supported for continuous distributions"]
+    ];
     (*pkl[flageps,p,q,cons,vars,varsminmax];*)
+]
+
+runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,cons_,vars_,varsminmax_] := Module[
+	{},
+    If[flagtvd,
+	    ptvd[flageps,p,np,cons,vars,varsminmax]
+    ];
+    If[flageps,
+	    pkl[flageps,p,np,cons,vars,varsminmax]
+    ];
 ]
 
 pedist[flageps_,p_,q_,cons_,vars_] := Module[

@@ -27,7 +27,7 @@ islinear[p_] := ((NumberQ[gtd[p]])&&(NumberQ[ltd[p]]))
 		AllTrue[islinearlist, NumberQ]
   ]*)
 
-inrunall[flageps_,p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x.csv"] := Module[
+inrunall[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x.csv"] := Module[
 	{
     vars := Map[First,varsminmax]
 	},
@@ -36,32 +36,46 @@ inrunall[flageps_,p_,np_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<
 	WriteString[$stream,","];*)
 	single = (Length[vars]==1);
     If[!flageps,vars=Prepend[vars,eps]];
-	If[single, runsingle[flageps,p,np,e,ne,epscons,varscons,vars,varsminmax],runmulti[flageps,p,np,epscons,vars,varsminmax]]
+	If[single, runsingle[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,e,ne,epscons,varscons,vars,varsminmax],runmulti[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,epscons,vars,varsminmax]]
     (*Close[$stream]*)
 	Print[""]
 ]
 
-runsingle[flageps_,p_,np_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
+runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
 	{
 	},
     If[!flageps,cons=epscons&&varscons,cons=varscons];
     varsnoeps = Map[First,varsminmax];
-	pedist[flageps,e,ne,epscons,cons,vars];
-	pks[flageps,p,np,cons,vars];
+    If[flagexpdist,
+	    pedist[flageps,e,ne,epscons,cons,vars]
+    ];
+    If[flagks,
+	    pks[flageps,p,np,cons,vars]
+    ];
 	(*revkseps[ksres,varsnoeps];*) 
 	(*ptvd[p,np,cons,vars,varsminmax];
 	pkl[p,np,cons,vars,varsminmax];*)
-	ptvdsingle[flageps,p,np,cons,vars,varscons];
-	pklsingle[flageps,p,np,cons,vars,varscons];
+    If[flagtvd,
+	    ptvdsingle[flageps,p,np,cons,vars,varscons]
+    ];
+    If[flagkl,
+	    pklsingle[flageps,p,np,cons,vars,varscons]
+    ];
 ]
 
-runmulti[flageps_,p_,np_,cons_,vars_,varsminmax_] := Module[
+runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,cons_,vars_,varsminmax_] := Module[
 	{},
 	varsnoeps = Map[First,varsminmax];
-	pks[flageps,p,np,cons,vars];
+    If[flagexpdist,
+	    pks[flageps,p,np,cons,vars]
+    ];
 	(*revkseps[ksres,varsnoeps];*)
-	ptvd[flageps,p,np,cons,vars,varsminmax];
-	pkl[flageps,p,np,cons,vars,varsminmax];
+    If[flagtvd,
+	    ptvd[flageps,p,np,cons,vars,varsminmax]
+    ];
+    If[flageps,
+	    pkl[flageps,p,np,cons,vars,varsminmax]
+    ];
 ]
 
 revkseps[disres_,varsnoeps_] := Module[
