@@ -307,7 +307,7 @@ def main():
     group.add_argument('-r', help='Directory containing PSI files')
     parser.add_argument('-o', nargs='?', help='Optional output file')
     parser.add_argument('-e', nargs='?', help='Explicit numerical interfrance in all prior distribution')
-    parser.add_argument('-metric', nargs='?', help='Metrics for sensitivity analysis. Use comma to seperate metrics (support ExpDist,KS,TVD,KL) e.g. \"ExpDist,KS,TVD,KL\" \"KS,TVD\"')
+    parser.add_argument('-metric', nargs='?', help='Metrics for sensitivity analysis (support ExpDist,KS,TVD,KL). Please enclose metrics with double quotation marks e.g. \"ExpDist,KS,TVD,KL\" \"KS,TVD\"')
     parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
     parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
     parser.add_argument('-verbose', action='store_true', help='Print all outputs of PSI')
