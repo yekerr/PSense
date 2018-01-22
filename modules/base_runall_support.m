@@ -14,7 +14,8 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_:
 	Print[""];
 	If[continuous, Get[mathepath<>"/base_runall_cont.m"], Get[mathepath<>"/base_runall_disc.m"]];
 	Print["Start All Metrics:"];
-	inrunall[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,e,ne,varsminmax,newepscons,newvarscons,file];
+    inrunall[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,e,ne,varsminmax,newepscons,newvarscons,file];
+    (*inrunall[flageps,p,np,e,ne,varsminmax,newepscons,newvarscons,file];*)
 	Print["Finish All Metrics"];
 	Print[""];
 	Print[""];

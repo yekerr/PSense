@@ -66,14 +66,14 @@ runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_,ne_,epscons_,
 runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,cons_,vars_,varsminmax_] := Module[
 	{},
 	varsnoeps = Map[First,varsminmax];
-    If[flagexpdist,
+    If[flagks,
 	    pks[flageps,p,np,cons,vars]
     ];
 	(*revkseps[ksres,varsnoeps];*)
     If[flagtvd,
 	    ptvd[flageps,p,np,cons,vars,varsminmax]
     ];
-    If[flageps,
+    If[flagkl,
 	    pkl[flageps,p,np,cons,vars,varsminmax]
     ];
 ]

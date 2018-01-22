@@ -74,7 +74,7 @@ runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,cons_,vars_,varsm
     If[flagtvd,
 	    ptvd[flageps,p,np,cons,vars,varsminmax]
     ];
-    If[flageps,
+    If[flagkl,
 	    pkl[flageps,p,np,cons,vars,varsminmax]
     ];
 ]
