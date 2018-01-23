@@ -113,7 +113,7 @@ pedist[flageps_,p_,q_,epscons_,cons_,vars_] := Module[
 
 pcus[flageps_,p_,q_,cons_,vars_,customfun_] := Module[
     {},
-    cusres := customfun[p,q,cons,varscons];
+    cusres := FullSimplify[customfun[p,q,cons,varscons],cons];
     Print["User Defined Function"];
     Print[cusres];
     If[!flageps,
