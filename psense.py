@@ -31,7 +31,7 @@ def rename_func(function_pre):
             function_name += ',r'+str(i+1)
     return function_name + ']'
 
-def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps, metrics):
+def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps, metrics, custom_metric_name):
     file = '\"' + file + '\"'
     var_minmax = '{'
     condition = ''
@@ -53,8 +53,9 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
         f_exp_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
     flag_metrics = [str(v) for v in metrics]
+    custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules') + "\""
-    exp = ','.join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, *flag_metrics, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
+    exp = ','.join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, condition, file])
     runall = 'runall[' + exp + ']'
     return runall
 
@@ -215,11 +216,17 @@ def rename_psi_out(exp, extend_name):
     parts = exp.split(':=')
     newname = parts[0].replace('[', extend_name + '[')
     return newname + ':=' + parts[-1]
-
-def run_file(file, output_file, explict_eps, metrics, psi_timeout, math_timeout, verbose):
+        
+def run_file(file, output_file, explict_eps, metrics, custom_metric_file, psi_timeout, math_timeout, verbose):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
+
+    custom_metric_name = None
+    if metrics[4]:
+        custom_metric_file_name = os.path.basename(custom_metric_file)
+        custom_metric_name_index = custom_metric_file_name.index(".")
+        custom_metric_name = custom_metric_file_name[:custom_metric_name_index]
 
     psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose)
     if not check_psi_out(psi_file, output_file, psi_out):
@@ -277,15 +284,17 @@ def run_file(file, output_file, explict_eps, metrics, psi_timeout, math_timeout,
         with open(math_files[i], 'w') as f:
             base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules', 'base_runall_support.m')
             f.write('Get[\"' + base_file + '\"]\n')
+            if metrics[4]:
+                f.write('Get[\"' + custom_metric_file + '\"]\n')
             f.write(psi_out + '\n')
             f.write(psi_pdf_out + '\n')
             f.write(psi_eps_out + '\n')
             if code_exp:
                 f.write(psi_exp_out + '\n')
                 f.write(psi_exp_eps_out + '\n')
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i], explict_eps, metrics)
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i], explict_eps, metrics, custom_metric_name)
             else:
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps, metrics)
+                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps, metrics, custom_metric_name)
             f.write(math_run + '\n')
         math_out = run_math(math_files[i], math_timeout)
         if output_file:
@@ -307,7 +316,10 @@ def main():
     group.add_argument('-r', help='Directory containing PSI files')
     parser.add_argument('-o', nargs='?', help='Optional output file')
     parser.add_argument('-e', nargs='?', help='Explicit numerical interfrance in all prior distribution')
-    parser.add_argument('-metric', nargs='?', help='Metrics for sensitivity analysis (support ExpDist,KS,TVD,KL). Please enclose metrics with double quotation marks e.g. \"ExpDist,KS,TVD,KL\" \"KS,TVD\"')
+    help_metric = 'Metrics for sensitivity analysis (support ExpDist,KS,TVD,KL,Custom). \
+    Please enclose metrics with double quotation marks e.g. \"ExpDist,KL,Custom:FilePath\" \"KS,TVD\" \
+    Note: function name of custom metric should be identical as the file name'
+    parser.add_argument('-metric', nargs='?', help=help_metric)
     parser.add_argument('-tp', nargs='?', help='Optional PSI timeout (second)')
     parser.add_argument('-tm', nargs='?', help='Optional Mathematica timeout (second)')
     parser.add_argument('-verbose', action='store_true', help='Print all outputs of PSI')
@@ -331,13 +343,27 @@ def main():
             print('Explicit numerical interfrance is invalid')
             return 0
     # metric0 = ExpDist, metric1 = KS, metric2 = TVD, metric3 = KL
-    metrics = [True]*4
+    metrics = [True]*4 + [False]
+    custom_metric_file = None
     if argv.metric:
         argv_metrics = argv.metric.lower()
         metrics[0] = True if "expdist" in argv_metrics else False
         metrics[1] = True if "ks" in argv_metrics else False
         metrics[2] = True if "tvd" in argv_metrics else False
         metrics[3] = True if "kl" in argv_metrics else False
+        metrics[4] = True if "custom" in argv_metrics else False
+        if not any(metrics):
+            print('No metric is selected')
+            return 0
+        if metrics[4]:
+            sp_metrics = argv_metrics.split(",")
+            custom_index = ["custom" in metric for metric in sp_metrics].index(True)
+            custom_metric = sp_metrics[custom_index]
+            custom_path_index = custom_metric.index(":")+1
+            custom_metric_file = custom_metric[custom_path_index:].strip()
+            if not os.path.isfile(custom_metric_file):
+                print('Custom metric file doesn\'t exist')
+                return 0
     output_file = argv.o
     explict_eps = argv.e
     math_timeout = argv.tm
@@ -349,7 +375,7 @@ def main():
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file, explict_eps, metrics, psi_timeout, math_timeout, verbose)
+        run_file(argv.f, output_file, explict_eps, metrics, custom_metric_file, psi_timeout, math_timeout, verbose)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -360,7 +386,7 @@ def main():
                         f.write('\n' + file + ':\n')
                 else:
                     print('\n' + file + ':')
-                run_file(file, output_file, explict_eps, metrics, psi_timeout, math_timeout, verbose)
+                run_file(file, output_file, explict_eps, metrics, custom_metric_file, psi_timeout, math_timeout, verbose)
 
 if __name__ == "__main__":
     main()
