@@ -40,18 +40,18 @@ islinear2[p_]:= Module[
 		AllTrue[islinearlist, NumberQ]
   ]*)
 
-inrunall[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
+inrunall[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_,e_:1,ne_:1,varsminmax_:{{r1,0,1}},epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:"ch0x"] := Module[
 	{vars:=Map[First,varsminmax]
 	},
 	single=(Length[vars]==1);
     If[!flageps,vars=Prepend[vars,eps]];
 	If[single,
-        runsingle[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,e,ne,epscons,varscons,vars,varsminmax],
-        runmulti[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,(epscons&&varscons),vars,varsminmax]
+        runsingle[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,flagcustom,customfun,e,ne,epscons,varscons,vars,varsminmax],
+        runmulti[flageps,p,np,flagexpdist,flagks,flagtvd,flagkl,flagcustom,customfun,(epscons&&varscons),vars,varsminmax]
     ];
 	Print[""]
 ]
-runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
+runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_,e_,ne_,epscons_,varscons_,vars_,varsminmax_] := Module[
     {},
 	If[!flageps,cons:=epscons&&varscons,cons:=varscons];
 	If[flagexpdist,
@@ -67,15 +67,21 @@ runsingle[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,e_,ne_,epscons_,
         Print["KL Divergence is not supported for continuous distributions"]
     ];
     (*pkl[flageps,p,q,cons,vars,varsminmax];*)
+    If[flagcustom, 
+        pcus[flageps,p,np,cons,vars,customfun]
+    ];
 ]
 
-runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,cons_,vars_,varsminmax_] := Module[
+runmulti[flageps_,p_,np_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_,cons_,vars_,varsminmax_] := Module[
 	{},
     If[flagtvd,
 	    ptvd[flageps,p,np,cons,vars,varsminmax]
     ];
     If[flagkl,
 	    pkl[flageps,p,np,cons,vars,varsminmax]
+    ];
+    If[flagcustom, 
+        pcus[flageps,p,np,cons,vars,customfun]
     ];
 ]
 
@@ -94,6 +100,20 @@ pedist[flageps_,p_,q_,cons_,vars_] := Module[
         Print["Is Linear?"];
         Print[islinear2[edistanceres]]];
 	Print[""]
+]
+
+pcus[flageps_,p_,q_,cons_,vars_,customfun_] := Module[
+    {},
+    cusres := customfun[p,q,cons,varscons];
+    Print["User Defined Function"];
+    Print[cusres];
+    If[!flageps,
+        Print["User Defined Function Max"];
+        (*Print[FindMaximum[{tvdres,cons},vars]];*)
+        Print[Maximize[{cusres,cons},vars]];
+        Print["Is Linear?"];
+        Print[islinear2[cusres]]];
+    Print[""]
 ]
 
 pks[flageps_,p_,q_,cons_,vars_] := Module[
