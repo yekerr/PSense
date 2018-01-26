@@ -22,7 +22,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     continuous := TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
     Print["Function Type:"];
     If[continuous, Print["Continuous"],Print["Discrete"]];
-    If[filecsv, addquote[Continuous],addquote[Discrete]];
+    If[filecsv && continuous, addquote[Continuous],addquote[Discrete]];
     Print[""];
     Print["Start All Metrics:"];
 
@@ -50,7 +50,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
 		timekl = Timing[pklcont[flageps,p,np,newepscons,newvarscons,newvars]],
 		timekl = Timing[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars]]
 	];
-	If[filecsv,WriteString[$stream, timetvd[[1]]];WriteString[$stream,","]]
+	If[filecsv,WriteString[$stream, timekl[[1]]];WriteString[$stream,","]]
     ];
     If[flagcustom, 
         pcus[flageps,p,np,newepscons,newvarscons,newvars,discretevars,customfun]

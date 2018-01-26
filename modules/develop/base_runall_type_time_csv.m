@@ -61,9 +61,11 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	Print["Expectation Distance Max"];
 	expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
 	Print[expmax];
+	addquote[expmax];
         Print["Is Linear?"];
 	explinear = islinear2[edistanceres];
-        Print[explinear]];
+        Print[explinear];
+	addquote[explinear]];
 	Print[""]
 ]
 
@@ -127,7 +129,7 @@ pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	},
 	Print["KL Divergence"];
 	Print[klres];
-	addquote[ksres];
+	addquote[klres];
     If[!flageps,
 	    Print["KL Max"];
 	    klmax = Maximize[{klres,epscons && varscons},Prepend[vars,eps]];
@@ -171,6 +173,7 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
             WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
             WriteString[$stream,"}}"];
             WriteString[$stream,"\""];
+	    WriteString[$stream,","];
 	    WriteString[$stream,","],
     Print[tvdvaluecont[p,q,epscons,varscons,vars]]];
     Print[""]
@@ -205,6 +208,7 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
             WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
             WriteString[$stream,"}}"];
             WriteString[$stream,"\""];
+	    WriteString[$stream,","];
 	    WriteString[$stream,","],
 	Print[klvaluecont[p,q,epscons,varscons,vars]]];
         Print[""]
