@@ -75,13 +75,6 @@ def generate_eps_param(f_eps_param, noise_percentage):
 
 def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps, noise_percentage, metrics, custom_metric_name):
     file = "\"" + file + "\""
-    var_minmax = "{"
-    for i in range(1, f_num_param + 1):
-        if i == f_num_param:
-            var_minmax += "{r" + str(i) + ", 0, 1}"
-        else:
-            var_minmax += "{r" + str(i) + ", 0, 1}, "
-    var_minmax += "}"
 
     eps_range, eps_type = generate_eps_param(f_eps_param, noise_percentage)
     # except ValueError:
@@ -94,7 +87,7 @@ def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_ep
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, var_minmax, eps_range, eps_type, file])
+    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, file])
     runall = "runall[" + exp + "]"
     return runall
 
