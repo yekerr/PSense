@@ -4,7 +4,7 @@
 MyDiracDelta[x_] := Boole[x == 0]
 
 runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:Null] := Module[{},
-    filecsv = True;
+    filecsv = False;
     If[filecsv, 
 	$stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
 	WriteString[$stream,$ScriptCommandLine[[1]]];
@@ -12,14 +12,14 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     ];
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     newvars=DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
-    pReplace := pdf /. DiracDelta -> MyDiracDelta;
-    newvarscons := FullSimplify[FunctionDomain[1/Boole[0 != pReplace], newvars]];
-    discretevars := Quiet[Solve[newvarscons, newvars]];
+    pReplace := (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
+    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]];
+    discretevars = Quiet[Solve[newvarscons, newvars]];
     If[filecsv,
 	Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
     	Get[mathepath<>"/base_runall_disc.m"]
     ];
-    continuous := TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
+    continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
     Print["Function Type:"];
     If[continuous, Print["Continuous"],Print["Discrete"]];
     If[filecsv && continuous, addquote[Continuous],addquote[Discrete]];
