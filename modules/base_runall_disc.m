@@ -10,8 +10,7 @@ distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},
 edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]],cons]
 edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
 extract[f_] := Values[f][[1]]
-edistancemax[p_, q_, cons_] := 
-distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
+edistancemax[p_, q_, cons_] := distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
 tvd[p_,q_,epscons_,discretevars_] := 1/2*Total[Map[ReplaceAll[FullSimplify[distance2[p, q],epscons],#] &, discretevars]]
 entropy[p_,q_] := q*Log2[q/p]
 kl[p_, q_, epscons_, discretevars_] := 
@@ -33,6 +32,7 @@ islinear2ks[p_] := Module[
         Print[islinearlist];
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
+
 
 revkseps[disres_,varsnoeps_] := Module[
 	{},
@@ -127,14 +127,16 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    data = Transpose[{xsample,table}];
 	    lm = Quiet[LinearModelFit[data,eps,eps]];
 	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
-	    Print[" TVD Bounds(lower, upper):"];
+	    Print["TVD Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
 	    Print[k*eps+bmin];
 	    Print[k*eps+bmax];
 	    Print["TVD Max"];
 	    maxSample := Max[table];
-	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"],
+	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"];
+	    Print["Is Linear?"];
+	    Print["NA"],
     Print[tvdvaluecont[p,q,epscons,varscons,vars]]];
     Print[""]
 ]
@@ -150,14 +152,16 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    data = Transpose[{xsample,table}];
 	    lm = Quiet[LinearModelFit[data,eps,eps]];
 	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
-	    Print[" KL Divergence Bounds(lower, upper):"];
+	    Print["KL Divergence Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
 	    Print[k*eps+bmin];
 	    Print[k*eps+bmax];
 	    Print["KL Divergence Max"];
 	    maxSample := Max[table];
-	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"],
+	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"];
+	    Print["Is Linear?"];
+	    Print["NA"],
 	Print[klvaluecont[p,q,epscons,varscons,vars]]];
         Print[""]
 ]
