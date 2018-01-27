@@ -107,7 +107,7 @@ pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	Print["KL Divergence"];
 	Print[klres];
     If[!flageps,
-	    Print["KL Max"];
+	    Print["KL Divergence Max"];
 	    Print[Maximize[{klres,epscons && varscons},Prepend[vars,eps]]];
         Print["Is Linear?"];
         Print[islinear2[klres]]];
@@ -150,12 +150,12 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    data = Transpose[{xsample,table}];
 	    lm = Quiet[LinearModelFit[data,eps,eps]];
 	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
-	    Print[" KL Bounds(lower, upper):"];
+	    Print[" KL Divergence Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
 	    Print[k*eps+bmin];
 	    Print[k*eps+bmax];
-	    Print["KL Max"];
+	    Print["KL Divergence Max"];
 	    maxSample := Max[table];
 	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"],
 	Print[klvaluecont[p,q,epscons,varscons,vars]]];

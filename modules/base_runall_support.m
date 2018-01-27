@@ -12,9 +12,14 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     ];
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     newvars=DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
-    pReplace := (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
-    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]];
-    discretevars = Quiet[Solve[newvarscons, newvars]];
+    
+    pReplace = pdf /. DiracDelta -> MyDiracDelta;
+    TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
+    If[!ValueQ[newvarscons],
+        pReplace = (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
+	newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
+    ]
+    Quiet[discretevars = Solve[newvarscons, newvars]];
     If[filecsv,
 	Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
     	Get[mathepath<>"/base_runall_disc.m"]
