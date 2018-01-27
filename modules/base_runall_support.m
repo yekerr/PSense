@@ -11,8 +11,8 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
 	WriteString[$stream,","]
     ];
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
-    newvars=DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
-    
+    newvars = DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
+    newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
     pReplace = pdf /. DiracDelta -> MyDiracDelta;
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
