@@ -2,6 +2,9 @@ import os, sys
 import subprocess as sp
 import re
 import argparse
+from terminaltables import SingleTable
+from textwrap import wrap
+import shutil
 
 def parse_psi_output(output):
     result = ""
@@ -248,8 +251,65 @@ def rename_psi_out(exp, extend_name):
     parts = exp.split(":=")
     newname = parts[0].replace("[", extend_name + "[")
     return newname + ":=" + parts[-1]
-        
-def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose):
+
+def print_plain_results(message, output_file):
+    if output_file:
+        with open(output_file, "a") as f:
+            f.write(message + "\n")
+    else:
+        print(message)
+
+def print_table_results(title, data, output_file):
+    table = SingleTable(data, title)
+    max_width = int(shutil.get_terminal_size()[0] / len(data[0]))
+    for j in range(1, len(data[0])):
+        table.table_data[1][j] = '\n'.join(wrap(data[1][j], max_width))
+    for j in range(1, len(data[0])):
+        table.table_data[2][j] = '\n'.join(data[2][j].split(", "))
+    print_plain_results(table.table, output_file)
+    
+
+def parse_math_out(math_out):
+    table_dict = {}
+    func_type = "Unknown"
+    prompt_func_type = "Function Type:"
+    prompt_metrics = ["Expectation Distance", "KS Distance", "TVD", "KL Divergence"]
+    prompt_info = ["Expression", "Maximum", "Linear"]
+    lines = math_out.split("\n")
+    lines = [line for line in lines if line]
+    i = 0
+    while i < len(lines):
+        if lines[i] == prompt_func_type:
+            func_type = lines[i+1]
+            i += 2
+        elif lines[i] in prompt_metrics:
+            table_dict[lines[i]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
+            i += 6
+        else:
+            i += 1
+    metrics = list(table_dict.keys())
+    table_data = [[""] + metrics]
+    for i in range(len(prompt_info)):
+        row = [prompt_info[i]]
+        for key in metrics:
+            row.append(table_dict[key][i])
+        table_data.append(row)
+    return table_data, func_type
+
+def print_results(index, math_file, math_out, output_file, plain):
+    if not math_out:
+        failure_message = "Mathematica fails or runs out of time: " + math_file
+        print_plain_results(failure_message, output_file)
+    elif plain:
+        success_message = "Analyzed parameter " + str(index+1) + ":\n" + math_out
+        print_plain_results(success_message, output_file)
+    else:
+        table_math_out, func_type = parse_math_out(math_out)
+        message = "Function Type:\n" + func_type
+        print_plain_results(message, output_file)
+        print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
+
+def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain):
     psi_file = file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
@@ -329,17 +389,7 @@ def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_m
                 math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps, noise_percentage, metrics, custom_metric_name)
             f.write(math_run + "\n")
         math_out = run_math(math_files[i], math_timeout)
-        if output_file:
-            with open(output_file, "a") as f:
-                if math_out:
-                    f.write("Changed parameter" + str(i+1) + ":\n" + math_out + "\n")
-                else:
-                    f.write("Mathematica runs out of time: " + math_files[i] + "\n")
-        else:
-            if math_out:
-                print("Changed parameter", i+1, ":\n", math_out)
-            else:
-                print("Mathematica runs out of time: " + math_files[i])
+        print_results(i, math_files[i], math_out, output_file, plain)
 
 def exit_message(message):
     print(message)
@@ -359,12 +409,13 @@ def main():
     parser.add_argument("-metric", nargs="?", help=help_metric)
     parser.add_argument("-tp", nargs="?", help="Optional PSI timeout (second)")
     parser.add_argument("-tm", nargs="?", help="Optional Mathematica timeout (second)")
+    parser.add_argument("-plain", action="store_true", help="Print raw outputs")
     parser.add_argument("-verbose", action="store_true", help="Print all outputs of PSI")
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
-        exit_message("PSI file doesn\"t exist")
+        exit_message("PSI file doesn\'t exist")
     if argv.r and not os.path.isdir(argv.r):
-        exit_message("Directory doesn\"t exist")
+        exit_message("Directory doesn\'t exist")
     if argv.tm and not argv.tm.isdigit():
         exit_message("Timeout parameter is invalid")
     if argv.tp and not argv.tp.isdigit():
@@ -408,13 +459,14 @@ def main():
     math_timeout = argv.tm
     psi_timeout = argv.tp
     verbose = argv.verbose
+    plain = argv.plain
     if output_file:
         if os.path.exists(output_file):
             os.remove(output_file)
         else:
             create_dirs_from_path(os.path.dirname(output_file))
     if argv.f:
-        run_file(argv.f, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose)
+        run_file(argv.f, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain)
     else:
         for filename in os.listdir(argv.r):
             if filename.endswith(".psi"):
@@ -425,7 +477,7 @@ def main():
                         f.write("\n" + file + ":\n")
                 else:
                     print("\n" + file + ":")
-                run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose)
+                run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain)
 
 if __name__ == "__main__":
     main()
