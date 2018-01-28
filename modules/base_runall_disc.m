@@ -160,7 +160,7 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    printCheckExp[{k*eps+bmin,k*eps+bmax}];
 	    Print["KL Divergence Max"];
 	    maxSample = Max[table];
-	    printPrecision12["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
+	    Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
 	    Print["NA"],
 	Print[klvaluecont[p,q,epscons,varscons,vars]]];
