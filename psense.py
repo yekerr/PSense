@@ -4,6 +4,7 @@ import re
 import argparse
 from terminaltables import SingleTable
 from textwrap import wrap
+from collections import defaultdict
 import shutil
 
 def parse_psi_output(output):
@@ -259,50 +260,77 @@ def print_plain_results(message, output_file):
 
 def print_table_results(title, data, output_file):
     table = SingleTable(data, title)
-    max_width = int(shutil.get_terminal_size()[0] / len(data[0]) - 1)
-    for j in range(1, len(data[0])):
-        table.table_data[1][j] = '\n'.join(wrap(data[1][j], max_width))
-    for j in range(1, len(data[0])):
-        table.table_data[2][j] = '\n'.join(data[2][j].split(", "))
+    max_width = int(shutil.get_terminal_size()[0] / len(data[0]) - 5)
+    for i in range(1, len(data)):
+        for j in range(1, len(data[0])):
+            table.table_data[i][j] = '\n'.join(wrap(data[i][j], max_width))
     print_plain_results(table.table, output_file)
-    
-def parse_math_content(lines):
+
+def parse_math_expr(exp):
+    return "\n".join(exp.replace("{", "").replace("}", "").split(", "))
+
+def parse_math_content(lines, explict_eps):
     MATH_TITLE = 0
     TABLE_TITLE = 1
-    func_type = "Unknown"
+    table_dict = defaultdict(list)
+    func_type = "Discrete"
     prompt_func_type = "Function Type:"
-    prompt_metrics = (("Expectation Distance", "KS Distance", "TVD", "KL Divergence"),("Expectation Distance", "KS", "TVD", "KL"))
-        # "KS Distance": (),
-        # "TVD": (),
-        # "KL Divergence": ()}
-    errors = ["::", "not a valid", "error"]
-    i = 0
-    while i < len(lines):
-        if lines[i] == prompt_func_type:
-            func_type = lines[i+1]
-            i += 2
-        elif lines[i] in prompt_metrics[MATH_TITLE]:
-            index_metric = prompt_metrics[MATH_TITLE].index(lines[i])
-        else:
-            i += 1
-    if func_type == "Discrete":
-        table_dict[prompt_metrics[TABLE_TITLE][index_metric]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
-        index += 6
+    prompt_metrics = {"Discrete": set(["Expectation Distance", "KS Distance", "TVD", "KL Divergence"]),
+        "Continuous": set(["Expectation Distance", "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
+    translate_metrics = {"Expectation Distance": "Expectation Distance", "KS Distance": "KS Distance",
+        "TVD": "TVD", "KL Divergence": "KL", "TVD Bounds(lower, upper):": "TVD Bounds", "KL Divergence Bounds(lower, upper):": "KL Bounds"}
+    errors = ["::", "error"]
+    if explict_eps:
+        i = 0
+        while i < len(lines):
+            if lines[i] == "Finish All Metrics":
+                break
+            if lines[i] == prompt_func_type:
+                func_type = lines[i+1]
+                i += 2
+            elif lines[i] in prompt_metrics["Discrete"]:
+                table_dict[translate_metrics[lines[i]]].append(parse_math_expr(lines[i+1]))
+                i += 2
+            else:
+                i += 1
     else:
-        table_dict[prompt_metrics[TABLE_TITLE][index_metric]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
-        index += 6
-    return index
+        i = 0
+        while i < len(lines):
+            if lines[i] == "Finish All Metrics":
+                break
+            if lines[i] == prompt_func_type:
+                func_type = lines[i+1]
+                i += 2
+            elif lines[i] in prompt_metrics[func_type]:
+                metric = lines[i]
+                abbr_metric = translate_metrics[lines[i]]
+                expr = parse_math_expr(lines[i+1]) if func_type == "Continuous" else lines[i+1]
+                table_dict[abbr_metric].append(expr)
+                i += 2
+                while i < len(lines):
+                    if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
+                        table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
+                        i += 2
+                    elif lines[i] == "Is Linear?":
+                        table_dict[abbr_metric].append(lines[i+1])
+                        i += 2
+                        break
+                    else:
+                        i += 1 
+            else:
+                i += 1
+    return table_dict, func_type
 
 def parse_math_out(math_out, explict_eps):
     if explict_eps:
-        prompt_info = {"Discrete": ("Maximum"),
-            "Continous": ("Maximum")}
+        prompt_info = {"Discrete": ["Maximum"],
+            "Continuous": ["Maximum"]}
     else:
-        prompt_info = {"Discrete": ("Expression", "Maximum", "Linear"),
-            "Continous": ("Bounds", "Maximum", "Linear")}
+        prompt_info = {"Discrete": ["Expression", "Maximum", "Linear"],
+            "Continuous": ["Bounds", "Maximum", "Linear"]}
     lines = math_out.split("\n")
     lines = [line.strip() for line in lines if line]
-    table_dict, func_type = parse_math_content(lines)
+    table_dict, func_type = parse_math_content(lines, explict_eps)
     metrics = list(table_dict.keys())
     table_data = [[""] + metrics]
     for i in range(len(prompt_info[func_type])):
@@ -314,14 +342,14 @@ def parse_math_out(math_out, explict_eps):
 
 def print_results(index, math_file, math_out, output_file, plain, explict_eps):
     if not math_out:
-        failure_message = "Mathematica fails or runs out of time: " + math_file + "\n" + math_out
+        failure_message = "\nMathematica fails or runs out of time: " + math_file + "\n" + math_out
         print_plain_results(failure_message, output_file)
     elif plain:
-        success_message = "Analyzed parameter " + str(index+1) + ":\n" + math_out
+        success_message = "\nAnalyzed parameter " + str(index+1) + ":\n" + math_out
         print_plain_results(success_message, output_file)
     else:
         table_math_out, func_type = parse_math_out(math_out, explict_eps)
-        message = "Function Type:\n" + func_type
+        message = "\nFunction Type:\n" + func_type
         print_plain_results(message, output_file)
         print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
 
