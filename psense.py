@@ -279,7 +279,7 @@ def parse_math_content(lines, explict_eps):
         "Continuous": set(["Expectation Distance", "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
     translate_metrics = {"Expectation Distance": "Expectation Distance", "KS Distance": "KS Distance",
         "TVD": "TVD", "KL Divergence": "KL", "TVD Bounds(lower, upper):": "TVD Bounds", "KL Divergence Bounds(lower, upper):": "KL Bounds"}
-    errors = ["::", "error"]
+    errors = set(["::", "error"])
     if explict_eps:
         i = 0
         while i < len(lines):
