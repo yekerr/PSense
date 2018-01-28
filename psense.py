@@ -67,22 +67,20 @@ def generate_eps_param(f_eps_param, noise_percentage):
     distribution_range["binomial2"] = (0, 1, REAL)
     distribution_range["negBinomial1"] = (1, None, INT)
     distribution_range["negBinomial2"] = (0, 1, REAL)
-    
-    value = float(f_eps_param["value"])
-    noise_value = value*noise_percentage
     param_lower, param_upper, param_type = distribution_range[f_eps_param["type"]]
-    eps_lower = max(param_lower - value, -noise_value) if param_lower else -noise_value
-    eps_upper = min(param_upper - value, noise_value) if param_upper else noise_value
-    eps_range = "(" + f"{eps_lower:.16f}" + "<=eps<=" + f"{eps_upper:.16f}" + ")"
+    try:
+        value = float(f_eps_param["value"])
+        noise_value = value*noise_percentage
+        eps_lower = max(param_lower - value, -noise_value) if param_lower else -noise_value
+        eps_upper = min(param_upper - value, noise_value) if param_upper else noise_value
+        eps_range = "(" + f"{eps_lower:.16f}" + "<=eps<=" + f"{eps_upper:.16f}" + ")"
+    except ValueError:
+        eps_range = "(-0.1<=eps<=0.1)"
     return eps_range, str(param_type)
 
 def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps, noise_percentage, metrics, custom_metric_name):
     file = "\"" + file + "\""
-
     eps_range, eps_type = generate_eps_param(f_eps_param, noise_percentage)
-    # except ValueError:
-    #      eps_range = "(-0.1<=eps<=0.1)"
-
     if not f_exp_name or not f_exp_eps_name:
         f_exp_name = "Null"
         f_exp_eps_name = "Null"
@@ -261,50 +259,68 @@ def print_plain_results(message, output_file):
 
 def print_table_results(title, data, output_file):
     table = SingleTable(data, title)
-    max_width = int(shutil.get_terminal_size()[0] / len(data[0]))
+    max_width = int(shutil.get_terminal_size()[0] / len(data[0]) - 1)
     for j in range(1, len(data[0])):
         table.table_data[1][j] = '\n'.join(wrap(data[1][j], max_width))
     for j in range(1, len(data[0])):
         table.table_data[2][j] = '\n'.join(data[2][j].split(", "))
     print_plain_results(table.table, output_file)
     
-
-def parse_math_out(math_out):
-    table_dict = {}
+def parse_math_content(lines):
+    MATH_TITLE = 0
+    TABLE_TITLE = 1
     func_type = "Unknown"
     prompt_func_type = "Function Type:"
-    prompt_metrics = ["Expectation Distance", "KS Distance", "TVD", "KL Divergence"]
-    prompt_info = ["Expression", "Maximum", "Linear"]
-    lines = math_out.split("\n")
-    lines = [line for line in lines if line]
+    prompt_metrics = (("Expectation Distance", "KS Distance", "TVD", "KL Divergence"),("Expectation Distance", "KS", "TVD", "KL"))
+        # "KS Distance": (),
+        # "TVD": (),
+        # "KL Divergence": ()}
+    errors = ["::", "not a valid", "error"]
     i = 0
     while i < len(lines):
         if lines[i] == prompt_func_type:
             func_type = lines[i+1]
             i += 2
-        elif lines[i] in prompt_metrics:
-            table_dict[lines[i]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
-            i += 6
+        elif lines[i] in prompt_metrics[MATH_TITLE]:
+            index_metric = prompt_metrics[MATH_TITLE].index(lines[i])
         else:
             i += 1
+    if func_type == "Discrete":
+        table_dict[prompt_metrics[TABLE_TITLE][index_metric]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
+        index += 6
+    else:
+        table_dict[prompt_metrics[TABLE_TITLE][index_metric]] = [lines[i+1], lines[i+3].replace("{", "").replace("}", ""), lines[i+5]]
+        index += 6
+    return index
+
+def parse_math_out(math_out, explict_eps):
+    if explict_eps:
+        prompt_info = {"Discrete": ("Maximum"),
+            "Continous": ("Maximum")}
+    else:
+        prompt_info = {"Discrete": ("Expression", "Maximum", "Linear"),
+            "Continous": ("Bounds", "Maximum", "Linear")}
+    lines = math_out.split("\n")
+    lines = [line.strip() for line in lines if line]
+    table_dict, func_type = parse_math_content(lines)
     metrics = list(table_dict.keys())
     table_data = [[""] + metrics]
-    for i in range(len(prompt_info)):
-        row = [prompt_info[i]]
+    for i in range(len(prompt_info[func_type])):
+        row = [prompt_info[func_type][i]]
         for key in metrics:
             row.append(table_dict[key][i])
         table_data.append(row)
     return table_data, func_type
 
-def print_results(index, math_file, math_out, output_file, plain):
+def print_results(index, math_file, math_out, output_file, plain, explict_eps):
     if not math_out:
-        failure_message = "Mathematica fails or runs out of time: " + math_file
+        failure_message = "Mathematica fails or runs out of time: " + math_file + "\n" + math_out
         print_plain_results(failure_message, output_file)
     elif plain:
         success_message = "Analyzed parameter " + str(index+1) + ":\n" + math_out
         print_plain_results(success_message, output_file)
     else:
-        table_math_out, func_type = parse_math_out(math_out)
+        table_math_out, func_type = parse_math_out(math_out, explict_eps)
         message = "Function Type:\n" + func_type
         print_plain_results(message, output_file)
         print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
@@ -389,7 +405,7 @@ def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_m
                 math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps, noise_percentage, metrics, custom_metric_name)
             f.write(math_run + "\n")
         math_out = run_math(math_files[i], math_timeout)
-        print_results(i, math_files[i], math_out, output_file, plain)
+        print_results(i, math_files[i], math_out, output_file, plain, explict_eps)
 
 def exit_message(message):
     print(message)
