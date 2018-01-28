@@ -33,7 +33,8 @@ islinear2ks[p_] := Module[
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
 
-printPrecision12[num_] := (Print[ToString[SetPrecision[num,12]]])
+printPrecision12[num_] := Print[ToString[Quiet[Check[SetPrecision[num,12],"error"]]]]
+printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
 revkseps[disres_,varsnoeps_] := Module[
 	{},
@@ -47,9 +48,9 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres := edistance[p,q,epscons][[1]];
+	edistanceres = Quiet[Check[edistance[p,q,epscons][[1]],"error"]];
 	Print["Expectation Distance"];
-	Print[edistanceres];
+	printCheckExp[edistanceres];
     If[!flageps,
 	    Print["Expectation Distance Max"];
 	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
@@ -61,7 +62,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 
 pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module[
     {},
-    cusres := customfun[p,q];
+    cusres = customfun[p,q];
     Print["User Defined Metric"];
     Print[cusres];
     If[!flageps,
@@ -75,18 +76,18 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module
 
 pks[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
-	disres = FullSimplify[distance[p,q,epscons && varscons],epscons && varscons];
+	disres = Quiet[Check[FullSimplify[distance[p,q,epscons && varscons],epscons && varscons],"error"]];
     If[!flageps,
 	    Print["KS Distance"];
-	    Print[disres];
+	    printCheckExp[disres];
 	    Print["KS Distance Max"];
-	    distancemax2res := distancemax2[p,q,epscons && varscons,Prepend[vars,eps]];
+	    distancemax2res = Quiet[distancemax2[p,q,epscons && varscons,Prepend[vars,eps]]];
 	    printPrecision12[distancemax2res];
         Print["Is Linear?"];
         disresr2[r2_] = (disres /. r1->r2);
 	    Print[islinear2[disresr2[r2]]],
     Print["KS Distance"];
-        distancemax2res := distancemax2[p,q,varscons,vars];
+        distancemax2res = Quiet[distancemax2[p,q,varscons,vars]];
         printPrecision12[distancemax2res]];
 	Print[""];
 	disres
@@ -95,7 +96,7 @@ ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	{tvdres := tvd[p,q,epscons,discretevars]
 	},
 	Print["TVD"];
-	Print[tvdres];
+	printCheckExp[tvdres];
     If[!flageps,
 	    Print["TVD Max"];
 	    printPrecision12[Maximize[{tvdres,epscons && varscons},Prepend[vars,eps]]];
@@ -104,10 +105,10 @@ ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	Print[""]
 ]
 pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
-	{klres := kl[p,q,epscons,discretevars]
+	{klres = kl[p,q,epscons,discretevars]
 	},
 	Print["KL Divergence"];
-	Print[klres];
+	printCheckExp[klres];
     If[!flageps,
 	    Print["KL Divergence Max"];
 	    printPrecision12[Maximize[{klres,epscons && varscons},Prepend[vars,eps]]];
@@ -132,9 +133,9 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    Print["TVD Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
-	    Print[{k*eps+bmin,k*eps+bmax}];
+	    printCheckExp[{k*eps+bmin,k*eps+bmax}];
 	    Print["TVD Max"];
-	    maxSample := Max[table];
+	    maxSample = Max[table];
 	    Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
 	    Print["NA"],
@@ -156,9 +157,9 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    Print["KL Divergence Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
-	    Print[{k*eps+bmin,k*eps+bmax}];
+	    printCheckExp[{k*eps+bmin,k*eps+bmax}];
 	    Print["KL Divergence Max"];
-	    maxSample := Max[table];
+	    maxSample = Max[table];
 	    printPrecision12["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
 	    Print["NA"],
