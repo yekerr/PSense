@@ -52,7 +52,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     ];
     If[flagkl,
 	If[continuous,
-		timekl = Timing[pklcont[flageps,p,np,newepscons,newvarscons,newvars]],
+		timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
 		timekl = Timing[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars]]
 	];
 	If[filecsv,WriteString[$stream, timekl[[1]]];WriteString[$stream,","]]

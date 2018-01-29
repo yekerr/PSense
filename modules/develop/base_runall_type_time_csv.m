@@ -19,8 +19,8 @@ kl[p_, q_, epscons_, discretevars_] :=
    discretevars]]
 tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]
 tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],{r1,Quiet[Minimize[{r1, varscons},r1]][[1]],Quiet[Maximize[{r1, varscons},r1]][[1]]}]
-sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[tvdcont[p,np,epscons,varscons,vars,v], epsrange]
-samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
+sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
+samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[klcont[p,np,epscons,varscons,vars,v]], epsrange]
 klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
 klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
 islinear2[p_]:= Module[
@@ -131,7 +131,7 @@ pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	Print[klres];
 	addquote[klres];
     If[!flageps,
-	    Print["KL Max"];
+	    Print["KL Divergence Max"];
 	    klmax = Maximize[{klres,epscons && varscons},Prepend[vars,eps]];
 	    Print[klmax];
 	    addquote[klmax];
@@ -190,7 +190,7 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    data = Transpose[{xsample,table}];
 	    lm = Quiet[LinearModelFit[data,eps,eps]];
 	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
-	    Print[" KL Bounds(lower, upper):"];
+	    Print[" KL Divergence Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
             lowerbound = k*eps+bmin;
@@ -198,7 +198,7 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    Print[lowerbound];
 	    Print[upperbound];
             addquote[{lowerbound,upperbound}];
-	    Print["KL Max"];
+	    Print["KL Divergence Max"];
 	    maxSample := Max[table];
 	    Print["{",maxSample,", ","{eps -> ",xsample[[Position[table, maxSample][[1]][[1]]]],"}}"];
 	    WriteString[$stream,"\""];
