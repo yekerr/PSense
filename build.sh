@@ -9,5 +9,5 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 
 if [ "$(uname)" == "Darwin" ] || [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    echo "alias psense='python3 $(PWD)/psense.py'" >> ~/.bash_profile     
+    echo "alias psense='python3 $PWD/psense.py'" >> ~/.bash_profile     
 fi
