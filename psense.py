@@ -8,6 +8,7 @@ from terminaltables import SingleTable
 from textwrap import wrap
 from collections import defaultdict
 
+file_dirs = []
 
 def parse_psi_output(output):
     result = ""
@@ -21,9 +22,11 @@ def parse_psi_output(output):
     return result
 
 def create_dirs_from_path(path):
+    global file_dirs
     if path and not os.path.exists(path):
         try:
             os.makedirs(path)
+            file_dirs.append(path)
         except:
             raise
 
@@ -369,6 +372,7 @@ def print_results(index, math_file, math_out, output_file, plain, explict_eps):
         print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
 
 def run_file(args):
+    global file_dirs
     input_file = args["input_file"]
     output_file = args["output_file"]
     explict_eps = args["explict_eps"]
@@ -472,6 +476,9 @@ def run_file(args):
             f.write(math_run + "\n")
         math_out = run_math(math_files[i], math_timeout)
         print_results(i, math_files[i], math_out, output_file, plain, explict_eps)
+    if not args["log"]:
+        for path in file_dirs:
+            shutil.rmtree(path)
 
 def exit_message(message):
     print(message)
@@ -484,17 +491,18 @@ def init_args():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", help="PSI file")
     group.add_argument("-r", help="Directory containing PSI files")
-    parser.add_argument("-o", nargs="?", help="Optional output file")
+    parser.add_argument("-o", nargs="?", help="Output file")
     parser.add_argument("-e", nargs="?", help="Explicit numerical interfrance in all prior distribution")
     parser.add_argument("-p", nargs="?", help="Noise percentage (p=(0,1), Defualt=0.1)")
     help_metric = "Metrics for sensitivity analysis (support ExpDist,KS,TVD,KL,Custom). \
     Please enclose metrics with double quotation marks e.g. \"ExpDist,KL,Custom:FilePath\" \"KS,TVD\" \
     Note: function name of custom metric should be identical as the file name"
     parser.add_argument("-metric", nargs="?", help=help_metric)
-    parser.add_argument("-tp", nargs="?", help="Optional PSI timeout (second)")
-    parser.add_argument("-tm", nargs="?", help="Optional Mathematica timeout (second)")
+    parser.add_argument("-tp", nargs="?", help="PSI timeout (second)")
+    parser.add_argument("-tm", nargs="?", help="Mathematica timeout (second)")
     parser.add_argument("-plain", action="store_true", help="Print raw outputs")
-    parser.add_argument("-verbose", action="store_true", help="Print all outputs of PSI")
+    parser.add_argument("-verbose", action="store_true", help="Print outputs of PSI")
+    parser.add_argument("-log", action="store_true", help="Keep the generated files")
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
         exit_message("PSI file doesn\'t exist")
@@ -551,7 +559,8 @@ def init_args():
         "math_timeout": argv.tm,
         "psi_timeout": argv.tp,
         "verbose": argv.verbose,
-        "plain": argv.plain
+        "plain": argv.plain,
+        "log": argv.log
     }
     return args
 
