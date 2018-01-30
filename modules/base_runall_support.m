@@ -33,27 +33,27 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
 
     If[flagexpdist,
 	If[(Length[newvars]==1),
-		timeexpdist = Timing[pedist[flageps,e,ne,newepscons,newvarscons,newvars]];
+		timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars],600]];
 		If[filecsv,WriteString[$stream, timeexpdist[[1]]];WriteString[$stream,","]],
 		If[filecsv,WriteString[$stream,",,,,"]]
 	]
     ];
     If[flagks,
-	timeks = Timing[pks[flageps,p,np,newepscons,newvarscons,newvars]];
+	timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars],600]];
 	If[filecsv,WriteString[$stream, timeks[[1]]];WriteString[$stream,","]]
 	(*revkseps[ksres,newvars];*) 
     ];
     If[flagtvd,
 	If[continuous,
-		timetvd = Timing[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars]],
-		timetvd = Timing[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars]]
+		timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
+		timetvd = Timing[ptvd[TimeConstrained[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
 	];
 	If[filecsv,WriteString[$stream, timetvd[[1]]];WriteString[$stream,","]]
     ];
     If[flagkl,
 	If[continuous,
 		timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
-		timekl = Timing[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars]]
+		timekl = Timing[TimeConstrained[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
 	];
 	If[filecsv,WriteString[$stream, timekl[[1]]];WriteString[$stream,","]]
     ];
