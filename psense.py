@@ -1,11 +1,13 @@
 import os, sys
-import subprocess as sp
 import re
 import argparse
+import shutil
+import subprocess as sp
+
 from terminaltables import SingleTable
 from textwrap import wrap
 from collections import defaultdict
-import shutil
+
 
 def parse_psi_output(output):
     result = ""
@@ -79,8 +81,21 @@ def generate_eps_param(f_eps_param, noise_percentage):
         eps_range = "(-0.1<=eps<=0.1)"
     return eps_range, str(param_type)
 
-def generate_math_exp(file, f_name, f_pdf_name, f_eps_name, f_exp_name, f_exp_eps_name, f_num_param, f_eps_param, explict_eps, noise_percentage, metrics, custom_metric_name):
-    file = "\"" + file + "\""
+def generate_math_exp(args):
+    math_output_file = args["math_output_file"]
+    f_name = args["f_name"]
+    f_pdf_name = args["f_pdf_name"]
+    f_eps_name = args["f_eps_name"]
+    f_exp_name = args["f_exp_name"]
+    f_exp_eps_name = args["f_exp_eps_name"]
+    f_num_param = args["f_num_param"]
+    f_eps_param = args["f_eps_param"]
+    explict_eps = args["explict_eps"]
+    noise_percentage = args["noise_percentage"]
+    metrics = args["metrics"]
+    custom_metric_name = args["custom_metric_name"]
+
+    file = "\"" + math_output_file + "\""
     eps_range, eps_type = generate_eps_param(f_eps_param, noise_percentage)
     if not f_exp_name or not f_exp_eps_name:
         f_exp_name = "Null"
@@ -353,8 +368,18 @@ def print_results(index, math_file, math_out, output_file, plain, explict_eps):
         print_plain_results(message, output_file)
         print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
 
-def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain):
-    psi_file = file
+def run_file(args):
+    input_file = args["input_file"]
+    output_file = args["output_file"]
+    explict_eps = args["explict_eps"]
+    metrics = args["metrics"]
+    custom_metric_file = args["custom_metric_file"]
+    psi_timeout = args["psi_timeout"]
+    math_timeout = args["math_timeout"]
+    verbose = args["verbose"]
+    plain = args["plain"]
+    
+    psi_file = input_file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
 
@@ -425,12 +450,25 @@ def run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_m
             f.write(psi_out + "\n")
             f.write(psi_pdf_out + "\n")
             f.write(psi_eps_out + "\n")
+            
+            args["math_output_file"] = math_output_files[i]
+            args["f_name"] = psi_func_name
+            args["f_pdf_name"] = psi_pdf_func_name
+            args["f_eps_name"] = psi_eps_func_name
+
+            args["f_num_param"] = psi_func_num_param
+            args["f_eps_param"] = code_eps_params[i]
+            args["custom_metric_name"] = custom_metric_name
             if code_exp:
                 f.write(psi_exp_out + "\n")
                 f.write(psi_exp_eps_out + "\n")
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, psi_exp_func_name, psi_exp_eps_func_name, psi_func_num_param, code_eps_params[i], explict_eps, noise_percentage, metrics, custom_metric_name)
+                args["f_exp_name"] = psi_exp_func_name
+                args["f_exp_eps_name"] = psi_exp_eps_func_name
+                math_run = generate_math_exp(args)
             else:
-                math_run = generate_math_exp(math_output_files[i], psi_func_name, psi_pdf_func_name, psi_eps_func_name, None, None, psi_func_num_param, code_eps_params[i], explict_eps, noise_percentage, metrics, custom_metric_name)
+                args["f_exp_name"] = None
+                args["f_exp_eps_name"] = None
+                math_run = generate_math_exp(args)
             f.write(math_run + "\n")
         math_out = run_math(math_files[i], math_timeout)
         print_results(i, math_files[i], math_out, output_file, plain, explict_eps)
@@ -439,7 +477,9 @@ def exit_message(message):
     print(message)
     exit(0)
 
-def main():
+def init_args():
+    if (sys.version_info < (3, 6)):
+        exit_message("Python vesrion should be 3.6 at greater.")
     parser = argparse.ArgumentParser(description="PSI")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", help="PSI file")
@@ -486,8 +526,7 @@ def main():
         metrics[3] = True if "kl" in argv_metrics else False
         metrics[4] = True if "custom" in argv_metrics else False
         if not any(metrics):
-            print("No metric is selected")
-            return 0
+            exit_message("No metric is selected")
         if metrics[4]:
             sp_metrics = argv_metrics.split(",")
             custom_index = ["custom" in metric for metric in sp_metrics].index(True)
@@ -495,33 +534,39 @@ def main():
             custom_path_index = custom_metric.index(":")+1
             custom_metric_file = custom_metric[custom_path_index:].strip()
             if not os.path.isfile(custom_metric_file):
-                print("Custom metric file doesn\"t exist")
-                return 0
-    output_file = argv.o
-    explict_eps = argv.e
-    noise_percentage = float(argv.p) if argv.p else 0.1
-    math_timeout = argv.tm
-    psi_timeout = argv.tp
-    verbose = argv.verbose
-    plain = argv.plain
-    if output_file:
-        if os.path.exists(output_file):
-            os.remove(output_file)
+                exit_message("Custom metric file doesn\"t exist")
+    if argv.o:
+        if os.path.exists(argv.o):
+            os.remove(argv.o)
         else:
-            create_dirs_from_path(os.path.dirname(output_file))
-    if argv.f:
-        run_file(argv.f, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain)
+            create_dirs_from_path(os.path.dirname(argv.o))
+    args = {
+        "input_file": argv.f,
+        "directory": argv.r,
+        "output_file": argv.o,
+        "explict_eps": argv.e,
+        "noise_percentage": loat(argv.p) if argv.p else 0.1,
+        "metrics": metrics,
+        "custom_metric_file": custom_metric_file,
+        "math_timeout": argv.tm,
+        "psi_timeout": argv.tp,
+        "verbose": argv.verbose,
+        "plain": argv.plain
+    }
+    return args
+
+def main():
+    args = init_args()
+    if args["input_file"]:
+        run_file(args)
     else:
-        for filename in os.listdir(argv.r):
+        for filename in os.listdir(directory):
             if filename.endswith(".psi"):
-                file = os.path.join(argv.r, filename)
+                args["input_file"] = os.path.join(directory, filename)
                 if output_file:
-                    print("Processing: "+ file + "\n")
-                    with open(output_file, "a") as f:
-                        f.write("\n" + file + ":\n")
-                else:
-                    print("\n" + file + ":")
-                run_file(file, output_file, explict_eps, noise_percentage, metrics, custom_metric_file, psi_timeout, math_timeout, verbose, plain)
+                    print("Processing: "+ input_file + "\n")
+                print_plain_results("\n" + input_file + ":", output_file)
+                run_file(args)
 
 if __name__ == "__main__":
     main()
