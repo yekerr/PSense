@@ -10,6 +10,9 @@ from collections import defaultdict
 
 file_dirs = []
 
+def tool_installed(cmd):
+    return shutil.which(cmd) is not None
+
 def parse_psi_output(output):
     result = ""
     for valid_output in output.split("\n"):
@@ -570,7 +573,14 @@ def init_args():
     }
     return args
 
+def check_cmd():
+    if not tool_installed("psi"):
+         exit_message("Please include \"psi\" into your path.")
+    if not tool_installed("MathematicaScript"):
+        exit_message("Please include \"MathematicaScript\" into your path.")
+
 def main():
+    check_cmd()
     args = init_args()
     if args["input_file"]:
         run_file(args)
