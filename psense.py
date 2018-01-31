@@ -329,7 +329,10 @@ def parse_math_content(lines, explict_eps):
                 table_dict[abbr_metric].append(expr)
                 i += 2
                 while i < len(lines):
-                    if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
+                    if lines[i] == metric + " Max":
+                        table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
+                        i += 2
+                    elif lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
                         table_dict[abbr_metric].append(parse_math_bounds(lines[i+1]))
                         i += 2
                     elif lines[i] == "Is Linear?":
