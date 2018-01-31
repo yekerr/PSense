@@ -1,0 +1,83 @@
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance     (0x(B KL              (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Abs[p[r1] -     (0x(B (Log[pEps[r1]/p (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]]       (0x(B [r1]]*pEps[r1]) (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B /Log[2]         (0x(B
+(0x(B Maximum    (0x(B error                (0x(B NMaximize[Abs[p (0x(B error           (0x(B
+(0x(B            (0x(B                      (0x(B [r1] -          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 1.00000000000   (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]] -0.01 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 00000000000 <=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B eps <=          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0.0100000000000 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B && pPDF[r1] !=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0 eps r1]       (0x(B                 (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True            (0x(B True            (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 2(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance     (0x(B KL              (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Abs[p[r1] -     (0x(B (Log[pEps[r1]/p (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]]       (0x(B [r1]]*pEps[r1]) (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B /Log[2]         (0x(B
+(0x(B Maximum    (0x(B error                (0x(B NMaximize[Abs[p (0x(B error           (0x(B
+(0x(B            (0x(B                      (0x(B [r1] -          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 1.00000000000   (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]]       (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B -0.100000000000 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B <= eps <=       (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0.100000000000  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B && pPDF[r1] !=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0 eps r1]       (0x(B                 (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True            (0x(B True            (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 3(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance     (0x(B KL              (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (-98816*Abs[eps      (0x(B Abs[p[r1] -     (0x(B (Log[pEps[r1]/p (0x(B
+(0x(B            (0x(B ])/(321*(-321 +      (0x(B pEps[r1]]       (0x(B [r1]]*pEps[r1]) (0x(B
+(0x(B            (0x(B 130*eps))            (0x(B                 (0x(B /Log[2]         (0x(B
+(0x(B Maximum    (0x(B error                (0x(B NMaximize[Abs[p (0x(B error           (0x(B
+(0x(B            (0x(B                      (0x(B [r1] -          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 1.00000000000   (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]] -0.05 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 00000000000 <=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B eps <=          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0.0500000000000 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B && pPDF[r1] !=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0 eps r1]       (0x(B                 (0x(B
+(0x(B Linear     (0x(B False                (0x(B True            (0x(B True            (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 4(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance     (0x(B KL              (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B -128/321 +           (0x(B Abs[p[r1] -     (0x(B (Log[pEps[r1]/p (0x(B
+(0x(B            (0x(B 128/(321 +           (0x(B pEps[r1]]       (0x(B [r1]]*pEps[r1]) (0x(B
+(0x(B            (0x(B 8*eps^2*(-61 +       (0x(B                 (0x(B /Log[2]         (0x(B
+(0x(B            (0x(B 176*eps^2 -          (0x(B                 (0x(B                 (0x(B
+(0x(B            (0x(B 304*eps^4 +          (0x(B                 (0x(B                 (0x(B
+(0x(B            (0x(B 224*eps^6))          (0x(B                 (0x(B                 (0x(B
+(0x(B Maximum    (0x(B error                (0x(B NMaximize[Abs[p (0x(B error           (0x(B
+(0x(B            (0x(B                      (0x(B [r1] -          (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 1.00000000000   (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B pEps[r1]]       (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B -0.100000000000 (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B <= eps <=       (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0.100000000000  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B && pPDF[r1] !=  (0x(B                 (0x(B
+(0x(B            (0x(B                      (0x(B 0 eps r1]       (0x(B                 (0x(B
+(0x(B Linear     (0x(B False                (0x(B True            (0x(B True            (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B

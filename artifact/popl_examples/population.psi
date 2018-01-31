@@ -1,0 +1,12 @@
+def main(){
+	x := 0.5;
+	for t in [0..10){
+		p := 0.1*x;
+		x = 0;
+		for j in [0..4){
+			z := bernoulli(p);
+			x = x + (1/4)*z;
+		}
+	}
+	return Expectation(x);
+}
