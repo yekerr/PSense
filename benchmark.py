@@ -29,9 +29,9 @@ def tool_installed(cmd):
 
 def check_cmd():
     if not tool_installed("psi"):
-        exit_message("Please include \"psi\" into your path.")
+        exit_message("Please include \"psi\" into your PATH.")
     if not tool_installed("MathematicaScript"):
-        exit_message("Please include \"MathematicaScript\" into your path.")
+        exit_message("Please include \"MathematicaScript\" into your PATH.")
 
 def main():
     if len(sys.argv) != 3:
