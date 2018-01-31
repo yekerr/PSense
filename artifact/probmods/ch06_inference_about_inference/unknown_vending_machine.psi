@@ -1,0 +1,21 @@
+actionPrior := [0.5, 0.5];
+def vendingMachine(action: R, aEffects: R[], bEffects: R[]){
+        if(action == 0) {return categorical(aEffects);}
+        else if(action == 1){return categorical(bEffects);}
+        else{return 2;}
+}
+
+def chooseAction(goal: R, aEffects: R[], bEffects: R[]){
+        action := categorical(actionPrior);
+        observe(goal == vendingMachine(action, aEffects, bEffects));
+        return action;
+}
+def main(){
+        aEffects := [beta(1,1), 0];
+        bEffects := [beta(1,1), 0];
+        aEffects[1] = 1-aEffects[0];
+        bEffects[1] = 1-bEffects[0];
+        goal := bernoulli(0.5);
+	observe(goal == 1 && sample(Marginal(chooseAction(goal, aEffects, bEffects)== 1)));
+        return bEffects[1]; //expected: 1/2·[-1+r₁≤0]·[-r₁≤0]+[-1+r₁≤0]·[-r₁≤0]·r₁
+}

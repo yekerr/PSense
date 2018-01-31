@@ -1,0 +1,13 @@
+def skepticalModel(){
+	sameAsFlippling := bernoulli(0.5);
+	p := 0;
+	if(sameAsFlippling){p = 0.5;}
+	else{p = uniform(0,1);}
+	coinSpinner := binomial(20, p);
+	observe(coinSpinner == 15);
+	return sameAsFlippling;
+}
+
+def main(){
+	return skepticalModel(); // expected: 20349/85885·δ[-r₁+1]+65536/85885·δ[r₁]
+}

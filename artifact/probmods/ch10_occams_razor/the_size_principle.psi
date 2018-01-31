@@ -1,0 +1,17 @@
+def hypothesisToDist(hyp){// 0 is Big, 1 is Small
+        if(hyp == 0){return categorical([1/ 6, 1/ 6, 1/ 6, 1/ 6, 1/ 6, 1/ 6]);}
+        else{return categorical([1/ 3, 1/ 3, 1/ 3]);}
+}
+
+data := 0;//  0 is 'a'
+
+def post(){
+        hypothesis := 0;
+        if(!bernoulli(0.5)){hypothesis = 1;}
+        observe(data == hypothesisToDist(hypothesis));
+        return hypothesis;
+}
+
+def main(){
+        return post(); //expected: 1/3·δ[r₁]+2/3·δ[-r₁+1]
+}

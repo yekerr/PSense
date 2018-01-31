@@ -1,0 +1,9 @@
+def main(){ 
+	A := 0;
+	B := 0;
+	C := bernoulli(0.5);
+	if(C){A = bernoulli(0.5);B = bernoulli(0.1);} 
+	else{B = bernoulli(0.4);A = bernoulli(0.9);}
+	observe(A == 1); //observe(A == 0);
+	return B; // expected: 41/140·δ[-B+1]+99/140·δ[B]
+} 

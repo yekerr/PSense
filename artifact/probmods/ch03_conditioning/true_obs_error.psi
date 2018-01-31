@@ -1,0 +1,5 @@
+def main(){
+  trueX := gauss(0, 1);
+  observe(gauss(trueX, 0.1) == 0.2);
+  return trueX; // expected: 0
+}
