@@ -286,6 +286,9 @@ def print_table_results(title, data, output_file):
 
 def parse_math_expr(exp):
     return "\n".join(exp.replace("{", "").replace("}", "").split(", "))
+def parse_math_bounds(exp):
+    exps = exp.strip("{}").split(", ")
+    return "lower: " + exps[0] + "\n" + "upper: " + exps[-1]
 
 def parse_math_content(lines, explict_eps):
     MATH_TITLE = 0
@@ -327,7 +330,7 @@ def parse_math_content(lines, explict_eps):
                 i += 2
                 while i < len(lines):
                     if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
-                        table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
+                        table_dict[abbr_metric].append(parse_math_bounds(lines[i+1]))
                         i += 2
                     elif lines[i] == "Is Linear?":
                         table_dict[abbr_metric].append(lines[i+1])

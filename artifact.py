@@ -1,7 +1,7 @@
 import os
 import subprocess as sp
 
-input_root_dir = "123"
+input_root_dir = "probmods_webppl_to_psi"
 output_root_dir = "artifact"
 black_list = ["eps", "exp", "math"]
 cwd_dir = os.getcwd()
