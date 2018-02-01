@@ -247,11 +247,11 @@ def run_psi(file, option, timeout, verbose):
         print(psi_out.stdout.decode("utf-8"))
     return parse_psi_output(psi_out.stdout.decode("utf-8"))
 
-def run_math(file, timeout):
+def run_math(file, timeout, mathematica):
     if timeout:
         timeout = int(timeout)
     try:
-        math_out = sp.run(["MathematicaScript", "-script", file], stdout=sp.PIPE, timeout=timeout)
+        math_out = sp.run([mathematica, "-script", file], stdout=sp.PIPE, timeout=timeout)
     except sp.TimeoutExpired:
         return None
     return math_out.stdout.decode("utf-8").strip()
@@ -391,6 +391,7 @@ def run_file(args):
     math_timeout = args["math_timeout"]
     verbose = args["verbose"]
     plain = args["plain"]
+    mathematica = args["mathematica"]
     
     psi_file = input_file
     psi_file_name = os.path.basename(psi_file)
@@ -483,7 +484,7 @@ def run_file(args):
                 args["f_exp_eps_name"] = None
                 math_run = generate_math_exp(args)
             f.write(math_run + "\n")
-        math_out = run_math(math_files[i], math_timeout)
+        math_out = run_math(math_files[i], math_timeout, mathematica)
         print_results(i, math_files[i], math_out, output_file, plain, explict_eps)
     if not args["log"]:
         for path in file_dirs:
@@ -557,6 +558,7 @@ def init_args():
             os.remove(argv.o)
         else:
             create_dirs_from_path(os.path.dirname(argv.o))
+    mathematica = "wolfram" if tool_installed("wolfram") else "wolframscript"
     args = {
         "input_file": argv.f,
         "directory": argv.r,
@@ -569,15 +571,16 @@ def init_args():
         "psi_timeout": argv.tp,
         "verbose": argv.verbose,
         "plain": argv.plain,
-        "log": argv.log
+        "log": argv.log,
+        "mathematica": mathematica
     }
     return args
 
 def check_cmd():
     if not tool_installed("psi"):
          exit_message("Please include \"psi\" into your PATH.")
-    if not tool_installed("MathematicaScript"):
-        exit_message("Please include \"MathematicaScript\" into your PATH.")
+    if not tool_installed("wolfram") and not tool_installed("wolframscript"):
+        exit_message("Please include \"wolfram\" or \"wolframscript\" into your PATH.")
 
 def main():
     check_cmd()
