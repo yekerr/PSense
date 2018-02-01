@@ -1,0 +1,81 @@
+
+Function Type:
+Continuous
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B         (0x(B Expectation Distance  (0x(B TVD Bounds            (0x(B
+(0tqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqu(B
+(0x(B Bounds  (0x(B error                 (0x(B 0. - 0.28038646626701 (0x(B
+(0x(B         (0x(B                       (0x(B 61*eps                (0x(B
+(0x(B         (0x(B                       (0x(B 0.0039267800647356755 (0x(B
+(0x(B         (0x(B                       (0x(B - 0.2803864662670161* (0x(B
+(0x(B         (0x(B                       (0x(B eps                   (0x(B
+(0x(B Maximum (0x(B NMaximize::nnum: The  (0x(B lower:                (0x(B
+(0x(B         (0x(B function value -error (0x(B 0.00616987179487      (0x(B
+(0x(B         (0x(B is not a number at    (0x(B upper: {eps ->        (0x(B
+(0x(B         (0x(B eps r1 = 0.00837242   (0x(B -0.00800000000000     (0x(B
+(0x(B         (0x(B 0.831757.             (0x(B                       (0x(B
+(0x(B Linear  (0x(B True                  (0x(B NA                    (0x(B
+(0mqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Continuous
+(0l(BAnalyzed parameter 2(0qqqqqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B         (0x(B Expectation Distance                (0x(B
+(0tqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu(B
+(0x(B Bounds  (0x(B error                               (0x(B
+(0x(B Maximum (0x(B NMaximize::nnum: The function value (0x(B
+(0x(B         (0x(B -error is not a number at eps r1 =  (0x(B
+(0x(B         (0x(B 0.0837242 0.831757.                 (0x(B
+(0x(B Linear  (0x(B True                                (0x(B
+(0mqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Continuous
+(0l(BAnalyzed parameter 3(0qqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B         (0x(B Expectation Distance (0x(B TVD Bounds      (0x(B KL Bounds       (0x(B
+(0tqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Bounds  (0x(B error                (0x(B 0. - 0.28584181 (0x(B -0.008961860737 (0x(B
+(0x(B         (0x(B                      (0x(B 678858617*eps 0 (0x(B 516538 + 1.0617 (0x(B
+(0x(B         (0x(B                      (0x(B .00388313726056 (0x(B 243810728045*ep (0x(B
+(0x(B         (0x(B                      (0x(B 3115 - 0.285841 (0x(B s 0. + 1.061724 (0x(B
+(0x(B         (0x(B                      (0x(B 81678858617*eps (0x(B 3810728045*eps  (0x(B
+(0x(B Maximum (0x(B NMaximize::nnum      (0x(B lower: 0.006169 (0x(B lower: 0.002196 (0x(B
+(0x(B         (0x(B : The function       (0x(B 87179487 upper: (0x(B 29155894 upper: (0x(B
+(0x(B         (0x(B value -error is      (0x(B {eps -> -0.0080 (0x(B {eps ->         (0x(B
+(0x(B         (0x(B not a number at      (0x(B 0000000000      (0x(B 0.0100000000000 (0x(B
+(0x(B         (0x(B eps r1 =             (0x(B                 (0x(B                 (0x(B
+(0x(B         (0x(B 0.00837242           (0x(B                 (0x(B                 (0x(B
+(0x(B         (0x(B 0.831757.            (0x(B                 (0x(B                 (0x(B
+(0x(B Linear  (0x(B True                 (0x(B NA              (0x(B NA              (0x(B
+(0mqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Continuous
+(0l(BAnalyzed parameter 4(0qqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B         (0x(B Expectation Distance  (0x(B TVD Bounds            (0x(B
+(0tqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqu(B
+(0x(B Bounds  (0x(B error                 (0x(B -4.473787389638136*^- (0x(B
+(0x(B         (0x(B                       (0x(B 18 + 0.32237035553454 (0x(B
+(0x(B         (0x(B                       (0x(B 61*eps                (0x(B
+(0x(B         (0x(B                       (0x(B 0.02703075069098932 + (0x(B
+(0x(B         (0x(B                       (0x(B 0.3223703555345461*ep (0x(B
+(0x(B         (0x(B                       (0x(B s                     (0x(B
+(0x(B Maximum (0x(B NMaximize::nnum: The  (0x(B lower:                (0x(B
+(0x(B         (0x(B function value -error (0x(B 0.0534722222222       (0x(B
+(0x(B         (0x(B is not a number at    (0x(B upper: {eps ->        (0x(B
+(0x(B         (0x(B eps r1 = 0.0837242    (0x(B 0.100000000000        (0x(B
+(0x(B         (0x(B 0.831757.             (0x(B                       (0x(B
+(0x(B Linear  (0x(B True                  (0x(B NA                    (0x(B
+(0mqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqj(B
+
+Function Type:
+Continuous
+(0l(BAnalyzed parameter 5(0qqqqqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B         (0x(B Expectation Distance                (0x(B
+(0tqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu(B
+(0x(B Bounds  (0x(B error                               (0x(B
+(0x(B Maximum (0x(B NMaximize::nnum: The function value (0x(B
+(0x(B         (0x(B -error is not a number at eps r1 =  (0x(B
+(0x(B         (0x(B 0.0837242 0.831757.                 (0x(B
+(0x(B Linear  (0x(B True                                (0x(B
+(0mqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj(B

@@ -1,0 +1,72 @@
+4
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqwqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance     (0x(B KL              (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B ((893 +              (0x(B Abs[60*Boole[r1 (0x(B ((1 + 5*eps)*Bo (0x(B
+(0x(B            (0x(B eps*(-973 +          (0x(B >= 1] + (-4 +   (0x(B ole[eps <=      (0x(B
+(0x(B            (0x(B 5*(129 - 40*eps      (0x(B 5*eps)*(5*(3 +  (0x(B 0]*Log[(1 + 5*e (0x(B
+(0x(B            (0x(B )*eps))*Abs[eps      (0x(B 8*eps)*Boole[r1 (0x(B ps)*Boole[eps   (0x(B
+(0x(B            (0x(B ])/200               (0x(B >= 1] + (-5 +   (0x(B <=              (0x(B
+(0x(B            (0x(B                      (0x(B 8*eps)*(-((1 +  (0x(B 0]])/(5*Log[2]) (0x(B
+(0x(B            (0x(B                      (0x(B 5*eps)*Boole[r1 (0x(B + ((40*(1 +     (0x(B
+(0x(B            (0x(B                      (0x(B >= 2]) + (-4 +  (0x(B 5*eps) - 5*(-4  (0x(B
+(0x(B            (0x(B                      (0x(B eps + 5*eps^2)* (0x(B + 5*eps)*(3 + 8 (0x(B
+(0x(B            (0x(B                      (0x(B Boole[r1 >=     (0x(B *eps))*Boole[ep (0x(B
+(0x(B            (0x(B                      (0x(B 3]))*Boole[eps  (0x(B s <=            (0x(B
+(0x(B            (0x(B                      (0x(B <= 0] + 20*(2 + (0x(B 0]*Log[((40*(1  (0x(B
+(0x(B            (0x(B                      (0x(B Boole[r1 >= 2]  (0x(B + 5*eps) -      (0x(B
+(0x(B            (0x(B                      (0x(B + 4*Boole[r1 >= (0x(B 5*(-4 +         (0x(B
+(0x(B            (0x(B                      (0x(B 3] - 2*(1 + 5*e (0x(B 5*eps)*(3 + 8*e (0x(B
+(0x(B            (0x(B                      (0x(B ps)*Boole[eps   (0x(B ps))*Boole[eps  (0x(B
+(0x(B            (0x(B                      (0x(B <= 0])]/200     (0x(B <= 0])/100])/(2 (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 00*Log[2]) +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B ((40*(1 +       (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps) + (-4 +  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps)*((1 +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps)*(-5 +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps) - 5*(3 + (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps)))*Boole[ (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B eps <=          (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 0]*Log[((40*(1  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 5*eps) + (-4  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 5*eps)*((1 +  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps)*(-5 +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps) - 5*(3 + (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps)))*Boole[ (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B eps <= 0])/120] (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B )/(200*Log[2])  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + ((40*(1 +     (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps) + (-4 +  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps)*(-5*(3 + (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps) + (-5 +  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 8*eps)*(1 +     (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps - (1 +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B eps)*(-4 + 5*ep (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B s))))*Boole[eps (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B <=              (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 0]*Log[((40*(1  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 5*eps) + (-4  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 5*eps)*(-5*(3 (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 8*eps) + (-5  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B + 8*eps)*(1 +   (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 5*eps - (1 +    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B eps)*(-4 + 5*ep (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B s))))*Boole[eps (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B <= 0])/200])/(2 (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 00*Log[2])      (0x(B
+(0x(B Maximum    (0x(B 0.498475000000       (0x(B 0.187250000000  (0x(B NMaximize::nnum (0x(B
+(0x(B            (0x(B eps ->               (0x(B eps ->          (0x(B : The function  (0x(B
+(0x(B            (0x(B -0.100000000000      (0x(B -0.100000000000 (0x(B value           (0x(B
+(0x(B            (0x(B r1 -> 0              (0x(B r1 ->           (0x(B Indeterminate   (0x(B
+(0x(B            (0x(B                      (0x(B 2.00000000000   (0x(B is not a number (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B at eps r1 =     (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 0.0109772 0.    (0x(B
+(0x(B Linear     (0x(B False                (0x(B True            (0x(B FullSimplify::i (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B nfd: Expression (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B Log[(1 + 5 eps) (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B Boole[eps <=    (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B 0]] simplified  (0x(B
+(0x(B            (0x(B                      (0x(B                 (0x(B to -Infinity.   (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqj(B

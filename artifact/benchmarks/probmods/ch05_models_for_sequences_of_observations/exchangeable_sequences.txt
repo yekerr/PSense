@@ -1,0 +1,60 @@
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (28*Abs[eps          (0x(B (28*Abs[eps (0x(B 14*Abs[eps/ (0x(B ((-37 + 10* (0x(B
+(0x(B            (0x(B ])/(81 -             (0x(B ]*(-1 +     (0x(B (-81 +      (0x(B eps)*Log[(3 (0x(B
+(0x(B            (0x(B 90*eps)              (0x(B Boole[r1 >= (0x(B 90*eps)]    (0x(B 33 - 90*eps (0x(B
+(0x(B            (0x(B                      (0x(B 1]))/(-81 + (0x(B             (0x(B )/(333 - 37 (0x(B
+(0x(B            (0x(B                      (0x(B 90*eps)     (0x(B             (0x(B 0*eps)])/(1 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 0*(-9 + 10* (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps)*Log[2] (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B )           (0x(B
+(0x(B Maximum    (0x(B 0.016374269          (0x(B 0.016374269 (0x(B 0.008187134 (0x(B 0.026981381 (0x(B
+(0x(B            (0x(B 0058 eps ->          (0x(B 0058 eps -> (0x(B 50292 eps   (0x(B 0480 eps -> (0x(B
+(0x(B            (0x(B -0.05000000          (0x(B -0.05000000 (0x(B -> -0.05000 (0x(B 0.049999999 (0x(B
+(0x(B            (0x(B 00000 r1 ->          (0x(B 00000 r1 -> (0x(B 00000000 r1 (0x(B 7663 r1 ->  (0x(B
+(0x(B            (0x(B 0                    (0x(B 0           (0x(B -> 0        (0x(B 0           (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 2(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (25*Abs[eps          (0x(B (25*Abs[(ep (0x(B (25*Abs[eps (0x(B ((37 + 110* (0x(B
+(0x(B            (0x(B ])/(9*(9 +           (0x(B s*(-1 +     (0x(B /(9 + 20*ep (0x(B eps)*Log[(3 (0x(B
+(0x(B            (0x(B 20*eps))             (0x(B Boole[r1 >= (0x(B s)])/18     (0x(B 33 + 990*ep (0x(B
+(0x(B            (0x(B                      (0x(B 1]))/(9 +   (0x(B             (0x(B s)/(333 + 7 (0x(B
+(0x(B            (0x(B                      (0x(B 20*eps)])/9 (0x(B             (0x(B 40*eps)])/( (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 10*(9 + 20* (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps)*Log[2] (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B )           (0x(B
+(0x(B Maximum    (0x(B 0.039682539          (0x(B 0.039682539 (0x(B 0.019841269 (0x(B 0.037528371 (0x(B
+(0x(B            (0x(B 6825 eps ->          (0x(B 6825 eps -> (0x(B 8413 eps -> (0x(B 4461 eps -> (0x(B
+(0x(B            (0x(B -0.10000000          (0x(B -0.10000000 (0x(B -0.10000000 (0x(B 0.100000000 (0x(B
+(0x(B            (0x(B 0000 r1 ->           (0x(B 0000 r1 ->  (0x(B 0000 r1 ->  (0x(B 000 r1 -> 0 (0x(B
+(0x(B            (0x(B 0                    (0x(B 0           (0x(B 0           (0x(B             (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 3(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Abs[eps - e (0x(B Abs[eps]/2  (0x(B ((37 - 90*e (0x(B
+(0x(B            (0x(B                      (0x(B ps*Boole[r1 (0x(B             (0x(B ps)*Log[1 - (0x(B
+(0x(B            (0x(B                      (0x(B >= 1]]      (0x(B             (0x(B (90*eps)/37 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B ])/(90*Log[ (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 2])         (0x(B
+(0x(B Maximum    (0x(B error                (0x(B 0.100000000 (0x(B 0.050000000 (0x(B 0.160544390 (0x(B
+(0x(B            (0x(B                      (0x(B 000 eps ->  (0x(B 0000 eps -> (0x(B 663 eps ->  (0x(B
+(0x(B            (0x(B                      (0x(B -0.10000000 (0x(B -0.10000000 (0x(B -0.10000000 (0x(B
+(0x(B            (0x(B                      (0x(B 0000 r1 ->  (0x(B 0000 r1 ->  (0x(B 0000 r1 ->  (0x(B
+(0x(B            (0x(B                      (0x(B 0           (0x(B 0           (0x(B 0           (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True        (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B

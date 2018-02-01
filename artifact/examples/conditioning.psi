@@ -1,0 +1,8 @@
+def main(){ 
+	A:=flip(0.5); 
+	B:=flip(0.5); 
+	C:=flip(0.5); 
+	D:=A+B+C; 
+	observe(D>=2); 
+	return A;
+} 

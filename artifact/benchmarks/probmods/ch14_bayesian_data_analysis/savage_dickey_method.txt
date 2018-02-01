@@ -1,0 +1,61 @@
+Expectation is not supported
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B (Boole[8*(1 (0x(B
+(0x(B            (0x(B                      (0x(B {1, eps <   (0x(B {1, 8*(1 +  (0x(B + eps) >= 8 (0x(B
+(0x(B            (0x(B                      (0x(B 0}}, 0]     (0x(B eps) < 8}}, (0x(B ]*Log[Boole (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B 0]/2        (0x(B [8*(1 +     (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps) >=     (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 8]])/Log[2] (0x(B
+(0x(B Maximum    (0x(B NMaximize::          (0x(B 1.000000000 (0x(B 0.500000000 (0x(B Infinity::i (0x(B
+(0x(B            (0x(B nnum: The            (0x(B 00 eps -> - (0x(B 000 eps ->  (0x(B ndet: Indet (0x(B
+(0x(B            (0x(B function             (0x(B 0.008160761 (0x(B -0.00816076 (0x(B erminate    (0x(B
+(0x(B            (0x(B value                (0x(B 63493 r1 -> (0x(B 163493 r1   (0x(B expression  (0x(B
+(0x(B            (0x(B -error is            (0x(B 0.727272727 (0x(B -> 0.727272 (0x(B 0           (0x(B
+(0x(B            (0x(B not a                (0x(B 273         (0x(B 727273      (0x(B (-Infinity) (0x(B
+(0x(B            (0x(B number at            (0x(B             (0x(B             (0x(B encountered (0x(B
+(0x(B            (0x(B eps r1 =             (0x(B             (0x(B             (0x(B .           (0x(B
+(0x(B            (0x(B -0.00868794          (0x(B             (0x(B             (0x(B             (0x(B
+(0x(B            (0x(B 0.727273.            (0x(B             (0x(B             (0x(B             (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True        (0x(B True        (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 2(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B (Boole[8*(1 (0x(B
+(0x(B            (0x(B                      (0x(B {1, eps <   (0x(B {1, 8*(1 +  (0x(B + eps) >= 8 (0x(B
+(0x(B            (0x(B                      (0x(B 0}}, 0]     (0x(B eps) < 8}}, (0x(B ]*Log[Boole (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B 0]/2        (0x(B [8*(1 +     (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps) >=     (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 8]])/Log[2] (0x(B
+(0x(B Maximum    (0x(B NMaximize::          (0x(B 1.000000000 (0x(B 0.500000000 (0x(B Infinity::i (0x(B
+(0x(B            (0x(B nnum: The            (0x(B 00 eps -> - (0x(B 000 eps ->  (0x(B ndet: Indet (0x(B
+(0x(B            (0x(B function             (0x(B 0.081607616 (0x(B -0.08160761 (0x(B erminate    (0x(B
+(0x(B            (0x(B value                (0x(B 3493 r1 ->  (0x(B 63493 r1 -> (0x(B expression  (0x(B
+(0x(B            (0x(B -error is            (0x(B 0.727272727 (0x(B 0.727272727 (0x(B 0           (0x(B
+(0x(B            (0x(B not a                (0x(B 273         (0x(B 273         (0x(B (-Infinity) (0x(B
+(0x(B            (0x(B number at            (0x(B             (0x(B             (0x(B encountered (0x(B
+(0x(B            (0x(B eps r1 =             (0x(B             (0x(B             (0x(B .           (0x(B
+(0x(B            (0x(B -0.0868794           (0x(B             (0x(B             (0x(B             (0x(B
+(0x(B            (0x(B 0.727273.            (0x(B             (0x(B             (0x(B             (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True        (0x(B True        (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 3(0qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance                (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                               (0x(B
+(0x(B Maximum    (0x(B NMaximize::nnum: The function value (0x(B
+(0x(B            (0x(B -error is not a number at eps r1 =  (0x(B
+(0x(B            (0x(B -0.00868794 0.727273.               (0x(B
+(0x(B Linear     (0x(B True                                (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj(B

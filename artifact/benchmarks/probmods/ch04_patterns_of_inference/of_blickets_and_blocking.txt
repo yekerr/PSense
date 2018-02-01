@@ -1,0 +1,207 @@
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 1(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (1693711695          (0x(B (1693711695 (0x(B (8468558475 (0x(B (-17979*(-3 (0x(B
+(0x(B            (0x(B 0*Abs[eps])          (0x(B 0*Abs[(eps* (0x(B *Abs[eps/(1 (0x(B + 5*eps)*Lo (0x(B
+(0x(B            (0x(B /(129301*(1          (0x(B (-1 +       (0x(B 29301 + 985 (0x(B g[(-129301* (0x(B
+(0x(B            (0x(B 29301 +              (0x(B Boole[r1 >= (0x(B 15*eps)])/1 (0x(B (-3 + 5*eps (0x(B
+(0x(B            (0x(B 98515*eps))          (0x(B 1]))/(12930 (0x(B 29301       (0x(B ))/(387903  (0x(B
+(0x(B            (0x(B                      (0x(B 1 + 98515*e (0x(B             (0x(B + 295545*ep (0x(B
+(0x(B            (0x(B                      (0x(B ps)])/12930 (0x(B             (0x(B s)])/((1293 (0x(B
+(0x(B            (0x(B                      (0x(B 1           (0x(B             (0x(B 01 + 98515* (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps)*Log[2] (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B )           (0x(B
+(0x(B Maximum    (0x(B 0.041796241          (0x(B 0.041796241 (0x(B 0.020898120 (0x(B 0.063223989 (0x(B
+(0x(B            (0x(B 0072 eps ->          (0x(B 0072 eps -> (0x(B 5036 eps -> (0x(B 6349 eps -> (0x(B
+(0x(B            (0x(B -0.04000000          (0x(B -0.04000000 (0x(B -0.04000000 (0x(B -0.04000000 (0x(B
+(0x(B            (0x(B 00000 r1 ->          (0x(B 00000 r1 -> (0x(B 00000 r1 -> (0x(B 00000 r1 -> (0x(B
+(0x(B            (0x(B 0                    (0x(B 0           (0x(B 0           (0x(B 0           (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 2(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (6589200000          (0x(B (6589200000 (0x(B (3294600000 (0x(B (3*(17979 + (0x(B
+(0x(B            (0x(B *Abs[eps])/          (0x(B *Abs[(eps*( (0x(B *Abs[eps/(1 (0x(B 30685*eps)* (0x(B
+(0x(B            (0x(B (129301*(12          (0x(B -1 +        (0x(B 29301 + 985 (0x(B Log[(129301 (0x(B
+(0x(B            (0x(B 9301 +               (0x(B Boole[r1 >= (0x(B 15*eps)])/1 (0x(B *(17979 + 3 (0x(B
+(0x(B            (0x(B 98515*eps))          (0x(B 1]))/(12930 (0x(B 29301       (0x(B 0685*eps))/ (0x(B
+(0x(B            (0x(B                      (0x(B 1 + 98515*e (0x(B             (0x(B (17979*(129 (0x(B
+(0x(B            (0x(B                      (0x(B ps)])/12930 (0x(B             (0x(B 301 + 98515 (0x(B
+(0x(B            (0x(B                      (0x(B 1           (0x(B             (0x(B *eps))])/(( (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 129301 + 98 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 515*eps)*Lo (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B g[2])       (0x(B
+(0x(B Maximum    (0x(B 0.016260370          (0x(B 0.016260370 (0x(B 0.008130185 (0x(B 0.022471044 (0x(B
+(0x(B            (0x(B 1715 eps ->          (0x(B 1715 eps -> (0x(B 08574 eps   (0x(B 6480 eps -> (0x(B
+(0x(B            (0x(B -0.04000000          (0x(B -0.04000000 (0x(B -> -0.04000 (0x(B 0.040000000 (0x(B
+(0x(B            (0x(B 00000 r1 ->          (0x(B 00000 r1 -> (0x(B 00000000 r1 (0x(B 0000 r1 ->  (0x(B
+(0x(B            (0x(B 0                    (0x(B 0           (0x(B -> 0        (0x(B 0           (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 3(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqwqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD        (0x(B KL         (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqnqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B 0                    (0x(B 0           (0x(B 0          (0x(B 0          (0x(B
+(0x(B Maximum    (0x(B 0 eps -> 0           (0x(B 0 eps -> -0 (0x(B 0 eps -> 0 (0x(B 0 eps -> 0 (0x(B
+(0x(B            (0x(B r1 -> 0              (0x(B .0050000000 (0x(B r1 -> 0    (0x(B r1 -> 0    (0x(B
+(0x(B            (0x(B                      (0x(B 0000 r1 ->  (0x(B            (0x(B            (0x(B
+(0x(B            (0x(B                      (0x(B 0           (0x(B            (0x(B            (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True       (0x(B True       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqvqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 4(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B
+(0x(B            (0x(B                      (0x(B {118218/646 (0x(B {118218/646 (0x(B {0, eps ==  (0x(B
+(0x(B            (0x(B                      (0x(B 505, r1 < 1 (0x(B 505, eps != (0x(B 0 || eps != (0x(B
+(0x(B            (0x(B                      (0x(B && eps !=   (0x(B 0}}, 0]/2   (0x(B 0}}, Indete (0x(B
+(0x(B            (0x(B                      (0x(B 0}}, 0]     (0x(B             (0x(B rminate] +  (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B Piecewise[{ (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B {(3*Log[129 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 301/89895]) (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B /Log[32],   (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps != 0},  (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B {0, eps ==  (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 0}}, Indete (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B rminate]    (0x(B
+(0x(B Maximum    (0x(B error                (0x(B 0.182857054 (0x(B 0.091428527 (0x(B 0.314652391 (0x(B
+(0x(B            (0x(B                      (0x(B 470 eps ->  (0x(B 2349 eps -> (0x(B 858 eps ->  (0x(B
+(0x(B            (0x(B                      (0x(B -0.08160761 (0x(B -0.08160761 (0x(B -0.08160761 (0x(B
+(0x(B            (0x(B                      (0x(B 63493 r1 -> (0x(B 63493 r1 -> (0x(B 63493 r1 -> (0x(B
+(0x(B            (0x(B                      (0x(B 0           (0x(B 0           (0x(B 0           (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True        (0x(B True        (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 5(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqwqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD        (0x(B KL         (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqnqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B 0                    (0x(B 0           (0x(B 0          (0x(B 0          (0x(B
+(0x(B Maximum    (0x(B 0 eps -> 0           (0x(B 0 eps -> -0 (0x(B 0 eps -> 0 (0x(B 0 eps -> 0 (0x(B
+(0x(B            (0x(B r1 -> 0              (0x(B .0050000000 (0x(B r1 -> 0    (0x(B r1 -> 0    (0x(B
+(0x(B            (0x(B                      (0x(B 0000 r1 ->  (0x(B            (0x(B            (0x(B
+(0x(B            (0x(B                      (0x(B 0           (0x(B            (0x(B            (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True       (0x(B True       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqvqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 6(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B error                (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B Piecewise[{ (0x(B
+(0x(B            (0x(B                      (0x(B {395352000/ (0x(B {395352000/ (0x(B {0, eps ==  (0x(B
+(0x(B            (0x(B                      (0x(B 2436160141, (0x(B 2436160141, (0x(B 0 || eps != (0x(B
+(0x(B            (0x(B                      (0x(B r1 < 1 &&   (0x(B eps != 0}}, (0x(B 0}}, Indete (0x(B
+(0x(B            (0x(B                      (0x(B eps != 0}}, (0x(B 0]/2        (0x(B rminate] +  (0x(B
+(0x(B            (0x(B                      (0x(B 0]          (0x(B             (0x(B Piecewise[{ (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B {(10917*Log (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B [156842113/ (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 112914113]) (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B /(18841*Log (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B [2]), eps   (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B != 0}, {0,  (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps == 0}}, (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B Indetermina (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B te]         (0x(B
+(0x(B Maximum    (0x(B error                (0x(B 0.162284898 (0x(B 0.081142449 (0x(B 0.274699303 (0x(B
+(0x(B            (0x(B                      (0x(B 003 eps ->  (0x(B 0013 eps -> (0x(B 772 eps ->  (0x(B
+(0x(B            (0x(B                      (0x(B -0.08160761 (0x(B -0.08160761 (0x(B -0.08160761 (0x(B
+(0x(B            (0x(B                      (0x(B 63493 r1 -> (0x(B 63493 r1 -> (0x(B 63493 r1 -> (0x(B
+(0x(B            (0x(B                      (0x(B 0           (0x(B 0           (0x(B 0           (0x(B
+(0x(B Linear     (0x(B True                 (0x(B True        (0x(B True        (0x(B True        (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 7(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (4977600000          (0x(B (4977600000 (0x(B (2488800000 (0x(B (3*(17979 + (0x(B
+(0x(B            (0x(B *Abs[eps])/          (0x(B *Abs[(eps*( (0x(B *Abs[eps/(1 (0x(B 23180*eps)* (0x(B
+(0x(B            (0x(B (129301*(12          (0x(B -1 +        (0x(B 29301 + 744 (0x(B Log[(129301 (0x(B
+(0x(B            (0x(B 9301 +               (0x(B Boole[r1 >= (0x(B 20*eps)])/1 (0x(B *(17979 + 2 (0x(B
+(0x(B            (0x(B 74420*eps))          (0x(B 1]))/(12930 (0x(B 29301       (0x(B 3180*eps))/ (0x(B
+(0x(B            (0x(B                      (0x(B 1 + 74420*e (0x(B             (0x(B (17979*(129 (0x(B
+(0x(B            (0x(B                      (0x(B ps)])/12930 (0x(B             (0x(B 301 + 74420 (0x(B
+(0x(B            (0x(B                      (0x(B 1           (0x(B             (0x(B *eps))])/(( (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 129301 + 74 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 420*eps)*Lo (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B g[2])       (0x(B
+(0x(B Maximum    (0x(B 0.001492924          (0x(B 0.001492924 (0x(B 0.000746462 (0x(B 0.002145279 (0x(B
+(0x(B            (0x(B 47208 eps            (0x(B 47208 eps   (0x(B 236039 eps  (0x(B 35998 eps   (0x(B
+(0x(B            (0x(B -> -0.00500          (0x(B -> -0.00500 (0x(B -> -0.00500 (0x(B -> 0.005000 (0x(B
+(0x(B            (0x(B 000000000            (0x(B 000000000   (0x(B 000000000   (0x(B 00000000 r1 (0x(B
+(0x(B            (0x(B r1 -> 0              (0x(B r1 -> 0     (0x(B r1 -> 0     (0x(B -> 0        (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 8(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B (-2280*(263          (0x(B (2280*(2632 (0x(B (-1140*(263 (0x(B (-3*(17979  (0x(B
+(0x(B            (0x(B 281 + 71916          (0x(B 81 + 719160 (0x(B 281 + 71916 (0x(B + 14440*eps (0x(B
+(0x(B            (0x(B 0*eps)*Abs[          (0x(B *eps)*Abs[e (0x(B 0*eps)*Abs[ (0x(B )*Log[(-129 (0x(B
+(0x(B            (0x(B eps])/(1293          (0x(B ps]*(-1 +   (0x(B eps])/(1293 (0x(B 301*(17979  (0x(B
+(0x(B            (0x(B 01*(-129301          (0x(B Boole[r1 >= (0x(B 01*(-129301 (0x(B + 14440*eps (0x(B
+(0x(B            (0x(B + 1520*eps*          (0x(B 1]))/(12930 (0x(B + 1520*eps* (0x(B ))/(17979*( (0x(B
+(0x(B            (0x(B (-61 +               (0x(B 1*(-129301  (0x(B (-61 +      (0x(B -129301 + 1 (0x(B
+(0x(B            (0x(B 20*eps)))            (0x(B + 1520*eps* (0x(B 20*eps)))   (0x(B 520*eps*(-6 (0x(B
+(0x(B            (0x(B                      (0x(B (-61 +      (0x(B             (0x(B 1 + 20*eps) (0x(B
+(0x(B            (0x(B                      (0x(B 20*eps)))   (0x(B             (0x(B ))])/((-129 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 301 + 1520* (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B eps*(-61 +  (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 20*eps))*Lo (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B g[2])       (0x(B
+(0x(B Maximum    (0x(B 0.002610457          (0x(B 0.002610457 (0x(B 0.001305228 (0x(B 0.005490443 (0x(B
+(0x(B            (0x(B 90449 eps            (0x(B 90449 eps   (0x(B 95224 eps   (0x(B 60575 eps   (0x(B
+(0x(B            (0x(B -> -0.09000          (0x(B -> -0.09000 (0x(B -> -0.09000 (0x(B -> 0.090000 (0x(B
+(0x(B            (0x(B 00000000 r1          (0x(B 00000000 r1 (0x(B 00000000 r1 (0x(B 0000000 r1  (0x(B
+(0x(B            (0x(B -> 0                 (0x(B -> 0        (0x(B -> 0        (0x(B -> 0        (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B
+
+Function Type:
+Discrete
+(0l(BAnalyzed parameter 9(0qqqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqwqqqqqqqqqqqqqk(B
+(0x(B            (0x(B Expectation Distance (0x(B KS Distance (0x(B TVD         (0x(B KL          (0x(B
+(0tqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqnqqqqqqqqqqqqqu(B
+(0x(B Expression (0x(B Abs[75364/1          (0x(B (4560*(-216 (0x(B (2280*(-216 (0x(B (3*(-17979  (0x(B
+(0x(B            (0x(B 29301 +              (0x(B 9301 + 1130 (0x(B 9301 + 1130 (0x(B + 760*eps*( (0x(B
+(0x(B            (0x(B (75364 + 45          (0x(B 460*eps)*Ab (0x(B 460*eps)*Ab (0x(B -59 + 30*ep (0x(B
+(0x(B            (0x(B 60*eps)/(-1          (0x(B s[eps]*Piec (0x(B s[eps])/(12 (0x(B s))*Log[(12 (0x(B
+(0x(B            (0x(B 29301 + 228          (0x(B ewise[{{1,  (0x(B 9301*(-1293 (0x(B 9301*(-1797 (0x(B
+(0x(B            (0x(B 0*eps*(-61           (0x(B r1 < 1}}, 0 (0x(B 01 + 2280*e (0x(B 9 + 760*eps (0x(B
+(0x(B            (0x(B + 30*eps))]          (0x(B ])/(129301* (0x(B ps*(-61 +   (0x(B *(-59 + 30* (0x(B
+(0x(B            (0x(B                      (0x(B (-129301 +  (0x(B 30*eps)))   (0x(B eps)))/(179 (0x(B
+(0x(B            (0x(B                      (0x(B 2280*eps*(- (0x(B             (0x(B 79*(-129301 (0x(B
+(0x(B            (0x(B                      (0x(B 61 +        (0x(B             (0x(B + 2280*eps* (0x(B
+(0x(B            (0x(B                      (0x(B 30*eps)))   (0x(B             (0x(B (-61 + 30*e (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B ps)))])/((- (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 129301 + 22 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B 80*eps*(-61 (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B + 30*eps))* (0x(B
+(0x(B            (0x(B                      (0x(B             (0x(B             (0x(B Log[2])     (0x(B
+(0x(B Maximum    (0x(B 0.002982145          (0x(B 0.002982145 (0x(B 0.001491072 (0x(B 0.004249033 (0x(B
+(0x(B            (0x(B 26202 eps            (0x(B 26202 eps   (0x(B 63101 eps   (0x(B 82318 eps   (0x(B
+(0x(B            (0x(B -> -0.00500          (0x(B -> -0.00500 (0x(B -> -0.00500 (0x(B -> 0.005000 (0x(B
+(0x(B            (0x(B 000000000            (0x(B 000000000   (0x(B 000000000   (0x(B 00000000 r1 (0x(B
+(0x(B            (0x(B r1 -> 0              (0x(B r1 -> 0     (0x(B r1 -> 0     (0x(B -> 0        (0x(B
+(0x(B Linear     (0x(B False                (0x(B False       (0x(B False       (0x(B False       (0x(B
+(0mqqqqqqqqqqqqvqqqqqqqqqqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqvqqqqqqqqqqqqqj(B

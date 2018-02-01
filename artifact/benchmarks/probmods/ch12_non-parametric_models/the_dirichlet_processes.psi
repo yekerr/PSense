@@ -1,0 +1,21 @@
+def pickStick(){
+        J := 0;
+        break := 0;
+        sticks := ([]:R[]);
+        for i in [0..4){
+                sticks ~= makeSticks(1);
+                if(bernoulli(sticks[i])){break = 1;}
+                if(!break){J += 1;}
+        }
+        return J+ 1;
+}
+
+
+def makeSticks(alpha){
+        return [beta(1, alpha)];
+}
+
+def main(){
+        return pickStick(); //expected: 1/16·δ[-r₁+4]+1/16·δ[-r₁+5]+1/2·δ[-r₁+1]+1/4·δ[-r₁+2]+1/8·δ[-r₁+3]
+
+}
