@@ -1,6 +1,6 @@
 
 
-PSense is a system that evaluates sensitivity of probabilistic programs. It takes programs written in the source language of PSI as input and automatically evaluates how the noise in the prior distributions affects the posterior probabilities. PSense measures the posterior change via statistical distances including expectation distance, Kolmogorov-€“Smirnov statistic, total variation distance, and Kullback-Leibler divergence.
+PSense is a system that evaluates sensitivity of probabilistic programs. It takes programs written in the source language of PSI as input and automatically evaluates how the noise in the prior distributions affects the posterior probabilities. PSense measures the posterior change via statistical distances including expectation distance, Kolmogorov-Smirnov statistic, total variation distance, and Kullback-Leibler divergence.
 
 # Artifact folder contents
 
@@ -61,7 +61,7 @@ psense.py:
   Contains the system entry point, interprets the command line arguments, gets psi results and generates .m files to call the Mathematica modules.
 
 terminaltables/*:
-  Renders the plain output given by Mathematica to table-like format.
+  Renders the plain output given by Mathematica to table-like format. The author is @Robpol86.
 
 modules/base_runall_support.m:
   Detects the distribution support and calls different functions and metrics defined in base.m.
