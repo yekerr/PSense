@@ -328,15 +328,12 @@ def parse_math_content(lines, explict_eps):
             elif lines[i] in prompt_metrics[func_type]:
                 metric = lines[i]
                 abbr_metric = translate_metrics[lines[i]]
-                expr = parse_math_expr(lines[i+1]) if func_type == "Continuous" else lines[i+1]
+                expr = parse_math_bounds(lines[i+1]) if func_type == "Continuous" else lines[i+1]
                 table_dict[abbr_metric].append(expr)
                 i += 2
                 while i < len(lines):
-                    if lines[i] == metric + " Max":
+                    if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
                         table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
-                        i += 2
-                    elif lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
-                        table_dict[abbr_metric].append(parse_math_bounds(lines[i+1]))
                         i += 2
                     elif lines[i] == "Is Linear?":
                         table_dict[abbr_metric].append(lines[i+1])
