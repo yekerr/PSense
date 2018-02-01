@@ -125,7 +125,7 @@ def generate_psi_expectation(psi_file):
 
     parse_psi = re.compile(r"main(?P<code>.+?)return(?P<result>.+?);", re.S)
 
-    with open(psi_file, "r") as f:
+    with open(psi_file, "r", encoding="utf-8") as f:
         code = f.read()
         code_exp = parse_psi.sub(replace, code)
     return code_exp if supported else None
@@ -207,7 +207,7 @@ def generate_psi_epsilon(psi_file, explict_eps):
         return len(matches) + extra
 
     codes_eps = []
-    with open(psi_file, "r") as f:
+    with open(psi_file, "r", encoding="utf-8") as f:
         code = f.read()
         num_eps = get_num_eps(parse_dis.findall(code))
         for i in range(1, num_eps + 1):
@@ -232,7 +232,7 @@ def extend_file_name(base_dir, base_name, extend_name, extension):
 
 def store_codes_to_files(codes, files):
     for i in range(len(codes)):
-        with open(files[i], "w") as f:
+        with open(files[i], "w", encoding="utf-8") as f:
             f.write(codes[i])
 
 def run_psi(file, option, timeout, verbose):
@@ -259,7 +259,7 @@ def run_math(file, timeout):
 def check_psi_out(file, output_file, result):
     if not result:
         if output_file:
-            with open(output_file, "a") as f:
+            with open(output_file, "a", encoding="utf-8") as f:
                 f.write("PSI runs out of time: " + file + "\n")
         else:
             print("PSI runs out of time: " + file)
@@ -274,7 +274,7 @@ def rename_psi_out(exp, extend_name):
 
 def print_plain_results(message, output_file):
     if output_file:
-        with open(output_file, "a") as f:
+        with open(output_file, "a", encoding="utf-8") as f:
             f.write(message + "\n")
     else:
         print(message)
@@ -436,7 +436,7 @@ def run_file(args):
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_exp_eps", "psi", len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
     elif output_file:
-        with open(output_file, "a") as f:
+        with open(output_file, "a", encoding="utf-8") as f:
             f.write("Expectation is not supported" + "\n")
     else:
         print("Expectation is not supported")
@@ -455,7 +455,7 @@ def run_file(args):
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, "ExpEps")
             psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(":=")[0].strip())
         
-        with open(math_files[i], "w") as f:
+        with open(math_files[i], "w", encoding="utf-8") as f:
             base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules", "base_runall_support.m")
             f.write("Get[\"" + base_file + "\"]\n")
             if metrics[4]:
