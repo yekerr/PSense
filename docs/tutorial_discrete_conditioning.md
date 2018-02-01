@@ -77,19 +77,30 @@ PSense changes each parameter and gets the results for different metrics:
     It is defined as $D_{Exp}=|\mathbb{E}[p_{eps}(r)]-\mathbb{E}[p(r)]|$, where
 $\mathbb{E}[p_{eps}(r)]$ and $\mathbb{E}[p(r)]$ are expectations of the output distributions with and without disturbance. After changing the first parameter, PSense genterates the symbolic expression for Expectation Distance as:
 ```
-Expectation Distance
-(3*Abs[eps])/(4*(1 + eps))
+┌Analyzed parameter 1──────────────────────────────────────────┐
+│            │ Expectation Distance                            │
+├────────────┼─────────────────────────────────────────────────┤
+│ Expression │ (3*Abs[eps])/(4*(1 + eps))                      │
+└────────────┴─────────────────────────────────────────────────┘
 ```
 PSense finds the maximum value of the Expectation Distance with respect to the disturbance `eps` within $\pm 10\%$ of the original parameter: 
 ```
-Expectation Distance Max
-{0.039473684210526314, {eps -> -0.05, r1 -> 0}}
+┌Analyzed parameter 1──────────────────────────────────────────┐
+│            │ Expectation Distance                            │
+├────────────┼─────────────────────────────────────────────────┤
+│ ...        │ ...                                             │
+│ Maximum    │ 0.0394736842105 eps -> -0.0500000000000 r1 -> 0 │
+└────────────┴─────────────────────────────────────────────────┘
 ```
 The result above shows that the maximum value `0.0395` is obtained when `eps` $= -0.05$.
 PSense further analyzes whether the distance grows linearly when the disturbance |`eps`| increases:
 ```
-Is Linear?
-False
+┌Analyzed parameter 1──────────────────────────────────────────┐
+│            │ Expectation Distance                            │
+├────────────┼─────────────────────────────────────────────────┤
+│ ...        │ ...                                             │
+│ Linear     │ False                                           │
+└────────────┴─────────────────────────────────────────────────┘
 ```
 In this example the Expectation Distance does not grow linearly so PSense outputs `False`.
 
@@ -97,38 +108,43 @@ In this example the Expectation Distance does not grow linearly so PSense output
 
     It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where p_{eps}(r) and p(r) are cumulative density functions, and $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance $|p_{eps}(r)-p(r)|$ and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
 ```
-Distance
-(3*Abs[(eps*(-1 + Boole[r1 >= 1]))/(1 + eps)])/4
-KS Distance Max
-{0.039473684210526314, {eps -> -0.05, r1 -> 0}}
-Is Linear?
-False
+┌Analyzed parameter 1───────────────────────────────────────────┐
+│            │ KS Distance                                      │
+├────────────┼──────────────────────────────────────────────────┤
+│ Expression │ (3*Abs[(eps*(-1 + Boole[r1 >= 1]))/(1 + eps)])/4 │
+│ Maximum    │ 0.0394736842105 eps -> -0.0500000000000 r1 -> 0  │
+│ Linear     │ False                                            │
+└────────────┴──────────────────────────────────────────────────┘
 ```
 
 * Total Variation Distance
     
     It is defined as $D_{TVD}=\frac{1}{2}\Sigma_{r\in support}|p_{eps}(r)-p(r)|$ for discrete distributions and $D_{TVD}=\frac{1}{2}\int_{r\in support}|p_{eps}(r)-p(r)|$ for continuous ones. PSense outputs:
 ```
-TVD
-Abs[eps/(1 + eps)]/8
-TVD Max
-{0.006578947368421052, {eps -> -0.05, r1 -> 0}}
-Is Linear?
-False
+Discrete
+┌Analyzed parameter 1──────────────────────────────────────────┐
+│            │ TVD                                             │
+├────────────┼─────────────────────────────────────────────────┤
+│ Expression │ (3*Abs[eps/(1 + eps)])/8                        │
+│ Maximum    │ 0.0197368421053 eps -> -0.0500000000000 r1 -> 0 │
+│ Linear     │ False                                           │
+└────────────┴─────────────────────────────────────────────────┘
 ```
 
 * Kullback–Leibler Divergence
     
     Defined as 
-    $D_{KL}=\Sigma_{r\in support} p_{eps}(r) \log \frac{p_{eps}(r)}{p(r)}$ for discrete distributions and $D_{KL}=\int_{r\in support} p_{eps}(r) \log \frac{p_{eps}(r)}{p(r)}$ for continuous ones. PSense supports KL Divergence for discrete distributions. For this example, it outputs:
+    $D_{KL}=\Sigma_{r\in support} p_{eps}(r) \log \frac{p_{eps}(r)}{p(r)}$ for discrete distributions and $D_{KL}=\int_{r\in support} p_{eps}(r) \log \frac{p_{eps}(r)}{p(r)}$ for continuous ones.  For this example, it outputs:
 ```
-KL Divergence
-((-1 + 2*eps)*ArcTanh[(3*eps)/(2 - eps)])/(2*(1 + eps)*Log[4])
-KL Max
-{0.030612436275416263, {eps -> -0.0499999999961868, r1 -> 0}}
-Is Linear?
-False
+┌Analyzed parameter 1──────────────────────────────────────────┐
+│            │ KL                                              │
+├────────────┼─────────────────────────────────────────────────┤
+│ Expression │ ((1 - 2*eps)*Log[-2 + 3/(1 + eps)])/(4*(1 +     │
+│            │ eps)*Log[2])                                    │
+│ Maximum    │ 0.0612248725508 eps -> -0.0499999999962 r1 -> 0 │
+│ Linear     │ False                                           │
+└────────────┴─────────────────────────────────────────────────┘
 ```
     
 ***
-[Return to Homepage](index.html) | [Return to Tutorials](tutorial.html)
+[Return to Tutorials](tutorial.html)

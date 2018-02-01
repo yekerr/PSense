@@ -95,14 +95,15 @@ The change in the prior distribution (when `?eps` = 0.1) is shown in the followi
 PSense can automatically add `?eps` to each constant parameters and find the sensitivity of the probabilistic program. 
 Run the following in shell prompt:
 ```{shell}
-psense -f examples/continuous.psi
+psense -f examples/unknown_vending_machine.psi
 ```
 
 After changing the first parameter, PSense outputs:
 ```
-Changed parameter 1 :
- Function Type:
+Function Type:
 Continuous
+┌Analyzed parameter 1────────
+│ ...
 ```
 
 Then PSense gives the results for different metrics:
@@ -112,19 +113,34 @@ Then PSense gives the results for different metrics:
      It is defined as $D_{Exp}=|\mathbb{E}[p_{eps}(r)]-\mathbb{E}[p(r)]|$, where
      $\mathbb{E}[p_{eps}(r)]$ and $\mathbb{E}[p(r)]$ are expectations of the output distributions with and without disturbance. After changing the first parameter, PSense genterates the symbolic expression for Expectation Distance as:
 ```
-Expectation Distance
-Abs[5/12 - (5 + eps)/(3*(4 + eps))]
+┌Analyzed parameter 1────────────┬
+│         │ Expectation Distance │ ...
+├─────────┼──────────────────────┼───
+│ Bounds  │ Abs[eps]/(4          │ ...
+│         │ 8 + 12*eps)          │
 ```
 PSense finds the maximum value of the Expectation Distance with respect to the disturbance `eps` within $\pm 10\%$ of the original parameter
 ```
-Expectation Distance Max
-{0.002032520325203291, {eps -> 0.1, r1 -> 6.4624724516972485}}
+┌Analyzed parameter 1────────────┬
+│         │ Expectation Distance │ ...
+├─────────┼──────────────────────┼───
+│ ...     │ ...                  │ ...
+│ Maximum │ 0.002032520          │ 
+│         │ 32520 eps            │ 
+│         │ -> 0.100000          │ 
+│         │ 000000 r1            │ 
+│         │ -> 0.999647          │ 
+│         │ 097614               │ 
 ```
 The result above shows the maximum value `0.00203` is obtained when `eps` $= -0.1$.
 PSense further analyzes whether the distance grows linearly when the disturbance |`eps`| increases:
 ```
-Is Linear?
-False
+┌Analyzed parameter 1────────────┬
+│         │ Expectation Distance │ ...
+├─────────┼──────────────────────┼───
+│ ...     │ ...                  │ ...
+│ Linear  │ False                │
+└─────────┴──────────────────────┴
 ```
 In this example the Expectation Distance is not linear so PSense outputs `False`.
 
@@ -132,24 +148,73 @@ In this example the Expectation Distance is not linear so PSense outputs `False`
 
     It is defined as $D_{KS}=\sup_{r\in support}|p_{eps}(r)-p(r)|$, where p_{eps}(r) and p(r) are the output cumulative density functions, and $\sup_{r\in support}$ represents the supremum of the distance over the support of $r$. PSense gives the distance $|p_{eps}(r)-p(r)|$ and the maximum value of $D_{KS}$, and then analyzes the linearity of $D_{KS}$.
 ```
-Distance
-Abs[(eps*(-1 + r1)*r1*Boole[r1 != 1])/(4 + eps)]/2
-KS Distance Max
-{0.0030487804878048764, {eps -> 0.1, r1 -> 0.49999998683698976}}
-Is Linear?
-False
+┌Analyzed parameter 1───┬
+│         │ KS Distance │ ...
+├─────────┼─────────────┼───
+│ Bounds  │ Abs[(eps*(- │ ...
+│         │ 1 + r1)*r1* │
+│         │ Boole[r1 != │
+│         │ 1])/(4 +    │
+│         │ eps)]/2     │
+│ Maximum │ 0.003048780 │ 
+│         │ 48780 eps   │ 
+│         │ -> 0.100000 │ 
+│         │ 000000 r1   │ 
+│         │ -> 0.499999 │ 
+│         │ 986837      │ 
+│ Linear  │ False       │
+└─────────┴─────────────┴
 ```
 
 * Total Variation Distance
 
     It is defined as $D_{TVD}=\frac{1}{2}\int_{r\in support}|p_{eps}(r)-p(r)|$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
 ```
-TVD
- TVD Bounds(lower, upper):
-2.5377672326760113*^-6 + 0.010136913218544538*eps
-7.557631253843409*^-6 + 0.010136913218544538*eps
-TVD Max
-{0.0010162601626016266, {eps -> 0.09999999999999999}}
+┌Analyzed parameter 1───┬─
+│         │ TVD Bounds  │ 
+├─────────┼─────────────┼─
+│ Bounds  │ -1.91842781 │ 
+│         │ 5330059*^-2 │ 
+│         │ 0 + 0.00138 │ 
+│         │ 23729270812 │ 
+│         │ 238*eps 0.0 │ 
+│         │ 00960929970 │ 
+│         │ 22092 + 0.0 │ 
+│         │ 01382372927 │ 
+│         │ 0812238*eps │ 
+│ Maximum │ 0.001016260 │ 
+│         │ 16260       │ 
+│         │ {eps -> 0.1 │ 
+│         │ 00000000000 │ 
+│         │             │ 
+│ Linear  │ NA          │ 
+└─────────┴─────────────┴─
+```
+
+* Kullback–Leibler Divergence
+
+
+    It is defined as $D_{KL}=\int_{r\in support} p_{eps}(r) \log \frac{p_{eps}(r)}{p(r)}$ for continuous distribution.  PSense outputs the tightest linear upper and lower bound for the $D_{TVD}$ when the disturbance `eps` changes from 0 to 0.1:
+```
+┌Analyzed parameter 1───┬─
+│         │ KL Bounds   │
+├─────────┼─────────────┤
+│ Bounds  │ -8.65946098 │
+│         │ 6684*^-18 - │
+│         │ 0.029893770 │
+│         │ 465430913*e │
+│         │ ps 0.000071 │
+│         │ 15621843964 │
+│         │ 545 - 0.029 │
+│         │ 89377046543 │
+│         │ 0913*eps    │
+│ Maximum │ 0.002462657 │
+│         │ 85567       │
+│         │ {eps -> -0. │
+│         │ 08000000000 │
+│         │ 00          │
+│ Linear  │ NA          │
+└─────────┴─────────────┘
 ```
 
 
@@ -161,31 +226,26 @@ You can set a value for the disturbance `eps`.
 Running the following to set `eps` to:
 
 ```{shell}
-psense -f examples/unknown_vender_machine.psi -e 0.01
+psense -f examples/unknown_vending_machine.psi -e 0.01
 ```
 PSense would add `0.01` to each parameter in this program.
 It outputs the following:
 ```
-Changed parameter 1 :
- Function Type:
+Function Type:
 Continuous
-
-Start All Metrics:
-Expectation Distance
-1/4812
-
-KS Distance
-{0.0003117206982543641, {r1 -> 0.5}}
-
-TVD
-0.00010390689941812139
-
-
-Finish All Metrics
-Changed parameter 2 :
+┌Analyzed parameter 1────────────┬─────────────┬─────────┬─────────┐
+│         │ Expectation Distance │ KS Distance │ TVD     │ KL      │
+├─────────┼──────────────────────┼─────────────┼─────────┼─────────┤
+│ Maximum │ 1/4812               │ 0.00031     │ 0.00010 │ 0.00029 │
+│         │                      │ 1720698     │ 3906899 │ 9884255 │
+│         │                      │ 254 r1      │ 4181213 │ 3219106 │
+│         │                      │ -> 0.50     │ 9       │ 3       │
+│         │                      │ 0000000     │         │         │
+│         │                      │ 000         │         │         │
+└─────────┴──────────────────────┴─────────────┴─────────┴─────────┘
 ...
 ```
 Notice now that `eps` becomes a concrete value, PSense directly outputs the numerical distances instead of a symbolic expression containing `eps`. For KS statistic, PSense further outputs which $r1$ value results in the maximum value.
 
 ***
-[Return to Homepage](index.html) | [Return to Tutorials](tutorial.html)
+[Return to Tutorials](tutorial.html)
