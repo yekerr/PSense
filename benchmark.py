@@ -6,7 +6,29 @@ import subprocess as sp
 
 input_root_dir = "probmods_webppl_to_psi"
 output_root_dir = "benchmarks"
-black_list = ["eps", "exp", "math"]
+black_list = ["eps", "exp", "math", "popl_examples"]
+file_black_list = ["clinicalTrial.psi","sum.psi","max.psi",\
+                   "gaussian_infer.psi","true_obs_error.psi",\
+                   "medical_diagnosis.psi","tug_of_war.psi",\
+                   "explain_away.psi","polyas_urn.psi",\
+                   "temperature_high_low.psi","temperature_high_low.psi",\
+                   "communication_between_teacher_listener.psi",\
+                   "goal_inference.psi","preferences.psi",\
+                   "scalar_implicature.psi","estimating_causal_power.psi",\
+                   "learning_a_continuous_parameter.psi",\
+                   "learning_about_coins.psi",\
+                   "fair_or_unfair_coin.psi",\
+                   "the_rectangle_game_with_weak_sampling.psi",\
+                   "sampling_from_a_discrete_distribution.psi",\
+                   "the_dirichlet_processes.psi",\
+                   "bda_of_tug_of_war_model.psi",\
+                   "peoples_models_of_coins_expectation.psi",\
+                   "peoples_models_of_coins.psi",\
+                   "posterior_prediction.psi",\
+                   "single_regression.psi",\
+                   "true_obs.psi",\
+                   "unknown_numbers_of_categories.psi",\
+                   "savage_dickey_method.psi"]
 cwd_dir = os.getcwd()
 
 
@@ -15,9 +37,9 @@ def make_dirs(dir):
         os.makedirs(dir)
 
 def run_psense(input_file, output_file):
-    cmd = ["python3", "source/psense.py", "-tp", "600", "-f", input_file, ">", output_file]
+    cmd = ["python3","source/psense.py", "-tp", "600", "-f", input_file, ">", output_file]
     cmd = " ".join(cmd)
-    print("Running", cmd)
+    print("Running", "psense", "-tp", "600", "-f", input_file, ">", output_file)
     sp.run(cmd, shell=True)
 
 def exit_message(message):
@@ -30,12 +52,15 @@ def tool_installed(cmd):
 def check_cmd():
     if not tool_installed("psi"):
         exit_message("Please include \"psi\" into your PATH.")
-    if not tool_installed("MathematicaScript"):
-        exit_message("Please include \"MathematicaScript\" into your PATH.")
+    if not tool_installed("wolfram") and not :tool_installed("wolframscript")
+        exit_message("Please include \"wolfram\" or \"wolframscript\" into your PATH.")
 
 def main():
     if len(sys.argv) != 3:
         exit_message("Usage: python3 benchmark.py input_directory output_directory")
+    if (sys.version_info < (3, 5)): 
+        exit_message("Python vesrion should be 3.5 or greater.")
+    check_cmd()
     input_root_dir = sys.argv[1]
     output_root_dir = sys.argv[2]
     if not os.path.isdir(input_root_dir):
@@ -45,7 +70,7 @@ def main():
             continue
         print("\nDIR:", next_dir)
         for file_name in file_list:
-            if not file_name.endswith(".psi"):
+            if not file_name.endswith(".psi") or (file_name in file_black_list):
                 continue
             input_file = os.path.join(next_dir, file_name)
             output_dir = os.path.join(output_root_dir, next_dir[len(input_root_dir):].lstrip("/"))

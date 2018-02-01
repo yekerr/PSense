@@ -1,6 +1,0 @@
-def main(){ 
-	trueX := gauss(0, 1); 
-	obsX := gauss(trueX, 0.1);
-	cobserve(obsX, 0.2); 
-	return trueX; // expected: e^(-11/2·trueX²+-2/11+2·trueX)·⅟√π̅·√1̅1̅/̅2̅
-} 

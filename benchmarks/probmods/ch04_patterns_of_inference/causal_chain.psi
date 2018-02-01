@@ -1,9 +1,0 @@
-def main(){
-        C := bernoulli(0.5);
-        A := bernoulli(0.5);
-        B := 0;
-        if(A){B = bernoulli(0.1);}
-        else{B = bernoulli(0.4);}
-        observe(A == 1);
-        return B; // expected: 1/10·δ[-B+1]+9/10·δ[B]
-}
