@@ -15,7 +15,7 @@ def make_dirs(dir):
         os.makedirs(dir)
 
 def run_psense(input_file, output_file):
-    cmd = ["python3", "psense.py", "-f", input_file, ">", output_file]
+    cmd = ["python3", "source/psense.py", "-tp", "600", "-f", input_file, ">", output_file]
     cmd = " ".join(cmd)
     print("Running", cmd)
     sp.run(cmd, shell=True)
@@ -39,7 +39,7 @@ def main():
     input_root_dir = sys.argv[1]
     output_root_dir = sys.argv[2]
     if not os.path.isdir(input_root_dir):
-        print("The input directory is not existed.")
+        print("The input directory \"" + input_root_dir + "\" is not existed.")
     for next_dir, _, file_list in os.walk(input_root_dir):
         if any([key in next_dir for key in black_list]):
             continue
@@ -53,6 +53,7 @@ def main():
             output_file_name = file_name.replace(".psi", ".txt")
             output_file = os.path.join(output_dir, output_file_name)
             run_psense(input_file, output_file)
+            sp.run("cat " + output_file,shell=True)
 
 if __name__ == "__main__":
     main()
