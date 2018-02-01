@@ -492,8 +492,8 @@ def exit_message(message):
     exit(0)
 
 def init_args():
-    if (sys.version_info < (3, 6)):
-        exit_message("Python vesrion should be 3.6 or greater.")
+    if (sys.version_info < (3, 5)):
+        exit_message("Python vesrion should be 3.5 or greater.")
     parser = argparse.ArgumentParser(description="PSI")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", help="PSI file")
