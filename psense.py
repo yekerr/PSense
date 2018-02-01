@@ -82,7 +82,7 @@ def generate_eps_param(f_eps_param, noise_percentage):
         noise_value = value*noise_percentage
         eps_lower = max(param_lower - value, -noise_value) if param_lower else -noise_value
         eps_upper = min(param_upper - value, noise_value) if param_upper else noise_value
-        eps_range = "(" + f"{eps_lower:.16f}" + "<=eps<=" + f"{eps_upper:.16f}" + ")"
+        eps_range = "(" + "{:.16f}".format(eps_lower) + "<=eps<=" + "{:.16f}".format(eps_upper) + ")"
     except ValueError:
         eps_range = "(-0.1<=eps<=0.1)"
     return eps_range, str(param_type)
