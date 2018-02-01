@@ -1,8 +1,0 @@
-def main(){ 
-	prob := 0; 
-	if(bernoulli(0.5)){prob = 0.2;} 
-	else{prob = 0.7;} 
-	s := [bernoulli(prob),bernoulli(prob)]; 
-	observe(s[0] == 1); 
-	return s[1]; //expected: 37/90·δ[r₁]+53/90·δ[-r₁+1]
-}

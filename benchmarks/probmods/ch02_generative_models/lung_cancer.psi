@@ -1,5 +1,0 @@
-def main(){
-        lungCancer := bernoulli(0.01);
-        cold := bernoulli(0.2);
-        return lungCancer | cold; // expected: 26/125·δ[-r₁+1]+99/125·δ[r₁]
-}
