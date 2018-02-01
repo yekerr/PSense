@@ -4,6 +4,7 @@
 MyDiracDelta[x_] := Boole[x == 0]
 
 runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),file_:Null] := Module[{},
+    TimeConstrained[
     filecsv = False;
     If[filecsv, 
 	$stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
@@ -22,7 +23,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Quiet[discretevars = Solve[newvarscons, newvars]];
     If[filecsv,
 	Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
-    	Get[mathepath<>"/base_runall_disc.m"]
+    	Get[mathepath<>"/base.m"]
     ];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
     Print["Function Type:"];
@@ -46,7 +47,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     If[flagtvd,
 	If[continuous,
 		timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
-		timetvd = Timing[ptvd[TimeConstrained[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
+		timetvd = Timing[TimeConstrained[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
 	];
 	If[filecsv,WriteString[$stream, timetvd[[1]]];WriteString[$stream,","]]
     ];
@@ -65,6 +66,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Print["Finish All Metrics"];
     Print[""];
     Print[""];
-    Print[""]
+    Print[""],
+    600]
 ]
 
