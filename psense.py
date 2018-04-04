@@ -76,6 +76,8 @@ def generate_eps_param(f_eps_param, noise_percentage):
     distribution_range["binomial2"] = (0, 1, REAL)
     distribution_range["negBinomial1"] = (1, None, INT)
     distribution_range["negBinomial2"] = (0, 1, REAL)
+    distribution_range["observe"] = (None, None, REAL)
+    distribution_range["cobserve"] = (None, None, REAL)
     param_lower, param_upper, param_type = distribution_range[f_eps_param["type"]]
     try:
         value = float(f_eps_param["value"])
@@ -140,6 +142,8 @@ def generate_psi_epsilon(psi_file, explict_eps):
     distribution_1p["exponential"] = r"(exponential\s*\((?P<exponential>.+?)\))"
     distribution_1p["studentT"] = r"(studentT\s*\((?P<studentT>.+?)\))"
     distribution_1p["rayleigh"] = r"(rayleigh\s*\((?P<rayleigh>.+?)\))"
+    #distribution_1p["observe"] = r"(observe\s*\(.*==\s*(?P<observe>.+?)\))"
+    #distribution_1p["cobserve"] = r"(cobserve\s*\(.*,\s*(?P<cobserve>.+?)\))"
 
     distribution_2p = {}
     distribution_2p["gauss"] = r"(gauss\s*\((?P<gauss1>.+?),(?P<gauss2>.+?)\))"
@@ -153,6 +157,10 @@ def generate_psi_epsilon(psi_file, explict_eps):
     distribution_2p["weibull"] = r"(weibull\s*\((?P<weibull1>.+?),(?P<weibull2>.+?)\))"
     distribution_2p["binomial"] = r"(binomial\s*\((?P<binomial1>.+?),(?P<binomial2>.+?)\))"
     distribution_2p["negBinomial"] = r"(negBinomial\s*\((?P<negBinomial1>.+?),(?P<negBinomial2>.+?)\))"
+    
+    #distribution_group_p = {}
+    #distribution_group_p["observe"] = r"(observe\s*\(.*==\s*(?P<observe>.+?)\))"
+    #distribution_group_p["cobserve"] = r"(cobserve\s*\(.*,\s*(?P<cobserve>.+?)\))"
     
     reg = ""
     for dist in distribution_1p.values():
@@ -178,33 +186,45 @@ def generate_psi_epsilon(psi_file, explict_eps):
         def replace_counter(match):
             for dist_name_1p in distribution_1p.keys():
                 if match.group(dist_name_1p):
+                    #print('nth: ' + str(nth) + ', dist_name_1p: ' + str(dist_name_1p) + ', valuegroup: '+str(match.group(dist_name_1p)))
                     if nth == 1:
                         codes_eps_params.append({"type": dist_name_1p, "value": match.group(dist_name_1p)})
                     result = dist_name_1p + "(" + match.group(dist_name_1p) + check_eps()
                     break
-            else:
-                for dist_name_2p in distribution_2p.keys():
-                    if match.group(dist_name_2p + "1"):
-                        if nth == 1:
-                            codes_eps_params.extend([{"type": dist_name_2p+"1", "value": match.group(dist_name_2p+"1")}, {"type": dist_name_2p+"2", "value": match.group(dist_name_2p+"2")}])
-                        result = dist_name_2p + "(" + match.group(dist_name_2p+"1") + check_eps() + "," + match.group(dist_name_2p+"2") + check_eps()
+            #else:
+            for dist_name_2p in distribution_2p.keys():
+                if match.group(dist_name_2p + "1"):
+                    if nth == 1:
+                        codes_eps_params.extend([{"type": dist_name_2p+"1", "value": match.group(dist_name_2p+"1")}, {"type": dist_name_2p+"2", "value": match.group(dist_name_2p+"2")}])
+                    result = dist_name_2p + "(" + match.group(dist_name_2p+"1") + check_eps() + "," + match.group(dist_name_2p+"2") + check_eps()
+            #for dist_name_group_p in distribution_group_p.keys():
+            #    if match.group(dist_name_group_p):
+            #         
             result += ")"
             return result
         return replace_counter
     
     def get_num_eps(matches):
-        extra = 0
-        for match in matches:
-            for group in match:
-                flag_2p = False
-                for dist_name_2p in distribution_2p.keys():
-                    if group.startswith(dist_name_2p):
-                        extra += 1
-                        flag_2p = True
-                        break
-                if flag_2p:
-                    break
-        return len(matches) + extra
+        match_count = len(matches)
+        extra = sum([1 for match in matches 
+                 if any(any(group.startswith(dist_name_2p) for dist_name_2p in distribution_2p.keys()) for group in match) ])
+        return match_count + extra
+        #extra = 0
+        #for match in matches:
+        #    for group in match:
+        #        flag_2p = False
+        #        for dist_name_2p in distribution_2p.keys():
+        #            if group.startswith(dist_name_2p):
+        #                extra += 1
+        #                flag_2p = True
+        #                break
+        #        if flag_2p:
+        #            break
+        #return len(matches) + extra
+    def replace_obs(obs, compare_sym, match):
+        print("match")
+        result = obs + match.group("to_compare") + compare_sym + match.group(3) +"+?eps)"
+        return result
 
     codes_eps = []
     with open(psi_file, "r", encoding="utf-8") as f:
@@ -212,6 +232,16 @@ def generate_psi_epsilon(psi_file, explict_eps):
         num_eps = get_num_eps(parse_dis.findall(code))
         for i in range(1, num_eps + 1):
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
+    #add eps to observe
+    parse_obs = re.compile(r"((?<!c)observe\s*\((?P<to_compare>.+?)==\s*(?P<observe>.+?)\))")
+    if parse_obs.findall(code) != []: 
+        codes_eps.append(parse_obs.sub(lambda x: replace_obs("observe(", "==", x), code))
+        codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: float(x[2]),parse_obs.findall(code))))})
+    #add eps to cobserve
+    parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
+    if parse_cobs.findall(code) != []: 
+        codes_eps.append(parse_cobs.sub(lambda x: replace_obs("cobserve(",",", x), code))
+        codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: float(x[2]),parse_cobs.findall(code))))})
     return codes_eps, codes_eps_params
 
 def extend_n_files_name(base_dir, base_name, extend_name, extension, n):
