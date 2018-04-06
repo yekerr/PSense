@@ -197,20 +197,14 @@ def generate_psi_epsilon(psi_file, explict_eps):
                     if nth == 1:
                         codes_eps_params.append({"type": dist_name_1p, "value": match.group(dist_name_1p)})
                     break
-            #else:
             for dist_name_2p in distribution_2p.keys():
                 if match.group(dist_name_2p + "1"):
                     result = dist_name_2p + "(" + match.group(dist_name_2p+"1") + check_eps() + "," + match.group(dist_name_2p+"2") + check_eps() + ")"
                     if '?eps' in result:
                         codes_line_change.append(result)
-                        #codes_line_change.extend([dist_name_2p + "(" + match.group(dist_name_2p+"1") + add_eps() + "," + match.group(dist_name_2p+"2") + ")", dist_name_2p + "(" + match.group(dist_name_2p+"1") + "," + match.group(dist_name_2p+"2") + add_eps() + ")"])
                     if nth == 1:
                         codes_eps_params.extend([{"type": dist_name_2p+"1", "value": match.group(dist_name_2p+"1")}, {"type": dist_name_2p+"2", "value": match.group(dist_name_2p+"2")}])
                     break
-
-            #for dist_name_group_p in distribution_group_p.keys():
-            #    if match.group(dist_name_group_p):
-            #         
             return result
         return replace_counter
     
@@ -253,7 +247,6 @@ def generate_psi_epsilon(psi_file, explict_eps):
         codes_eps.append(parse_obs.sub(lambda x: replace_obs("observe(", "==", x), code))
         codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: convert_float(x[2]),parse_obs.findall(code))))})
         codes_line_change.append("observe( _ == _ +?eps)")
-        #print(parse_obs.findall(code))
     #add eps to cobserve
     parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
     if parse_cobs.findall(code) != []: 
