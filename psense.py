@@ -170,37 +170,47 @@ def generate_psi_epsilon(psi_file, explict_eps):
     reg = reg.strip("|")
     parse_dis = re.compile(reg)
     codes_eps_params = []
+    codes_line_change = []
+    def add_eps():
+        if explict_eps:
+            rt_add =  "+"+explict_eps
+        else:
+            rt_add = "+?eps"
+        return rt_add
     def replace(nth):
         count = 0
         def check_eps():
             nonlocal count
             count += 1
             if count == nth:
-                if explict_eps:
-                    rt =  "+"+explict_eps
-                else:
-                    rt = "+?eps"
+                rt = add_eps()
             else:
                 rt = ""
             return rt
+            
         def replace_counter(match):
             for dist_name_1p in distribution_1p.keys():
                 if match.group(dist_name_1p):
-                    #print('nth: ' + str(nth) + ', dist_name_1p: ' + str(dist_name_1p) + ', valuegroup: '+str(match.group(dist_name_1p)))
+                    result = dist_name_1p + "(" + match.group(dist_name_1p) + check_eps() + ")"
+                    if '?eps' in result:
+                        codes_line_change.append(result)
                     if nth == 1:
                         codes_eps_params.append({"type": dist_name_1p, "value": match.group(dist_name_1p)})
-                    result = dist_name_1p + "(" + match.group(dist_name_1p) + check_eps()
                     break
             #else:
             for dist_name_2p in distribution_2p.keys():
                 if match.group(dist_name_2p + "1"):
+                    result = dist_name_2p + "(" + match.group(dist_name_2p+"1") + check_eps() + "," + match.group(dist_name_2p+"2") + check_eps() + ")"
+                    if '?eps' in result:
+                        codes_line_change.append(result)
+                        #codes_line_change.extend([dist_name_2p + "(" + match.group(dist_name_2p+"1") + add_eps() + "," + match.group(dist_name_2p+"2") + ")", dist_name_2p + "(" + match.group(dist_name_2p+"1") + "," + match.group(dist_name_2p+"2") + add_eps() + ")"])
                     if nth == 1:
                         codes_eps_params.extend([{"type": dist_name_2p+"1", "value": match.group(dist_name_2p+"1")}, {"type": dist_name_2p+"2", "value": match.group(dist_name_2p+"2")}])
-                    result = dist_name_2p + "(" + match.group(dist_name_2p+"1") + check_eps() + "," + match.group(dist_name_2p+"2") + check_eps()
+                    break
+
             #for dist_name_group_p in distribution_group_p.keys():
             #    if match.group(dist_name_group_p):
             #         
-            result += ")"
             return result
         return replace_counter
     
@@ -222,27 +232,35 @@ def generate_psi_epsilon(psi_file, explict_eps):
         #            break
         #return len(matches) + extra
     def replace_obs(obs, compare_sym, match):
-        print("match")
-        result = obs + match.group("to_compare") + compare_sym + match.group(3) +"+?eps)"
+        result = obs + match.group("to_compare") + compare_sym + match.group(3) + add_eps() + ")"
         return result
+    def convert_float(string_to_convert):
+        try:
+            return float(string_to_convert)
+        except ValueError:
+            return string_to_convert
 
     codes_eps = []
     with open(psi_file, "r", encoding="utf-8") as f:
         code = f.read()
-        num_eps = get_num_eps(parse_dis.findall(code))
+        code_findall = parse_dis.findall(code) 
+        num_eps = get_num_eps(code_findall)
         for i in range(1, num_eps + 1):
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
     #add eps to observe
     parse_obs = re.compile(r"((?<!c)observe\s*\((?P<to_compare>.+?)==\s*(?P<observe>.+?)\))")
     if parse_obs.findall(code) != []: 
         codes_eps.append(parse_obs.sub(lambda x: replace_obs("observe(", "==", x), code))
-        codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: float(x[2]),parse_obs.findall(code))))})
+        codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: convert_float(x[2]),parse_obs.findall(code))))})
+        codes_line_change.append("observe( _ == _ +?eps)")
+        #print(parse_obs.findall(code))
     #add eps to cobserve
     parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
     if parse_cobs.findall(code) != []: 
         codes_eps.append(parse_cobs.sub(lambda x: replace_obs("cobserve(",",", x), code))
-        codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: float(x[2]),parse_cobs.findall(code))))})
-    return codes_eps, codes_eps_params
+        codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: convert_float(x[2]),parse_cobs.findall(code))))})
+        codes_line_change.append("cobserve( _ , _ +?eps)")
+    return codes_eps, codes_eps_params, codes_line_change
 
 def extend_n_files_name(base_dir, base_name, extend_name, extension, n):
     extend_dir = base_dir + extend_name
@@ -394,18 +412,18 @@ def parse_math_out(math_out, explict_eps):
         table_data.append(row)
     return table_data, func_type
 
-def print_results(index, math_file, math_out, output_file, plain, explict_eps):
+def print_results(index, math_file, math_out, output_file, plain, explict_eps, codes_line_change_i):
     if not math_out:
         failure_message = "\nMathematica fails or runs out of time: " + math_file + "\n" + math_out
         print_plain_results(failure_message, output_file)
     elif plain:
-        success_message = "\nAnalyzed parameter " + str(index+1) + ":\n" + math_out
+        success_message = "\nAnalyzed parameter " + str(index+1) + ": " + codes_line_change_i + "\n" + math_out
         print_plain_results(success_message, output_file)
     else:
         table_math_out, func_type = parse_math_out(math_out, explict_eps)
         message = "\nFunction Type:\n" + func_type
         print_plain_results(message, output_file)
-        print_table_results("Analyzed parameter " + str(index+1), table_math_out, output_file)
+        print_table_results("Analyzed parameter " + str(index+1) + ": " + codes_line_change_i, table_math_out, output_file)
 
 def run_file(args):
     global file_dirs
@@ -442,7 +460,7 @@ def run_file(args):
     psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
     psi_pdf_func_name = rename_func(psi_pdf_out.split(":=")[0].strip())
 
-    codes_eps, code_eps_params = generate_psi_epsilon(psi_file, explict_eps)
+    codes_eps, code_eps_params, codes_line_change = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math", "m", len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
@@ -460,7 +478,7 @@ def run_file(args):
         psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
         psi_exp_func_name = rename_func(psi_exp_out.split(":=")[0].strip())
 
-        codes_exp_eps, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
+        codes_exp_eps, _, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_exp_eps", "psi", len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
     elif output_file:
@@ -512,7 +530,7 @@ def run_file(args):
                 math_run = generate_math_exp(args)
             f.write(math_run + "\n")
         math_out = run_math(math_files[i], math_timeout, mathematica)
-        print_results(i, math_files[i], math_out, output_file, plain, explict_eps)
+        print_results(i, math_files[i], math_out, output_file, plain, explict_eps, codes_line_change[i])
     if not args["log"]:
         for path in file_dirs:
             shutil.rmtree(path)
