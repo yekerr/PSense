@@ -225,14 +225,17 @@ def generate_psi_epsilon(psi_file, explict_eps):
         #        if flag_2p:
         #            break
         #return len(matches) + extra
-    def replace_obs(obs, compare_sym, match):
+    def replace_cobs(obs, compare_sym, match):
         result = obs + match.group("to_compare") + compare_sym + match.group(3) + add_eps() + ")"
         return result
     def convert_float(string_to_convert):
         try:
             return float(string_to_convert)
         except ValueError:
-            return string_to_convert
+            return 0
+    def replace_obs(match):
+        result = "observe(" + match.group("observe") + add_eps() + ")"
+        return result
 
     codes_eps = []
     with open(psi_file, "r", encoding="utf-8") as f:
@@ -242,16 +245,17 @@ def generate_psi_epsilon(psi_file, explict_eps):
         for i in range(1, num_eps + 1):
             codes_eps.append(parse_dis.sub(replace(nth=i), code))
     #add eps to observe
-    parse_obs = re.compile(r"((?<!c)observe\s*\((?P<to_compare>.+?)==\s*(?P<observe>.+?)\))")
+    parse_obs = re.compile(r"((?<!c)observe\s*\(\s*(?P<observe>.+?)\))")
     if parse_obs.findall(code) != []: 
-        codes_eps.append(parse_obs.sub(lambda x: replace_obs("observe(", "==", x), code))
-        codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: convert_float(x[2]),parse_obs.findall(code))))})
+        codes_eps.append(parse_obs.sub(replace_obs, code))
+        codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: convert_float(x[1].split('=')[-1]),parse_obs.findall(code)),key=abs))})
+        print(codes_eps_params)
         codes_line_change.append("observe( _ == _ +?eps)")
     #add eps to cobserve
     parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
     if parse_cobs.findall(code) != []: 
         codes_eps.append(parse_cobs.sub(lambda x: replace_obs("cobserve(",",", x), code))
-        codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: convert_float(x[2]),parse_cobs.findall(code))))})
+        codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: convert_float(x[2]),parse_cobs.findall(code)), key=abs))})
         codes_line_change.append("cobserve( _ , _ +?eps)")
     return codes_eps, codes_eps_params, codes_line_change
 
@@ -329,7 +333,10 @@ def print_table_results(title, data, output_file):
     print_plain_results(table.table, output_file)
 
 def parse_math_expr(exp):
-    return "\n".join(exp.replace("{", "").replace("}", "").split(", "))
+    if "error" in exp:
+        return "error"
+    else:
+        return "\n".join(exp.replace("{", "").replace("}", "").split(", "))
 def parse_math_bounds(exp):
     exps = exp.strip("{}").split(", ")
     return "lower: " + exps[0] + "\n" + "upper: " + exps[-1]
@@ -522,6 +529,7 @@ def run_file(args):
                 args["f_exp_eps_name"] = None
                 math_run = generate_math_exp(args)
             f.write(math_run + "\n")
+    for i in range(len(psi_eps_files)):
         math_out = run_math(math_files[i], math_timeout, mathematica)
         print_results(i, math_files[i], math_out, output_file, plain, explict_eps, codes_line_change[i])
     if not args["log"]:
