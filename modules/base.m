@@ -35,10 +35,11 @@ islinear2ks[p_] := Module[
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
 
+Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
     maxValue = numPrecision12[num[[1]]];
     maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
-    Print[Append[{maxValue}, maxArgeps]];
+    Printerror[Append[{maxValue}, maxArgeps]];
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
@@ -60,7 +61,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
     If[!flageps,
 	    Print["Expectation Distance Max"];
 	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
-	    printPrecision12[expmax];(*TODO: remove [[1]]*)
+	    printPrecision12[expmax];
         Print["Is Linear?"];
         Print[islinear2[edistanceres]]];
 	Print[""]
