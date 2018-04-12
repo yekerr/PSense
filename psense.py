@@ -249,7 +249,6 @@ def generate_psi_epsilon(psi_file, explict_eps):
     if parse_obs.findall(code) != []: 
         codes_eps.append(parse_obs.sub(replace_obs, code))
         codes_eps_params.append({'type': 'observe','value': str(max(map(lambda x: convert_float(x[1].split('=')[-1]),parse_obs.findall(code)),key=abs))})
-        print(codes_eps_params)
         codes_line_change.append("observe( _ == _ +?eps)")
     #add eps to cobserve
     parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
@@ -465,7 +464,7 @@ def run_file(args):
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math", "m", len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
 
-    math_output_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math_out", "csv", len(codes_eps))
+    math_output_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math_log", "log", len(codes_eps))
 
     code_exp = generate_psi_expectation(psi_file)
 
@@ -510,7 +509,8 @@ def run_file(args):
             f.write(psi_pdf_out + "\n")
             f.write(psi_eps_out + "\n")
             
-            args["math_output_file"] = math_output_files[i]
+            if args["log"]:
+                args["math_output_file"] = math_output_files[i]
             args["f_name"] = psi_func_name
             args["f_pdf_name"] = psi_pdf_func_name
             args["f_eps_name"] = psi_eps_func_name

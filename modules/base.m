@@ -37,9 +37,10 @@ islinear2ks[p_] := Module[
 
 Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
-    maxValue = numPrecision12[num[[1]]];
+    maxValue = ToString[numPrecision12[num[[1]]]];
     maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
-    Printerror[Append[{maxValue}, maxArgeps]];
+    maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
+    If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult], Print["error"]]
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
@@ -55,7 +56,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres = Quiet[Check[edistance[p,q,epscons][[1]],"error"]];
+	edistanceres = Check[edistance[p,q,epscons][[1]],"error"];
 	Print["Expectation Distance"];
 	printCheckExp[edistanceres];
     If[!flageps,
