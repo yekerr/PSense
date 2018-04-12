@@ -1,11 +1,13 @@
 (* ::Package:: *)
+(*$Messages = {};*)
 
 (* ::Input:: *)
+numPrecision12[num_] := ToString[FortranForm[SetPrecision[num,12]]]
 distance[p_,q_,cons_] :=FullSimplify[Abs[p-q],cons]
 distance2[p_,q_] :=Abs[p-q]
 subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params 
 distancemax[p_,q_,cons_,vars_] := FindMaximum[{FullSimplify[Abs[p-q],cons],cons},vars]
-distancemax2[p_,q_,cons_,vars_] := ToString[SetPrecision[NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars],12]]
+distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars]
 (*distancemax3[p_,q_,cons_] := Maximize[{Abs[p-q],cons},{eps,Element[r1,Integers]}]*)
 edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]],cons]
 edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
@@ -33,7 +35,11 @@ islinear2ks[p_] := Module[
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
 
-printPrecision12[num_] := Print[ToString[Quiet[Check[SetPrecision[num,12],"error"]]]]
+printPrecision12[num_] := (
+    maxValue = numPrecision12[num[[1]]];
+    maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
+    Print[Append[{maxValue}, maxArgeps]];
+)
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
 revkseps[disres_,varsnoeps_] := Module[
@@ -54,7 +60,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
     If[!flageps,
 	    Print["Expectation Distance Max"];
 	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
-	    printPrecision12[expmax];
+	    printPrecision12[expmax];(*TODO: remove [[1]]*)
         Print["Is Linear?"];
         Print[islinear2[edistanceres]]];
 	Print[""]
