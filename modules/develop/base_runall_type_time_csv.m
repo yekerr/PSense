@@ -1,6 +1,7 @@
 (* ::Package:: *)
 
 (* ::Input:: *)
+numPrecision12[num_] := ToString[FortranForm[SetPrecision[num,12]]]
 distance[p_,q_,cons_] :=FullSimplify[Abs[p-q],cons]
 distance2[p_,q_] :=Abs[p-q]
 subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params 
@@ -10,8 +11,7 @@ distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},
 edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]],cons]
 edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
 extract[f_] := Values[f][[1]]
-edistancemax[p_, q_, cons_] := 
-distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
+edistancemax[p_, q_, cons_] := distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
 tvd[p_,q_,epscons_,discretevars_] := 1/2*Total[Map[ReplaceAll[FullSimplify[distance2[p, q],epscons],#] &, discretevars]]
 entropy[p_,q_] := q*Log2[q/p]
 kl[p_, q_, epscons_, discretevars_] := 
@@ -20,7 +20,7 @@ kl[p_, q_, epscons_, discretevars_] :=
 tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]
 tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],{r1,Quiet[Minimize[{r1, varscons},r1]][[1]],Quiet[Maximize[{r1, varscons},r1]][[1]]}]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
-samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[klcont[p,np,epscons,varscons,vars,v]], epsrange]
+samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
 klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
 klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
 islinear2[p_]:= Module[
@@ -34,10 +34,24 @@ islinear2ks[p_] := Module[
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
 
+Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
+printPrecision12[num_] := (
+    maxValue = ToString[numPrecision12[num[[1]]]];
+    maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
+    maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
+    If[StringFreeQ[maximizeResult, "error"],
+        Print[maximizeResult];
+        maximizeResult, 
+        Print["error"];
+        "error"
+    ]
+)
+printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
+
 addquote[expr_] := (
-	WriteString[$stream,"\""];
+	If[!StringQ[expr], WriteString[$stream,"\""]];
 	WriteString[$stream,InputForm[expr]];
-    WriteString[$stream,"\""];
+	If[!StringQ[expr], WriteString[$stream,"\""]];
     WriteString[$stream,","];
 )
 
@@ -53,30 +67,31 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres := edistance[p,q,epscons][[1]];
+	edistanceres = Check[edistance[p,q,epscons][[1]],"error"];
 	Print["Expectation Distance"];
-	Print[edistanceres];
+	printCheckExp[edistanceres];
 	addquote[edistanceres];
     If[!flageps,
-	Print["Expectation Distance Max"];
-	expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
-	Print[expmax];
-	addquote[expmax];
+	    Print["Expectation Distance Max"];
+	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
+	    addquote[printPrecision12[expmax]];
+    (*addquote[expmax];*)
         Print["Is Linear?"];
-	explinear = islinear2[edistanceres];
+	    explinear = islinear2[edistanceres];
         Print[explinear];
-	addquote[explinear]];
+	    addquote[explinear]
+    ];
 	Print[""]
 ]
 
 pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module[
     {},
-    cusres := customfun[p,q];
+    cusres = customfun[p,q];
     Print["User Defined Metric"];
     Print[cusres];
     If[!flageps,
         Print["User Defined Metric Max"];
-        Print[Maximize[{cusres,epscons && varscons},Prepend[vars,eps]]];
+        printPrecision12[Maximize[{cusres,epscons && varscons},Prepend[vars,eps]]];
         Print["Is Linear?"];
         Print[islinear2[cusres]]
 	];
@@ -92,16 +107,16 @@ pks[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    addquote[disres];
 	    Print["KS Distance Max"];
 	    distancemax2res := distancemax2[p,q,epscons && varscons,Prepend[vars,eps]];
-	    Print[distancemax2res];
-	    addquote[distancemax2res];
-            Print["Is Linear?"];
-            disresr2[r2_] = (disres /. r1->r2);
+	    addquote[printPrecision12[distancemax2res]];
+        Print["Is Linear?"];
+        disresr2[r2_] = (disres /. r1->r2);
 	    kslinear = islinear2[disresr2[r2]];
 	    Print[kslinear];
 	    addquote[kslinear],
     Print["KS Distance"];
-        distancemax2res := distancemax2[p,q,varscons,vars];
-        Print[distancemax2res]];
+        distancemax2res = distancemax2[p,q,varscons,vars];
+        printPrecision12[distancemax2res]
+    ];
 	Print[""];
 	disres
 ]
@@ -110,35 +125,35 @@ ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
 	{tvdres := tvd[p,q,epscons,discretevars]
 	},
 	Print["TVD"];
-	Print[tvdres];
+	printCheckExp[tvdres];
 	addquote[tvdres];
     If[!flageps,
 	    Print["TVD Max"];
 	    tvdmax = Maximize[{tvdres,epscons && varscons},Prepend[vars,eps]];
-	    Print[tvdmax];
-	    addquote[tvdmax];
+	    addquote[printPrecision12[tvdmax]];
         Print["Is Linear?"];
 	tvdlinear = islinear2[tvdres];
         Print[tvdlinear];
-	addquote[tvdlinear]];
+	    addquote[tvdlinear]
+    ];
 	Print[""]
 ]
 
 pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
-	{klres := kl[p,q,epscons,discretevars]
+	{klres = kl[p,q,epscons,discretevars]
 	},
 	Print["KL Divergence"];
-	Print[klres];
+	printCheckExp[klres];
 	addquote[klres];
     If[!flageps,
 	    Print["KL Divergence Max"];
 	    klmax = Maximize[{klres,epscons && varscons},Prepend[vars,eps]];
-	    Print[klmax];
-	    addquote[klmax];
+	    addquote[printPrecision12[klmax]];
         Print["Is Linear?"];
-	kllinear = islinear2[klres];
+	    kllinear = islinear2[klres];
         Print[kllinear];
-	addquote[kllinear]];
+	    addquote[kllinear]
+    ];
 	Print[""]
 ]
 
@@ -155,7 +170,7 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    data = Transpose[{xsample,table}];
 	    lm = Quiet[LinearModelFit[data,eps,eps]];
 	    k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
-	    Print[" TVD Bounds(lower, upper):"];
+	    Print["TVD Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
 	    lowerbound = k*eps+bmin;

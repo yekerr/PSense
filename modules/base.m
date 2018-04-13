@@ -1,5 +1,4 @@
 (* ::Package:: *)
-(*$Messages = {};*)
 
 (* ::Input:: *)
 numPrecision12[num_] := ToString[FortranForm[SetPrecision[num,12]]]
@@ -130,9 +129,9 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	},
 	Print["TVD"];
 	    If[!flageps,
-	epsmin = Quiet[Minimize[{eps,epscons},eps]][[1]];
-	epsmax = Quiet[Maximize[{eps,epscons},eps]][[1]];
-	epsrange = {v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10};
+	    epsmin = Quiet[Minimize[{eps,epscons},eps]][[1]];
+	    epsmax = Quiet[Maximize[{eps,epscons},eps]][[1]];
+	    epsrange = {v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10};
 	    xsample = Table[eps /. eps->v,{v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10}];
 	    table = sample[p,q,epscons,varscons,vars,epsrange];
 	    data = Transpose[{xsample,table}];

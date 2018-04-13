@@ -3,14 +3,14 @@
 MyDiracDelta[x_] := Boole[x == 0]
 
 runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),logfile_:Null] := Module[{},
-    logstream = OpenWrite[logfile];
+    logstream = OpenAppend[logfile];
     $Messages = {logstream};
-    Write[logstream, logfile]; 
+    Write[logstream, "Mathematica Modules Called"]; 
     TimeConstrained[
-    filecsv = False;
+    filecsv = True;
     If[filecsv, 
 	$stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
-	WriteString[$stream,$ScriptCommandLine[[1]]];
+	WriteString[$stream,$CommandLine[[3]]];
 	WriteString[$stream,","]
     ];
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
@@ -35,30 +35,46 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Print["Start All Metrics:"];
 
     If[flagexpdist,
-	If[(Length[newvars]==1),
-		timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars],600]];
-		If[filecsv,WriteString[$stream, timeexpdist[[1]]];WriteString[$stream,"T/O,"]],
-		If[filecsv,WriteString[$stream,"N/A,,,,"]]
-	]
+	    If[(Length[newvars]==1),
+	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars],600]];
+            If[timeexpdist[[2]]===$Aborted,
+                Print["Expectation Distance Time Out"];
+	    	    If[filecsv,WriteString[$stream,"T/O,,,,"]],
+	    	    If[filecsv,WriteString[$stream, timeexpdist[[1]]];WriteString[$stream,","]]
+            ],
+	    	If[filecsv,WriteString[$stream,"N/A,,,,"]]
+	    ]
     ];
     If[flagks,
-	timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars],600]];
-	If[filecsv,WriteString[$stream, timeks[[1]]];WriteString[$stream,"T/O,"]]
-	(*revkseps[ksres,newvars];*) 
+	    timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars],600]];
+        If[timeks[[2]]===$Aborted,
+            Print["KS Distance Time Out"];
+	        If[filecsv,WriteString[$stream,"T/O,,,,"]],
+	        If[filecsv,WriteString[$stream, timeks[[1]]];WriteString[$stream,","]]
+        ];
+	    (*revkseps[ksres,newvars];*) 
     ];
     If[flagtvd,
-	If[continuous,
-		timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
-		timetvd = Timing[TimeConstrained[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
-	];
-	If[filecsv,WriteString[$stream, timetvd[[1]]];WriteString[$stream,"T/O,"]]
+	    If[continuous,
+	    	timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
+	    	timetvd = Timing[TimeConstrained[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
+	    ];
+        If[timetvd[[2]]===$Aborted,
+            Print["TVD Time Out"];
+	        If[filecsv,WriteString[$stream,"T/O,,,,"]],
+	        If[filecsv,WriteString[$stream, timetvd[[1]]];WriteString[$stream,","]]
+        ];
     ];
     If[flagkl,
-	If[continuous,
-		timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
-		timekl = Timing[TimeConstrained[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
-	];
-	If[filecsv,WriteString[$stream, timekl[[1]]];WriteString[$stream,"T/O,"]]
+	    If[continuous,
+	    	timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars],600]],
+	    	timekl = Timing[TimeConstrained[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars],600]]
+	    ];
+        If[timekl[[2]]===$Aborted,
+            Print["KL Divergence Time Out"];
+	        If[filecsv,WriteString[$stream,"T/O,,,,"]],
+	        If[filecsv,WriteString[$stream, timekl[[1]]];WriteString[$stream,","]]
+        ];
     ];
     If[flagcustom, 
         pcus[flageps,p,np,newepscons,newvarscons,newvars,discretevars,customfun]

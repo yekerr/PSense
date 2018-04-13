@@ -21,7 +21,7 @@ def parse_psi_output(output):
                 result = valid_output.strip()
                 break;
     else:
-        print("Error in parsing PSI output: " + result)
+        result = None
     return result
 
 def create_dirs_from_path(path):
@@ -90,7 +90,7 @@ def generate_eps_param(f_eps_param, noise_percentage):
     return eps_range, str(param_type)
 
 def generate_math_exp(args):
-    math_output_file = args["math_output_file"]
+    log_file = args["log_file"]
     f_name = args["f_name"]
     f_pdf_name = args["f_pdf_name"]
     f_eps_name = args["f_eps_name"]
@@ -103,7 +103,7 @@ def generate_math_exp(args):
     metrics = args["metrics"]
     custom_metric_name = args["custom_metric_name"]
 
-    file = "\"" + math_output_file + "\""
+    file = "\"" + log_file + "\""
     eps_range, eps_type = generate_eps_param(f_eps_param, noise_percentage)
     if not f_exp_name or not f_exp_eps_name:
         f_exp_name = "Null"
@@ -279,17 +279,25 @@ def store_codes_to_files(codes, files):
         with open(files[i], "w", encoding="utf-8") as f:
             f.write(codes[i])
 
-def run_psi(file, option, timeout, verbose):
+def run_psi(file_psi, option, timeout, verbose, psi_log_file):
     if timeout:
         timeout = int(timeout)
-    cmd = ["psi", file, "--mathematica", option] if option else ["psi", file, "--mathematica"]
+    cmd = ["psi", file_psi, "--mathematica", option] if option else ["psi", file_psi, "--mathematica"]
     try:
-        psi_out = sp.run(cmd, stdout=sp.PIPE, timeout=timeout)
+        psi_out = sp.run(cmd, stdout=sp.PIPE, stderr=sp.PIPE, timeout=timeout)
     except sp.TimeoutExpired:
+        with open(psi_log_file, "a", encoding="utf-8") as psi_log_f:
+            psi_log_f.write(file_psi + " timeout\n\n")
         return None
     if verbose:
         print(psi_out.stdout.decode("utf-8"))
-    return parse_psi_output(psi_out.stdout.decode("utf-8"))
+    result = parse_psi_output(psi_out.stdout.decode("utf-8"))
+    if result is None:
+        with open(psi_log_file, "a", encoding="utf-8") as psi_log_f:
+            psi_log_f.write("Fail to parse " + file_psi + " :\n" + psi_out.stderr.decode("utf-8") + "\n" + psi_out.stdout.decode("utf-8") + "\n")
+    return result
+
+
 
 def run_math(file, timeout, mathematica):
     if timeout:
@@ -304,9 +312,9 @@ def check_psi_out(file, output_file, result):
     if not result:
         if output_file:
             with open(output_file, "a", encoding="utf-8") as f:
-                f.write("PSI runs out of time: " + file + "\n")
+                f.write("PSI program error or timeout: " + file + "\n" + "Run with `-log` and check _log/ for detail\n")
         else:
-            print("PSI runs out of time: " + file)
+            print("PSI program error or timeout: " + file + "\n" + "Run with `-log` and check _log/ for detail\n")
         return False
     else:
         return True
@@ -413,7 +421,7 @@ def parse_math_out(math_out, explict_eps):
 
 def print_results(index, math_file, math_out, output_file, plain, explict_eps, codes_line_change_i):
     if not math_out:
-        failure_message = "\nMathematica fails or runs out of time: " + math_file + "\n" + math_out
+        failure_message = "\nMathematica error or timeout: " + math_file + "\n" + "Run with `-log` and check _log/ for detail\n" + "\n" + math_out
         print_plain_results(failure_message, output_file)
     elif plain:
         success_message = "\nAnalyzed parameter " + str(index+1) + ": " + codes_line_change_i + "\n" + math_out
@@ -437,9 +445,12 @@ def run_file(args):
     plain = args["plain"]
     mathematica = args["mathematica"]
     
+    
     psi_file = input_file
     psi_file_name = os.path.basename(psi_file)
     psi_file_dir = os.path.dirname(psi_file) 
+
+    psi_file_org_log = extend_file_name(psi_file_dir, psi_file_name, "_log", "log")
 
     custom_metric_name = None
     if metrics[4]:
@@ -447,13 +458,13 @@ def run_file(args):
         custom_metric_name_index = custom_metric_file_name.index(".")
         custom_metric_name = custom_metric_file_name[:custom_metric_name_index]
 
-    psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose)
+    psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_out):
         return 1
     psi_func_name = rename_func(psi_out.split(":=")[0].strip())
     psi_func_num_param = len(psi_func_name.split(","))
 
-    psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose)
+    psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_pdf_out):
         return 1
     psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
@@ -463,15 +474,15 @@ def run_file(args):
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
     math_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math", "m", len(codes_eps))
     store_codes_to_files(codes_eps, psi_eps_files)
+    log_files = extend_n_files_name(psi_file_dir, psi_file_name, "_log", "log", len(codes_eps))
 
-    math_output_files = extend_n_files_name(psi_file_dir, psi_file_name, "_math_log", "log", len(codes_eps))
 
     code_exp = generate_psi_expectation(psi_file)
 
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, "_exp", "psi")    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file, None, psi_timeout, verbose)
+        psi_exp_out = run_psi(psi_exp_file, None, psi_timeout, verbose, psi_file_org_log)
         if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
             return 1
         psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
@@ -487,14 +498,14 @@ def run_file(args):
         print("Expectation is not supported")
 
     for i in range(len(psi_eps_files)):
-        psi_eps_out = run_psi(psi_eps_files[i], "--cdf", psi_timeout, verbose)
+        psi_eps_out = run_psi(psi_eps_files[i], "--cdf", psi_timeout, verbose, log_files[i])
         if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out):
             continue
         psi_eps_out = rename_psi_out(psi_eps_out, "Eps")
         psi_eps_func_name = rename_func(psi_eps_out.split(":=")[0].strip())
 
         if code_exp:
-            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose)
+            psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose, log_files[i])
             if not check_psi_out(psi_exp_eps_files[i], output_file, psi_exp_eps_out):
                 continue
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, "ExpEps")
@@ -510,7 +521,7 @@ def run_file(args):
             f.write(psi_eps_out + "\n")
             
             if args["log"]:
-                args["math_output_file"] = math_output_files[i]
+                args["log_file"] = log_files[i]
             args["f_name"] = psi_func_name
             args["f_pdf_name"] = psi_pdf_func_name
             args["f_eps_name"] = psi_eps_func_name
