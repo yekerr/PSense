@@ -6,13 +6,14 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     Write[logstream, "Mathematica Modules Called"]; 
-    TimeConstrained[
+    totalTime = TimeConstrained[
     filecsv = True;
     If[filecsv, 
-	$stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
-	WriteString[$stream,$CommandLine[[3]]];
-	WriteString[$stream,","]
+	    $stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
+	    WriteString[$stream,$CommandLine[[3]]];
+	    WriteString[$stream,","]
     ];
+    supportTime = TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     newvars = DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
     newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
@@ -20,14 +21,21 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
         pReplace = (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
-	newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
-    ]
+	    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
+    ];
     Quiet[discretevars = Solve[newvarscons, newvars]];
     If[filecsv,
-	Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
+	    Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
     	Get[mathepath<>"/base.m"]
     ];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
+    , 600];
+    If[supportTime===$Aborted,
+        Print["Solving Support Time Out"];
+        If[filecsv, WriteString[$stream, "SupportT/O,,,,,,,,,,,,,,,,,"]];
+        If[filecsv, WriteString[$stream,"\n"];Close[$stream]];
+        Quit[]
+    ];
     Print["Function Type:"];
     If[continuous, Print["Continuous"],Print["Discrete"]];
     If[filecsv && continuous, addquote[Continuous],addquote[Discrete]];
@@ -85,7 +93,12 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Print[""];
     Print[""];
     Print[""],
-    600];
+    6000];
+    If[totalTime===$Aborted,
+        Print["Total Time Out"];
+	    If[filecsv, WriteString[$stream,"AllT/O,,,,,,,,,,,,,,,,,"]];
+        If[filecsv, WriteString[$stream,"\n"];Close[$stream]];
+    ];
     $Messages = $Messages[[{1}]];
     Close[logstream];
 ]
