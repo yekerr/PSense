@@ -645,12 +645,13 @@ def main():
     if args["input_file"]:
         run_file(args)
     else:
+        directory = args["directory"]
         for filename in os.listdir(directory):
             if filename.endswith(".psi"):
                 args["input_file"] = os.path.join(directory, filename)
-                if output_file:
-                    print("Processing: "+ input_file + "\n")
-                print_plain_results("\n" + input_file + ":", output_file)
+                if args["output_file"]:
+                    print("Processing: "+ args["input_file"] + "\n")
+                print_plain_results("\n" + args["input_file"] + ":", args["output_file"])
                 run_file(args)
 
 if __name__ == "__main__":
