@@ -6,7 +6,7 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     totalTime = TimeConstrained[
-    filecsv = True;
+    filecsv = False;
     If[filecsv, 
 	    $stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
 	    WriteString[$stream,$CommandLine[[3]]];
@@ -17,19 +17,24 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     newvars = DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
     newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
+    newvars = DeleteCases[newvars, Infinity];
+    newvars = DeleteCases[newvars, a_ /; StringMatchQ[ToString@a, RegularExpression["xi[0-9]+"]]];
     pReplace = pdf /. DiracDelta -> MyDiracDelta;
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
         pReplace = (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
 	    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
     ];
+    evalresolve = ToExpression["Resolve[ForAll["<>ToString[newvars]<>","<>ToString[newvarscons,InputForm]<>"]]"];
+    If[TrueQ[evalresolve], newvarscons = True];
     Quiet[discretevars = Solve[newvarscons, newvars]];
+    (*If[discretevars === {}, newvarscons = True]*)
     If[filecsv,
 	    Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
     	Get[mathepath<>"/base.m"]
     ];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
-    , 600];
+    , 6];
     If[supportTime===$Aborted,
         Print["Solving support time out"];
         If[filecsv, WriteString[$stream, "SupportT/O,,,,,,,,,,,,,,,,,"]];
@@ -38,6 +43,8 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
         Quit[],
         Write[logstream, "Support solved: "]; 
         Write[logstream, newvarscons]; 
+        Write[logstream, newvars];
+        Write[logstream, discretevars]; 
     ];
     Print["Function Type:"];
     If[continuous, Print["Continuous"],Print["Discrete"]];
@@ -111,9 +118,9 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Print[""];
     Print[""];
     Print[""],
-    3000];
+    30];
     If[totalTime===$Aborted,
-        Print["Total Time Out"];
+        (*Print["Total Time Out"];*)
 	    If[filecsv, WriteString[$stream,"AllT/O,,,,,,,,,,,,,,,,,"]];
         If[filecsv, WriteString[$stream,"\n"];Close[$stream]];
     ];

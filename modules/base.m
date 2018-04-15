@@ -37,7 +37,7 @@ islinear2ks[p_] := Module[
 Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
     maxValue = ToString[numPrecision12[num[[1]]]];
-    maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
+    maxArgeps = "eps -> " <> ToString[(numPrecision12 /@ Association[num[[2]]])[eps]];
     maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
     If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult], Print["error"]]
 )

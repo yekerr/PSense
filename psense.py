@@ -19,6 +19,7 @@ def parse_psi_output(output):
         if valid_output:
             if valid_output[0] == "p":
                 result = valid_output.strip()
+                print(result) #TODO: remove 
                 break;
     else:
         result = None
@@ -253,7 +254,7 @@ def generate_psi_epsilon(psi_file, explict_eps):
     #add eps to cobserve
     parse_cobs = re.compile(r"(cobserve\s*\((?P<to_compare>.+?),\s*(?P<cobserve>.+?)\))")
     if parse_cobs.findall(code) != []: 
-        codes_eps.append(parse_cobs.sub(lambda x: replace_obs("cobserve(",",", x), code))
+        codes_eps.append(parse_cobs.sub(lambda x: replace_cobs("cobserve(",",", x), code))
         codes_eps_params.append({'type': 'cobserve','value': str(max(map(lambda x: convert_float(x[2]),parse_cobs.findall(code)), key=abs))})
         codes_line_change.append("cobserve( _ , _ +?eps)")
     return codes_eps, codes_eps_params, codes_line_change
@@ -346,7 +347,10 @@ def parse_math_expr(exp):
         return "\n".join(exp.replace("{", "").replace("}", "").split(", "))
 def parse_math_bounds(exp):
     exps = exp.strip("{}").split(", ")
-    return "lower: " + exps[0] + "\n" + "upper: " + exps[-1]
+    if len(exps) > 1:
+        return "lower: " + exps[0] + "\n" + "upper: " + exps[-1]
+    else:
+        return exps[0]
 
 def parse_math_content(lines, explict_eps):
     MATH_TITLE = 0
@@ -365,11 +369,13 @@ def parse_math_content(lines, explict_eps):
             if lines[i] == "Finish All Metrics":
                 break
             if lines[i] == prompt_func_type:
-                func_type = lines[i+1]
-                i += 2
+                if i+1 < len(lines):
+                    func_type = lines[i+1]
+                    i += 2
             elif lines[i] in prompt_metrics["Discrete"]:
-                table_dict[translate_metrics[lines[i]]].append(parse_math_expr(lines[i+1]))
-                i += 2
+                if i+1 < len(lines):
+                    table_dict[translate_metrics[lines[i]]].append(parse_math_expr(lines[i+1]))
+                    i += 2
             else:
                 i += 1
     else:
@@ -378,21 +384,25 @@ def parse_math_content(lines, explict_eps):
             if lines[i] == "Finish All Metrics":
                 break
             if lines[i] == prompt_func_type:
-                func_type = lines[i+1]
-                i += 2
+                if i+1 < len(lines):
+                    func_type = lines[i+1]
+                    i += 2
             elif lines[i] in prompt_metrics[func_type]:
                 metric = lines[i]
                 abbr_metric = translate_metrics[lines[i]]
-                expr = parse_math_bounds(lines[i+1]) if func_type == "Continuous" else lines[i+1]
-                table_dict[abbr_metric].append(expr)
-                i += 2
+                if i+1 < len(lines):
+                    expr = parse_math_bounds(lines[i+1]) if func_type == "Continuous" else lines[i+1]
+                    table_dict[abbr_metric].append(expr)
+                    i += 2
                 while i < len(lines):
                     if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
-                        table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
-                        i += 2
+                        if i+1 < len(lines):
+                            table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
+                            i += 2
                     elif lines[i] == "Is Linear?":
-                        table_dict[abbr_metric].append(lines[i+1])
-                        i += 2
+                        if i+1 < len(lines):
+                            table_dict[abbr_metric].append(lines[i+1])
+                            i += 2
                         break
                     else:
                         i += 1 
@@ -406,7 +416,7 @@ def parse_math_out(math_out, explict_eps):
             "Continuous": ["Maximum"]}
     else:
         prompt_info = {"Discrete": ["Expression", "Maximum", "Linear"],
-            "Continuous": ["Bounds", "Maximum", "Linear"]}
+            "Continuous": ["Expression \nor Bounds", "Maximum", "Linear"]}
     lines = math_out.split("\n")
     lines = [line.strip() for line in lines if line]
     table_dict, func_type = parse_math_content(lines, explict_eps)
@@ -415,7 +425,8 @@ def parse_math_out(math_out, explict_eps):
     for i in range(len(prompt_info[func_type])):
         row = [prompt_info[func_type][i]]
         for key in metrics:
-            row.append(table_dict[key][i])
+            if i < len(table_dict[key]):
+                row.append(table_dict[key][i])
         table_data.append(row)
     return table_data, func_type
 
@@ -520,8 +531,7 @@ def run_file(args):
             f.write(psi_pdf_out + "\n")
             f.write(psi_eps_out + "\n")
             
-            if args["log"]:
-                args["log_file"] = log_files[i]
+            args["log_file"] = log_files[i]
             args["f_name"] = psi_func_name
             args["f_pdf_name"] = psi_pdf_func_name
             args["f_eps_name"] = psi_eps_func_name
