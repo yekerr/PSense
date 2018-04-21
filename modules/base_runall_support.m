@@ -3,8 +3,8 @@
 MyDiracDelta[x_] := Boole[x == 0]
 
 runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null] := Module[{},
-    If[flagnumeric || flagexpdistNew, 
-        Print["Use new metric"]; 
+    If[flagnumeric, 
+        Print["Use numeric"]; 
         Get[mathepath<>"/numeric_approx.m"];
         Quit[]
     ];
@@ -20,14 +20,15 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
     Write[logstream, "Solving Support..."]; 
     supportTime = TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
-    newvars = DeleteCases[DeleteDuplicates@Cases[pdf, _Symbol, Infinity], eps];
+    pdfR = pPDF[r1];
+    newvars = DeleteCases[DeleteDuplicates@Cases[pdfR, _Symbol, Infinity], eps];
     newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
     newvars = DeleteCases[newvars, Infinity];
     newvars = DeleteCases[newvars, a_ /; StringMatchQ[ToString@a, RegularExpression["xi[0-9]+"]]];
-    pReplace = pdf /. DiracDelta -> MyDiracDelta;
+    pReplace = pdfR /. DiracDelta -> MyDiracDelta;
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
-        pReplace = (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
+        pReplace = (pdfR /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
 	    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
     ];
     evalresolve = ToExpression["Resolve[ForAll["<>ToString[newvars]<>","<>ToString[newvarscons,InputForm]<>"]]"];

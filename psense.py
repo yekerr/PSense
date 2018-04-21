@@ -339,6 +339,7 @@ def print_table_results(title, data, output_file):
     max_width = int(shutil.get_terminal_size()[0] / len(data[0]) - 5)
     for i in range(1, len(data)):
         for j in range(1, len(data[0])):
+            print(data[i][j]);
             table.table_data[i][j] = '\n'.join(wrap(data[i][j], max_width))
     print_plain_results(table.table, output_file)
 
@@ -397,7 +398,9 @@ def parse_math_content(lines, explict_eps):
                     table_dict[abbr_metric].append(expr)
                     i += 2
                 while i < len(lines):
-                    if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max":
+                    if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max"\
+                            or lines[i] == metric[:-len(" (|E[X]-E[X_eps]|)")] + " Max"\
+                            or lines[i] == metric[:-len(" (E[|X-X_eps|])")] + " Max":
                         if i+1 < len(lines):
                             table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
                             i += 2
@@ -486,11 +489,9 @@ def run_file(args):
     if not check_psi_out(psi_file, output_file, psi_pdf_out):
         return 1
     psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
+    psi_pdf_func_name = psi_pdf_out.split("[")[0]
     if numeric:
-        psi_pdf_func_name = psi_pdf_out.split("[")[0] 
         psi_pdf_out = psi_pdf_func_name + " = \"" + psi_pdf_out.split(":=")[-1].strip() + "\""
-    else:
-        psi_pdf_func_name = rename_func(psi_pdf_out.split(":=")[0].strip())
 
     codes_eps, code_eps_params, codes_line_change = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
@@ -532,14 +533,13 @@ def run_file(args):
             continue
         psi_eps_out = rename_psi_out(psi_eps_out, "Eps")
         psi_eps_out_pdf = rename_psi_out(psi_eps_out_pdf, "EpsPDF")
+        psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0]
         if numeric:
             psi_eps_func_name = psi_eps_out.split("[")[0] 
             psi_eps_out = psi_eps_func_name + " = \"" + psi_eps_out.split(":=")[-1].strip() + "\""
-            psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0]
             psi_eps_out_pdf = psi_eps_func_name_pdf + " = \"" + psi_eps_out_pdf.split(":=")[-1].strip() + "\""
         else:
             psi_eps_func_name = rename_func(psi_eps_out.split(":=")[0].strip())
-            psi_eps_func_name_pdf = rename_func(psi_eps_out_pdf.split(":=")[0].strip())
 
         if code_exp:
             psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose, log_files[i])

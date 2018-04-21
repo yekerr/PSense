@@ -33,14 +33,14 @@ islinear2ks[p_] := Module[
         Print[islinearlist];
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
-discreteNegConv[pPDF_, pEpsPDF_, y_, discretevars_] := 
+discreteNegConv[pPDF_, pEpsPDF_, y_, discretevars_] := (
  Total[Map[
    ReplaceAll[pPDF[xConvolveParam - y]*pEpsPDF[xConvolveParam], #] &, 
    discretevars /. (DeleteDuplicates@
         Cases[discretevars, _Symbol, Infinity])[[1]] -> 
      xConvolveParam]]
+)
 edistanceConvNew[pPDF_, pEpsPDF_, discretevars_, vars_, cons_] := (
-  replacedDiscreteVars =
    Total[Map[
       ReplaceAll[
         FullSimplify[
@@ -92,7 +92,7 @@ pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
     printCheckExp[edistNewRes];
     If[!flageps,
         Print["Expectation Distance 2 Max"];
-        exp2max = Maximize[{edistNewRes,epscons && varscons}, Pretend[vars, eps]];
+        exp2max = Maximize[{edistNewRes,epscons && varscons}, Prepend[vars, eps]];
         printPrecision12[exp2max];
         Print["Is Linear?"];
         Print[islinear2[edistNewRes]];
