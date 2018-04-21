@@ -33,7 +33,23 @@ islinear2ks[p_] := Module[
         Print[islinearlist];
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
-
+discreteNegConv[pPDF_, pEpsPDF_, y_, discretevars_] := 
+ Total[Map[
+   ReplaceAll[pPDF[xConvolveParam - y]*pEpsPDF[xConvolveParam], #] &, 
+   discretevars /. (DeleteDuplicates@
+        Cases[discretevars, _Symbol, Infinity])[[1]] -> 
+     xConvolveParam]]
+edistanceConvNew[pPDF_, pEpsPDF_, discretevars_, vars_, cons_] := (
+  replacedDiscreteVars =
+   Total[Map[
+      ReplaceAll[
+        FullSimplify[
+         yConvolveResult*
+          Abs[discreteNegConv[pPDF, pEpsPDF, yConvolveResult, 
+            discretevars]], cons], #] &, (discretevars /. 
+        vars[[1]] -> yConvolveResult)]] /. DiracDelta[0] -> 1
+  )
+(*Print formatting*)
 Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
     maxValue = ToString[numPrecision12[num[[1]]]];
@@ -56,15 +72,32 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
 	edistanceres = Check[edistance[p,q,epscons][[1]],"error"];
-	Print["Expectation Distance"];
+	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
 	printCheckExp[edistanceres];
     If[!flageps,
-	    Print["Expectation Distance Max"];
+	    Print["Expectation Distance 1 Max"];
 	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
 	    printPrecision12[expmax];
         Print["Is Linear?"];
         Print[islinear2[edistanceres]]];
 	Print[""]
+]
+
+pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
+    (* Find expectation distance E[|X-X_eps|] for discrete distribution,
+        where X~p and X_eps~q, p and q are PDFs.  *)
+    {},
+    edistNewRes = Check[edistanceConvNew[p,q,discretevars,vars,epscons],"error"];
+    Print["Expectation Distance 2 (E[|X-X_eps|])"];
+    printCheckExp[edistNewRes];
+    If[!flageps,
+        Print["Expectation Distance 2 Max"];
+        exp2max = Maximize[{edistNewRes,epscons && varscons}, Pretend[vars, eps]];
+        printPrecision12[exp2max];
+        Print["Is Linear?"];
+        Print[islinear2[edistNewRes]];
+    ]
+    Print[""]
 ]
 
 pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module[

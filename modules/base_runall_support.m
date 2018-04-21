@@ -2,7 +2,12 @@
 (* Input *)
 MyDiracDelta[x_] := Boole[x == 0]
 
-runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),logfile_:Null] := Module[{},
+runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null] := Module[{},
+    If[flagnumeric || flagexpdistNew, 
+        Print["Use new metric"]; 
+        Get[mathepath<>"/numeric_approx.m"];
+        Quit[]
+    ];
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     totalTime = TimeConstrained[
@@ -53,12 +58,12 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
     Print["Start All Metrics:"];
 
     If[flagexpdist,
-        Write[logstream, "Finding Expectation Distance..."]; 
+        Write[logstream, "Finding Expectation Distance 1..."]; 
 	    If[(Length[newvars]==1),
 	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars],600]];
             If[timeexpdist[[2]]===$Aborted,
-                Print["Finding Expectation Distance time out"];
-                Write[logstream, "Finding Expectation Distance time out"]; 
+                Print["Finding Expectation Distance 1 time out"];
+                Write[logstream, "Finding Expectation Distance 1 time out"]; 
 	    	    If[filecsv,WriteString[$stream,"T/O,,,,"]],
 	    	    If[filecsv,WriteString[$stream, timeexpdist[[1]]];WriteString[$stream,","]];
                 Write[logstream, "Done."]; 
@@ -66,6 +71,24 @@ runall[mathepath_,p_,pdf_,np_,flageps_,flagexpdist_,flagks_,flagtvd_,flagkl_,fla
             Write[logstream, "Expectation is not supported"]; 
 	    	If[filecsv,WriteString[$stream,"N/A,,,,"]]
 	    ]
+    ];
+    If[flagexpdistNew,
+        Write[logstream, "Finding Expectation Distance 2..."];
+        If[(Length[newvars]==1),
+            If[continuous,
+                nothing=1,
+                timeexpdistNew = Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,discretevars],600]]
+            ];
+            If[timeexpdistNew[[2]]===$Aborted,
+                Print["Finding Expectation Distance 2 time out"];
+                Write[logstream, "Finding Expectation Distance 2 time out"];
+                If[filecsv,WriteString[$stream,"T/O,,,,"]],
+                If[filecsv,WriteString[$stream,timeexpdistNew[[1]]];WriteString[$stream,","]];
+                Write[logstream, "Done."];
+            ],
+            Write[logstream, "Expectation is not supported"];
+            If[filecsv,WriteString[$stream,"N/A,,,,"]]
+        ]
     ];
     If[flagks,
         Write[logstream, "Finding KS Distance..."]; 

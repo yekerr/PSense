@@ -19,7 +19,6 @@ def parse_psi_output(output):
         if valid_output:
             if valid_output[0] == "p":
                 result = valid_output.strip()
-                print(result) #TODO: remove 
                 break;
     else:
         result = None
@@ -95,13 +94,15 @@ def generate_math_exp(args):
     f_name = args["f_name"]
     f_pdf_name = args["f_pdf_name"]
     f_eps_name = args["f_eps_name"]
+    f_eps_name_pdf = args["f_eps_name_pdf"]
     f_exp_name = args["f_exp_name"]
     f_exp_eps_name = args["f_exp_eps_name"]
-    f_num_param = args["f_num_param"]
+    #f_num_param = args["f_num_param"]
     f_eps_param = args["f_eps_param"]
     explict_eps = args["explict_eps"]
     noise_percentage = args["noise_percentage"]
     metrics = args["metrics"]
+    numeric = args["numeric"]
     custom_metric_name = args["custom_metric_name"]
 
     file = "\"" + log_file + "\""
@@ -110,10 +111,11 @@ def generate_math_exp(args):
         f_exp_name = "Null"
         f_exp_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
+    flag_numeric = "True" if numeric else "False"
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, file])
+    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file])
     runall = "runall[" + exp + "]"
     return runall
 
@@ -358,9 +360,9 @@ def parse_math_content(lines, explict_eps):
     table_dict = defaultdict(list)
     func_type = "Discrete"
     prompt_func_type = "Function Type:"
-    prompt_metrics = {"Discrete": set(["Expectation Distance", "KS Distance", "TVD", "KL Divergence"]),
-        "Continuous": set(["Expectation Distance", "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
-    translate_metrics = {"Expectation Distance": "Expectation Distance", "KS Distance": "KS Distance",
+    prompt_metrics = {"Discrete": set(["Expectation Distance 1 (|E[X]-E[X_eps]|)", "Expectation Distance 2 (E[|X-X_eps|])", "KS Distance", "TVD", "KL Divergence"]),
+        "Continuous": set(["Expectation Distance 1 (|E[X]-E[X_eps]|)", "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
+    translate_metrics = {"Expectation Distance 1 (|E[X]-E[X_eps]|)": "ED1 |E[X]-E[X_eps]|","Expectation Distance 2 (E[|X-X_eps|])":"ED2 E[|X-X_eps|]", "KS Distance": "KS Distance",
         "TVD": "TVD", "KL Divergence": "KL", "TVD Bounds(lower, upper):": "TVD Bounds", "KL Divergence Bounds(lower, upper):": "KL Bounds"}
     errors = set(["::", "error"])
     if explict_eps:
@@ -455,6 +457,7 @@ def run_file(args):
     verbose = args["verbose"]
     plain = args["plain"]
     mathematica = args["mathematica"]
+    numeric = args["numeric"]
     
     
     psi_file = input_file
@@ -464,7 +467,7 @@ def run_file(args):
     psi_file_org_log = extend_file_name(psi_file_dir, psi_file_name, "_log", "log")
 
     custom_metric_name = None
-    if metrics[4]:
+    if metrics[5]:
         custom_metric_file_name = os.path.basename(custom_metric_file)
         custom_metric_name_index = custom_metric_file_name.index(".")
         custom_metric_name = custom_metric_file_name[:custom_metric_name_index]
@@ -472,14 +475,22 @@ def run_file(args):
     psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_out):
         return 1
-    psi_func_name = rename_func(psi_out.split(":=")[0].strip())
-    psi_func_num_param = len(psi_func_name.split(","))
+    if numeric:
+        psi_func_name = psi_out.split("[")[0]  
+        psi_out = psi_func_name + " = \"" + psi_out.split(":=")[-1].strip() + "\""
+    else:
+        psi_func_name = rename_func(psi_out.split(":=")[0].strip())
+    #psi_func_num_param = len(psi_func_name.split(","))
 
     psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_pdf_out):
         return 1
     psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
-    psi_pdf_func_name = rename_func(psi_pdf_out.split(":=")[0].strip())
+    if numeric:
+        psi_pdf_func_name = psi_pdf_out.split("[")[0] 
+        psi_pdf_out = psi_pdf_func_name + " = \"" + psi_pdf_out.split(":=")[-1].strip() + "\""
+    else:
+        psi_pdf_func_name = rename_func(psi_pdf_out.split(":=")[0].strip())
 
     codes_eps, code_eps_params, codes_line_change = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
@@ -497,7 +508,11 @@ def run_file(args):
         if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
             return 1
         psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
-        psi_exp_func_name = rename_func(psi_exp_out.split(":=")[0].strip())
+        if numeric:
+            psi_exp_func_name = psi_exp_out.split("[")[0] 
+            psi_exp_out = psi_exp_func_name + " = \"" + psi_exp_out.split(":=")[-1].strip() + "\""
+        else:
+            psi_exp_func_name = rename_func(psi_exp_out.split(":=")[0].strip())
 
         codes_exp_eps, _, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_exp_eps", "psi", len(codes_exp_eps))
@@ -512,31 +527,48 @@ def run_file(args):
         psi_eps_out = run_psi(psi_eps_files[i], "--cdf", psi_timeout, verbose, log_files[i])
         if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out):
             continue
+        psi_eps_out_pdf = run_psi(psi_eps_files[i], None, psi_timeout, verbose, log_files[i])
+        if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out_pdf):
+            continue
         psi_eps_out = rename_psi_out(psi_eps_out, "Eps")
-        psi_eps_func_name = rename_func(psi_eps_out.split(":=")[0].strip())
+        psi_eps_out_pdf = rename_psi_out(psi_eps_out_pdf, "EpsPDF")
+        if numeric:
+            psi_eps_func_name = psi_eps_out.split("[")[0] 
+            psi_eps_out = psi_eps_func_name + " = \"" + psi_eps_out.split(":=")[-1].strip() + "\""
+            psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0]
+            psi_eps_out_pdf = psi_eps_func_name_pdf + " = \"" + psi_eps_out_pdf.split(":=")[-1].strip() + "\""
+        else:
+            psi_eps_func_name = rename_func(psi_eps_out.split(":=")[0].strip())
+            psi_eps_func_name_pdf = rename_func(psi_eps_out_pdf.split(":=")[0].strip())
 
         if code_exp:
             psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose, log_files[i])
             if not check_psi_out(psi_exp_eps_files[i], output_file, psi_exp_eps_out):
                 continue
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, "ExpEps")
-            psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(":=")[0].strip())
+            if numeric:
+                psi_exp_eps_func_name = psi_exp_eps_out.split("[")[0] 
+                psi_exp_eps_out = psi_exp_eps_func_name + " = \"" + psi_exp_eps_out.split(":=")[-1].strip() + "\""
+            else:
+                psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(":=")[0].strip())
         
         with open(math_files[i], "w", encoding="utf-8") as f:
             base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules", "base_runall_support.m")
             f.write("Get[\"" + base_file + "\"]\n")
-            if metrics[4]:
+            if metrics[5]:
                 f.write("Get[\"" + custom_metric_file + "\"]\n")
             f.write(psi_out + "\n")
             f.write(psi_pdf_out + "\n")
             f.write(psi_eps_out + "\n")
+            f.write(psi_eps_out_pdf + "\n")
             
             args["log_file"] = log_files[i]
             args["f_name"] = psi_func_name
             args["f_pdf_name"] = psi_pdf_func_name
             args["f_eps_name"] = psi_eps_func_name
+            args["f_eps_name_pdf"] = psi_eps_func_name_pdf
 
-            args["f_num_param"] = psi_func_num_param
+            #args["f_num_param"] = psi_func_num_param
             args["f_eps_param"] = code_eps_params[i]
             args["custom_metric_name"] = custom_metric_name
             if code_exp:
@@ -569,16 +601,17 @@ def init_args():
     group.add_argument("-f", help="PSI file")
     group.add_argument("-r", help="Directory containing PSI files")
     parser.add_argument("-o", nargs="?", help="Output file")
-    parser.add_argument("-e", nargs="?", help="Explicit numerical interfrance in all prior distribution")
+    parser.add_argument("-e", nargs="?", help="Explicit numerical interference in all prior distribution")
     parser.add_argument("-p", nargs="?", help="Noise percentage (p=(0,1), Defualt=0.1)")
-    help_metric = "Metrics for sensitivity analysis (support ExpDist,KS,TVD,KL,Custom). \
-    Please enclose metrics with double quotation marks e.g. \"ExpDist,KL,Custom:FilePath\" \"KS,TVD\" \
+    help_metric = "Metrics for sensitivity analysis (support ExpDist1,ExpDist2,KS,TVD,KL,Custom). \
+    Please enclose metrics with double quotation marks e.g. \"ExpDist1,ExpDist2,KL,Custom:FilePath\" \"KS,TVD\" \
     Note: function name of custom metric should be identical as the file name"
     parser.add_argument("-metric", nargs="?", help=help_metric)
     parser.add_argument("-tp", nargs="?", help="PSI timeout (second)")
     parser.add_argument("-tm", nargs="?", help="Mathematica timeout (second)")
     parser.add_argument("-plain", action="store_true", help="Print raw outputs")
     parser.add_argument("-verbose", action="store_true", help="Print outputs of PSI")
+    parser.add_argument("-n", action="store_true", help="Apply numerical integration and maximization")
     parser.add_argument("-log", action="store_true", help="Keep the generated files")
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
@@ -601,18 +634,19 @@ def init_args():
         except:
             exit_message("Noise percentage is invalid")
     # metric0 = ExpDist, metric1 = KS, metric2 = TVD, metric3 = KL
-    metrics = [True]*4 + [False]
+    metrics = [True]*5 + [False]
     custom_metric_file = None
     if argv.metric:
         argv_metrics = argv.metric.lower()
-        metrics[0] = True if "expdist" in argv_metrics else False
-        metrics[1] = True if "ks" in argv_metrics else False
-        metrics[2] = True if "tvd" in argv_metrics else False
-        metrics[3] = True if "kl" in argv_metrics else False
-        metrics[4] = True if "custom" in argv_metrics else False
+        metrics[0] = True if "expdist1" in argv_metrics else False
+        metrics[1] = True if "expdist2" in argv_metrics else False
+        metrics[2] = True if "ks" in argv_metrics else False
+        metrics[3] = True if "tvd" in argv_metrics else False
+        metrics[4] = True if "kl" in argv_metrics else False
+        metrics[5] = True if "custom" in argv_metrics else False
         if not any(metrics):
             exit_message("No metric is selected")
-        if metrics[4]:
+        if metrics[5]:
             sp_metrics = argv_metrics.split(",")
             custom_index = ["custom" in metric for metric in sp_metrics].index(True)
             custom_metric = sp_metrics[custom_index]
@@ -639,6 +673,7 @@ def init_args():
         "verbose": argv.verbose,
         "plain": argv.plain,
         "log": argv.log,
+        "numeric": argv.n,
         "mathematica": mathematica
     }
     return args
