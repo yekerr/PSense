@@ -99,6 +99,7 @@ def generate_math_exp(args):
     f_exp_eps_name = args["f_exp_eps_name"]
     #f_num_param = args["f_num_param"]
     f_eps_param = args["f_eps_param"]
+    f_eps_type = args["f_eps_type"]
     explict_eps = args["explict_eps"]
     noise_percentage = args["noise_percentage"]
     metrics = args["metrics"]
@@ -115,7 +116,7 @@ def generate_math_exp(args):
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file])
+    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type])
     runall = "runall[" + exp + "]"
     return runall
 
@@ -339,7 +340,6 @@ def print_table_results(title, data, output_file):
     max_width = int(shutil.get_terminal_size()[0] / len(data[0]) - 5)
     for i in range(1, len(data)):
         for j in range(1, len(data[0])):
-            print(data[i][j]);
             table.table_data[i][j] = '\n'.join(wrap(data[i][j], max_width))
     print_plain_results(table.table, output_file)
 
@@ -570,6 +570,7 @@ def run_file(args):
 
             #args["f_num_param"] = psi_func_num_param
             args["f_eps_param"] = code_eps_params[i]
+            args["f_eps_type"] = code_eps_params[i]["type"]
             args["custom_metric_name"] = custom_metric_name
             if code_exp:
                 f.write(psi_exp_out + "\n")

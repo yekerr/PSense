@@ -33,18 +33,46 @@ islinear2ks[p_] := Module[
         Print[islinearlist];
         NoneTrue[islinearlist, Function[x, MemberQ[x,Symbol["eps"]]]]
 ]
-
+discreteNegConv[pPDF_, pEpsPDF_, y_, discretevars_] := (
+ Total[Map[
+   ReplaceAll[pPDF[xConvolveParam - y]*pEpsPDF[xConvolveParam], #] &, 
+   discretevars /. (DeleteDuplicates@
+        Cases[discretevars, _Symbol, Infinity])[[1]] -> 
+     xConvolveParam]]
+)
+edistanceConvNew[pPDF_, pEpsPDF_, discretevars_, vars_, cons_] := (
+   Total[Map[
+      ReplaceAll[
+        FullSimplify[
+         yConvolveResult*
+          Abs[discreteNegConv[pPDF, pEpsPDF, yConvolveResult, 
+            discretevars]], cons], #] &, (discretevars /. 
+        vars[[1]] -> yConvolveResult)]] /. DiracDelta[0] -> 1
+  )
+continuousNegConv[pPDF_, pEpsPDF_, y_, vars_, varscons_] := (
+      varLower = Minimize[{vars[[1]], varscons}, vars[[1]]][[1]];
+  varUpper = Maximize[{vars[[1]], varscons}, vars[[1]]][[1]];
+  Integrate[pPDF[x - y]*pEpsPDF[x], {x, varLower, varUpper}]
+  )
+edistanceConvNewCont[pPDF_, pEpsPDF_, epscons_, varscons_, vars_] := (
+      FullSimplify[
+       Integrate[
+        Abs[yConvolveResult]*
+     continuousNegConv[pPDF, pEpsPDF, yConvolveResult, vars, varscons], {yConvolveResult, -Infinity, Infinity}], epscons]
+  )
+(*Print formatting*)
+numPrecision12[num_] := (
+    ret = ToString[FortranForm[SetPrecision[num,12]]]
+)
 Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
     maxValue = ToString[numPrecision12[num[[1]]]];
-    maxArgeps = ToString[numPrecision12 /@ Association[num[[2]]]];
+    If[StringCases[maxValue,{"List","Indeterminate",".eq."}] === {},
+        maxArgeps = "eps -> " <> ToString[(numPrecision12 /@ Association[num[[2]]])[eps]],
+        maxValue = ToString[num[[1]],InputForm];
+        maxArgeps = "eps -> " <> "Indeterminate"];
     maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
-    If[StringFreeQ[maximizeResult, "error"],
-        Print[maximizeResult];
-        maximizeResult, 
-        Print["error"];
-        "error"
-    ]
+    If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult]; maximizeResult, Print["error"];"error"]
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
@@ -67,12 +95,12 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres = Check[edistance[p,q,epscons][[1]],"error"];
-	Print["Expectation Distance"];
+	edistanceres = edistance[p,q,epscons][[1]];
+	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
 	printCheckExp[edistanceres];
 	addquote[edistanceres];
     If[!flageps,
-	    Print["Expectation Distance Max"];
+	    Print["Expectation Distance 1 Max"];
 	    expmax = Maximize[{edistanceres,epscons && varscons},Prepend[vars,eps]];
 	    addquote[printPrecision12[expmax]];
     (*addquote[expmax];*)
@@ -82,6 +110,28 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	    addquote[explinear]
     ];
 	Print[""]
+]
+pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
+    (* Find expectation distance E[|X-X_eps|] for discrete distribution,
+        where X~p and X_eps~q, p and q are PDFs.  *)
+    {},
+    edistNewRes = If[discretevars === Null,
+        edistanceConvNewCont[p,q,epscons,varscons,vars],
+        edistanceConvNew[p,q,discretevars,vars,epscons]
+    ];
+    Print["Expectation Distance 2 (E[|X-X_eps|])"];
+    printCheckExp[edistNewRes];
+	addquote[edistNewRes];
+    If[!flageps,
+        Print["Expectation Distance 2 Max"];
+        exp2max = Maximize[{edistNewRes,epscons && varscons}, Prepend[vars, eps]];
+        addquote[printPrecision12[exp2max]];
+        Print["Is Linear?"];
+        explinearNew = islinear2[edistNewRes];
+        Print[explinearNew];
+        addquote[explinearNew]
+    ]
+    Print[""]
 ]
 
 pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module[

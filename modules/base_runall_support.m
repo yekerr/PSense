@@ -2,7 +2,7 @@
 (* Input *)
 MyDiracDelta[x_] := Boole[x == 0]
 
-runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null] := Module[{},
+runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:""] := Module[{},
     If[flagnumeric, 
         Print["Use numeric"]; 
         Get[mathepath<>"/numeric_approx.m"];
@@ -11,10 +11,12 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     totalTime = TimeConstrained[
-    filecsv = False;
+    filecsv = True;
     If[filecsv, 
-	    $stream = OpenAppend["~/results_time.csv",BinaryFormat->True];
+	    $stream = OpenAppend[mathepath<>"/results_time.csv",BinaryFormat->True];
 	    WriteString[$stream,$CommandLine[[3]]];
+	    WriteString[$stream,","];
+	    WriteString[$stream,epsType];
 	    WriteString[$stream,","]
     ];
     Write[logstream, "Solving Support..."]; 
@@ -76,9 +78,9 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
     If[flagexpdistNew,
         Write[logstream, "Finding Expectation Distance 2..."];
         If[(Length[newvars]==1),
-            If[continuous,
-                nothing=1,
-                timeexpdistNew = Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,discretevars],600]]
+            timeexpdistNew = If[continuous,
+                 Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,Null],600]],
+                 Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,discretevars],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
                 Print["Finding Expectation Distance 2 time out"];
@@ -142,7 +144,7 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
     Print[""];
     Print[""];
     Print[""],
-    30];
+    3600];
     If[totalTime===$Aborted,
         (*Print["Total Time Out"];*)
 	    If[filecsv, WriteString[$stream,"AllT/O,,,,,,,,,,,,,,,,,"]];

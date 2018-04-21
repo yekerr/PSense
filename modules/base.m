@@ -1,7 +1,6 @@
 (* ::Package:: *)
 
 (* ::Input:: *)
-numPrecision12[num_] := ToString[FortranForm[SetPrecision[num,12]]]
 distance[p_,q_,cons_] :=FullSimplify[Abs[p-q],cons]
 distance2[p_,q_] :=Abs[p-q]
 subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params 
@@ -49,11 +48,28 @@ edistanceConvNew[pPDF_, pEpsPDF_, discretevars_, vars_, cons_] := (
             discretevars]], cons], #] &, (discretevars /. 
         vars[[1]] -> yConvolveResult)]] /. DiracDelta[0] -> 1
   )
+continuousNegConv[pPDF_, pEpsPDF_, y_, vars_, varscons_] := (
+      varLower = Minimize[{vars[[1]], varscons}, vars[[1]]][[1]];
+  varUpper = Maximize[{vars[[1]], varscons}, vars[[1]]][[1]];
+  Integrate[pPDF[x - y]*pEpsPDF[x], {x, varLower, varUpper}]
+  )
+edistanceConvNewCont[pPDF_, pEpsPDF_, epscons_, varscons_, vars_] := (
+      FullSimplify[
+       Integrate[
+        Abs[yConvolveResult]*
+     continuousNegConv[pPDF, pEpsPDF, yConvolveResult, vars, varscons], {yConvolveResult, -Infinity, Infinity}], epscons]
+  )
 (*Print formatting*)
+numPrecision12[num_] := (
+    ret = ToString[FortranForm[SetPrecision[num,12]]]
+)
 Printerror[exp_] := If[StringContainsQ[exp, "error"],Print["error"],Print[exp]]
 printPrecision12[num_] := (
     maxValue = ToString[numPrecision12[num[[1]]]];
-    maxArgeps = "eps -> " <> ToString[(numPrecision12 /@ Association[num[[2]]])[eps]];
+    If[StringCases[maxValue,{"List","Indeterminate",".eq."}] === {},
+        maxArgeps = "eps -> " <> ToString[(numPrecision12 /@ Association[num[[2]]])[eps]],
+        maxValue = ToString[num[[1]],InputForm];
+        maxArgeps = "eps -> " <> "Indeterminate"];
     maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
     If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult], Print["error"]]
 )
@@ -71,7 +87,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres = Check[edistance[p,q,epscons][[1]],"error"];
+	edistanceres = edistance[p,q,epscons][[1]];
 	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
 	printCheckExp[edistanceres];
     If[!flageps,
@@ -87,7 +103,10 @@ pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_] := Module[
     (* Find expectation distance E[|X-X_eps|] for discrete distribution,
         where X~p and X_eps~q, p and q are PDFs.  *)
     {},
-    edistNewRes = Check[edistanceConvNew[p,q,discretevars,vars,epscons],"error"];
+    edistNewRes = If[discretevars === Null,
+        edistanceConvNewCont[p,q,epscons,varscons,vars],
+        edistanceConvNew[p,q,discretevars,vars,epscons]
+    ];
     Print["Expectation Distance 2 (E[|X-X_eps|])"];
     printCheckExp[edistNewRes];
     If[!flageps,
@@ -116,7 +135,7 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_] := Module
 
 pks[flageps_,p_,q_,epscons_,varscons_,vars_] := Module[
 	{},
-	disres = Quiet[Check[FullSimplify[distance[p,q,epscons && varscons],epscons && varscons],"error"]];
+	disres = FullSimplify[distance[p,q,epscons && varscons],epscons && varscons];
     If[!flageps,
 	    Print["KS Distance"];
 	    printCheckExp[disres];
