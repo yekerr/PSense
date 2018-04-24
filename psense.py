@@ -104,6 +104,7 @@ def generate_math_exp(args):
     noise_percentage = args["noise_percentage"]
     metrics = args["metrics"]
     numeric = args["numeric"]
+    optimization = args["optimization"]
     custom_metric_name = args["custom_metric_name"]
 
     file = "\"" + log_file + "\""
@@ -113,10 +114,11 @@ def generate_math_exp(args):
         f_exp_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
     flag_numeric = "True" if numeric else "False"
+    flag_optimization = "True" if optimization else "False"
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type])
+    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization])
     runall = "runall[" + exp + "]"
     return runall
 
@@ -398,11 +400,18 @@ def parse_math_content(lines, explict_eps):
                     table_dict[abbr_metric].append(expr)
                     i += 2
                 while i < len(lines):
+                    print(lines[i])
                     if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max"\
                             or lines[i] == metric[:-len(" (|E[X]-E[X_eps]|)")] + " Max"\
                             or lines[i] == metric[:-len(" (E[|X-X_eps|])")] + " Max":
                         if i+1 < len(lines):
                             table_dict[abbr_metric].append(parse_math_expr(lines[i+1]))
+                            i += 2
+                    elif lines[i] == "eps Bounds for " + metric + " <= 0.1"\
+                            or lines[i] == "eps Bounds for " + metric[:-len(" (|E[X]-E[X_eps]|)")] + " <= 0.1"\
+                            or lines[i] == "eps Bounds for " + metric[:-len(" (E[|X-X_eps|])")] + " <= 0.1":
+                        if i+1 < len(lines):
+                            table_dict[abbr_metric].append(parse_math_bounds(lines[i+1]))
                             i += 2
                     elif lines[i] == "Is Linear?":
                         if i+1 < len(lines):
@@ -419,6 +428,9 @@ def parse_math_out(math_out, explict_eps):
     if explict_eps:
         prompt_info = {"Discrete": ["Maximum"],
             "Continuous": ["Maximum"]}
+    elif "eps Bounds for" in math_out:
+        prompt_info = {"Discrete": ["Expression", "eps Bounds", "Linear"],
+                            "Continuous": ["Expression \nor Bounds", "eps Bounds", "Linear"]}
     else:
         prompt_info = {"Discrete": ["Expression", "Maximum", "Linear"],
             "Continuous": ["Expression \nor Bounds", "Maximum", "Linear"]}
@@ -613,6 +625,7 @@ def init_args():
     parser.add_argument("-plain", action="store_true", help="Print raw outputs")
     parser.add_argument("-verbose", action="store_true", help="Print outputs of PSI")
     parser.add_argument("-n", action="store_true", help="Apply numerical integration and maximization")
+    parser.add_argument("-s", action="store_true", help="Search for the bounds of noise when the distance is constrainted to <= 0.1. (support ExpDist1,ExpDist2,KS,TVD,KL,Custom).")
     parser.add_argument("-log", action="store_true", help="Keep the generated files")
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
@@ -675,6 +688,7 @@ def init_args():
         "plain": argv.plain,
         "log": argv.log,
         "numeric": argv.n,
+        "optimization": argv.s,
         "mathematica": mathematica
     }
     return args
