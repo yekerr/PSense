@@ -75,6 +75,12 @@ printPrecision12[num_] := (
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
+addquote[expr_] := (
+	If[!StringQ[expr], WriteString[$stream,"\""]];
+	WriteString[$stream,InputForm[expr]];
+	If[!StringQ[expr], WriteString[$stream,"\""]];
+    WriteString[$stream,","];
+)
 (*revkseps[disres_,varsnoeps_] := Module[
 	{},
 	Print["eps range for ks<=0.01"];
@@ -84,10 +90,12 @@ printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 ]*)
 optimization[dist_] := ({Minimize[{eps, dist <= 0.1}, eps][[1]], Maximize[{eps, dist <= 0.1}, eps][[1]]})
 
-checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_] := (
+checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_, flagcsv_] := (
     If[!flagoptimization,
         Print[distName <> " Max"];
-        printPrecision12[Maximize[{dist, epscons && varscons},Prepend[vars,eps]]]
+        distmax = Maximize[{dist, epscons && varscons},Prepend[vars,eps]];
+        printPrecision12[distmax];
+        If[flagcsv, addquote[distmax]];
     (*else*),
         Print["eps Bounds for " <> distName <> " <= 0.1"];
         optret = optimization[dist];
@@ -95,25 +103,29 @@ checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_]
         If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
         upperbound = numPrecision12[optret[[2]]];
         If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
-        Print[{lowerbound,upperbound}]
+        Print[{lowerbound,upperbound}];
+        If[flagcsv, addquote[{lowerbound,upperbound}]];
     ];
     Print["Is Linear?"];
-    Print[islinear2[dist]]
+    islinear = islinear2[dist];
+    Print[islinear];
+    If[flagcsv, addquote[islinear]];
 )
 
 
-pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
+pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Module[
 	{},
 	f[_ DiracDelta[point_]] := Solve[point==0,vars];
 	f[DiracDelta[point_]] := Solve[point==0,vars];
 	edistanceres = edistance[p,q,epscons][[1]];
 	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
 	printCheckExp[edistanceres];
+    If[flagcsv, addquote[edistanceres]];
     If[!flageps, checkProperties[edistanceres, "Expectation Distance 1", epscons, varscons, vars, flagoptimization]];
 	Print[""]
 ]
 
-pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_] := Module[
+pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,flagcsv_] := Module[
     (* Find expectation distance E[|X-X_eps|] for discrete distribution,
         where X~p and X_eps~q, p and q are PDFs.  *)
     {},
@@ -123,12 +135,13 @@ pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization
     ];
     Print["Expectation Distance 2 (E[|X-X_eps|])"];
     printCheckExp[edistNewRes];
+    If[flagcsv, addquote[edistNewRes]];
     If[!flageps, checkProperties[edistNewRes, "Expectation Distance 2", epscons, varscons, vars, flagoptimization]];
     Print[""]
 ]
 
 
-pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptimization_] := Module[
+pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptimization_,flagcsv_] := Module[
     {},
     cusres = customfun[p,q];
     Print["User Defined Metric"];
@@ -137,16 +150,18 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptim
     Print[""]
 ]
 
-pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
+pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Module[
 	{},
     disres = FullSimplify[distance[p,q,epscons && varscons],epscons && varscons];
     If[!flageps,
         Print["KS Distance"];
         printCheckExp[disres];
+        If[flagcsv, addquote[disres]];
         If[!flagoptimization,
             Print["KS Distance Max"];
             distancemax2res = Quiet[distancemax2[p,q,epscons && varscons,Prepend[vars,eps]]];
-            printPrecision12[distancemax2res];
+            maxks = printPrecision12[distancemax2res];
+            If[flagcsv, addquote[maxks]];
         (*else*),
             Print["eps Bounds for " <> "KS Distance" <> " <= 0.1"];
             KSeps = MaxValue[disres, vars];
@@ -155,11 +170,14 @@ pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
             If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
             upperbound = numPrecision12[optret[[2]]];
             If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
-            Print[{lowerbound,upperbound}]
+            Print[{lowerbound,upperbound}];
+            If[flagcsv, addquote[{lowerbound,upperbound}]];
         ];
         Print["Is Linear?"];
         disresr2[r2_] = (disres /. vars[[1]]->r2);
-        Print[islinear2[disresr2[r2]]]
+        islinear = islinear2[disresr2[r2]];
+        Print[islinear2];
+        If[flagcsv, addquote[islinear2]];
     (*else*),
         Print["KS Distance"];
         distancemax2res = Quiet[distancemax2[p,q,varscons,vars]];
@@ -167,24 +185,26 @@ pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
     Print[""];
 ]
 
-ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_] := Module[
+ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,flagcsv_] := Module[
 	{tvdres := tvd[p,q,epscons,discretevars]
 	},
 	Print["TVD"];
 	printCheckExp[tvdres];
+    If[flagcsv, addquote[tvdres]];
     If[!flageps, checkProperties[tvdres, "TVD", epscons, varscons, vars, flagoptimization]];
 	Print[""]
 ]
-pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_, flagoptimization_] := Module[
+pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_, flagoptimization_,flagcsv_] := Module[
 	{klres = kl[p,q,epscons,discretevars]
 	},
 	Print["KL Divergence"];
 	printCheckExp[klres];
+    If[flagcsv, addquote[klres]];
     If[!flageps, checkProperties[klres, "KL Divergence", epscons, varscons, vars, flagoptimization]];
 	Print[""]
 ]
 
-ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[
+ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_,flagcsv_] := Module[
 	{
 	},
 	Print["TVD"];
@@ -200,16 +220,30 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[
 	    Print["TVD Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
-	    printCheckExp[{k*eps+bmin,k*eps+bmax}];
+	    lowerbound = k*eps+bmin;
+        upperbound = k*eps+bmax;
+	    printCheckExp[{lowerbound,upperbound}];
+        If[flagcsv, addquote[{lowerbound,upperbound}]];
 	    Print["TVD Max"];
 	    maxSample = Max[table];
 	    Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
-	    Print["NA"],
+	    Print["NA"];
+        If[flagcsv,
+            WriteString[$stream,"\""];
+            WriteString[$stream,"{"];
+            WriteString[$stream,InputForm[maxSample]];
+            WriteString[$stream,", {eps -> "];
+            WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
+            WriteString[$stream,"}}"];
+            WriteString[$stream,"\""];
+	        WriteString[$stream,","];
+	        WriteString[$stream,","]
+        ],
     Print[tvdvaluecont[p,q,epscons,varscons,{r}]]];
     Print[""]
 ]
-pklcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[
+pklcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_,flagcsv_] := Module[
     {},
     Print["KL Divergence"];
     If[!flageps,
@@ -224,12 +258,26 @@ pklcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[
 	    Print["KL Divergence Bounds(lower, upper):"];
 	    bmax = Max[table - k*xsample];
 	    bmin = Min[table - k*xsample];
-	    printCheckExp[{k*eps+bmin,k*eps+bmax}];
+        lowerbound = k*eps+bmin;
+        upperbound = k*eps+bmax;
+	    printCheckExp[{lowerbound,upperbound}];
+        If[flagcsv, addquote[{lowerbound,upperbound}]];
 	    Print["KL Divergence Max"];
 	    maxSample = Max[table];
 	    Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
-	    Print["NA"],
+	    Print["NA"];
+        If[flagcsv,
+            WriteString[$stream,"\""];
+            WriteString[$stream,"{"];
+            WriteString[$stream,InputForm[maxSample]];
+            WriteString[$stream,", {eps -> "];
+            WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
+            WriteString[$stream,"}}"];
+            WriteString[$stream,"\""];
+	        WriteString[$stream,","];
+	        WriteString[$stream,","]
+        ],
 	Print[klvaluecont[p,q,epscons,varscons,vars]]];
         Print[""]
 ]
