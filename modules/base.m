@@ -16,12 +16,12 @@ entropy[p_,q_] := q*Log2[q/p]
 kl[p_, q_, epscons_, discretevars_] := 
  Total[Map[ReplaceAll[FullSimplify[entropy[p, q], epscons], #] &, 
    discretevars]]
-tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]
-tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]
+tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
+tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],Evaluate[{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
 samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
-klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
-klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
+klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
+klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
 islinear2[p_]:= Module[
     {},
     !MemberQ[DeleteDuplicates@Cases[D[FullSimplify[p,eps>0],eps],_Symbol,Infinity],Symbol["eps"]]
