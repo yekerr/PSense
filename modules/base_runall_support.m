@@ -2,7 +2,7 @@
 (* Input *)
 MyDiracDelta[x_] := Boole[x == 0]
 
-runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,customfun_:0,e_:1,ne_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:"", flagoptimization_: False] := Module[{},
+runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,newvars_,customfun_:0,eU_:1,neU_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:"", flagoptimization_: False] := Module[{},
     If[flagnumeric, 
         Print["Use numeric"]; 
         Get[mathepath<>"/numeric_approx.m"];
@@ -30,15 +30,19 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
     Write[logstream, "Solving Support..."]; 
     supportTime = TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
-    newvars = DeleteCases[DeleteDuplicates@Cases[p, _Symbol, Infinity], eps];
+    (*newvars = DeleteCases[DeleteDuplicates@Cases[p, _Symbol, Infinity], eps];
     newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
     newvars = DeleteCases[newvars, Infinity];
-    newvars = DeleteCases[newvars, a_ /; StringMatchQ[ToString@a, RegularExpression["xi[0-9]+"]]];
-    pdfR = pPDF @@ newvars;
-    pReplace = pdfR /. DiracDelta -> MyDiracDelta;
+    newvars = DeleteCases[newvars, a_ /; StringMatchQ[ToString@a, RegularExpression["xi[0-9]+"]]];*)
+    p = pU @@ newvars;
+    pdf = pdfU @@ newvars;
+    np = npU @@ newvars;
+    e = eU @@ newvars;
+    ne = neU @@ newvars;
+    pReplace = pdf /. DiracDelta -> MyDiracDelta;
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
-        pReplace = (pdfR /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
+        pReplace = (pdf /. Boole[x_] -> 1) /. DiracDelta -> MyDiracDelta;
 	    newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]]
     ];
     evalresolve = ToExpression["Resolve[ForAll["<>ToString[newvars]<>","<>ToString[newvarscons,InputForm]<>"]]"];
@@ -87,8 +91,8 @@ runall[mathepath_,p_,pdf_,np_,npdf_,flageps_,flagexpdist_,flagexpdistNew_,flagks
         Write[logstream, "Finding Expectation Distance 2..."];
         If[(Length[newvars]==1),
             timeexpdistNew = If[continuous,
-                 Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,Null,flagoptimization],1]],
-                 Timing[TimeConstrained[pedistNew[flageps,pdf,npdf,newepscons,newvarscons,newvars,discretevars,flagoptimization],600]]
+                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization],1]],
+                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
                 Print["Finding Expectation Distance 2 time out"];

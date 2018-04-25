@@ -16,12 +16,12 @@ entropy[p_,q_] := q*Log2[q/p]
 kl[p_, q_, epscons_, discretevars_] := 
  Total[Map[ReplaceAll[FullSimplify[entropy[p, q], epscons], #] &, 
    discretevars]]
-tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]
-tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],{r1,Quiet[Minimize[{r1, varscons},r1]][[1]],Quiet[Maximize[{r1, varscons},r1]][[1]]}]
+tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]
+tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
 samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
-klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
-klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],{r1,Minimize[{r1, varscons},r1][[1]],Maximize[{r1, varscons},r1][[1]]}]]
+klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
+klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
 islinear2[p_]:= Module[
     {},
     !MemberQ[DeleteDuplicates@Cases[D[FullSimplify[p,eps>0],eps],_Symbol,Infinity],Symbol["eps"]]
@@ -75,13 +75,13 @@ printPrecision12[num_] := (
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
-revkseps[disres_,varsnoeps_] := Module[
+(*revkseps[disres_,varsnoeps_] := Module[
 	{},
 	Print["eps range for ks<=0.01"];
 	Print[epsmax=Maximize[{eps, disres <= 0.01,(-0.01<=eps<=0.01)&&(r1==0||r1==1)}, varsnoeps]];
 	Print[epsmin=Minimize[{eps, disres <= 0.01,r1==0||r1==1}, varsnoeps]];
 	Print["(", epsmin[[1]], ", ", epsmax[[1]], ")"];
-]
+]*)
 optimization[dist_] := ({Minimize[{eps, dist <= 0.1}, eps][[1]], Maximize[{eps, dist <= 0.1}, eps][[1]]})
 
 checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_] := (
@@ -90,15 +90,17 @@ checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_]
         printPrecision12[Maximize[{dist, epscons && varscons},Prepend[vars,eps]]]
     (*else*),
         Print["eps Bounds for " <> distName <> " <= 0.1"];
-        lowerbound = numPrecision12[optimization[dist][[1]]];
+        optret = optimization[dist];
+        lowerbound = numPrecision12[optret[[1]]];
         If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
-        upperbound = numPrecision12[optimization[dist][[2]]];
+        upperbound = numPrecision12[optret[[2]]];
         If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
         Print[{lowerbound,upperbound}]
     ];
     Print["Is Linear?"];
     Print[islinear2[dist]]
 )
+
 
 pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
 	{},
@@ -137,12 +139,32 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptim
 
 pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_] := Module[
 	{},
-    disres = FullSimplify[MaxValue[{distance[p,q,epscons && varscons], varscons}, vars], epscons && varscons];
-    ksName = "KS Distance";
-	Print[ksName];
-	printCheckExp[disres];
-    If[!flageps, checkProperties[disres, ksName, epscons, varscons, vars, flagoptimization]];
-	Print[""];
+    disres = FullSimplify[distance[p,q,epscons && varscons],epscons && varscons];
+    If[!flageps,
+        Print["KS Distance"];
+        printCheckExp[disres];
+        If[!flagoptimization,
+            Print["KS Distance Max"];
+            distancemax2res = Quiet[distancemax2[p,q,epscons && varscons,Prepend[vars,eps]]];
+            printPrecision12[distancemax2res];
+        (*else*),
+            Print["eps Bounds for " <> "KS Distance" <> " <= 0.1"];
+            KSeps = MaxValue[disres, vars];
+            optret = optimization[KSeps];
+            lowerbound = numPrecision12[optret[[1]]];
+            If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
+            upperbound = numPrecision12[optret[[2]]];
+            If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
+            Print[{lowerbound,upperbound}]
+        ];
+        Print["Is Linear?"];
+        disresr2[r2_] = (disres /. vars[[1]]->r2);
+        Print[islinear2[disresr2[r2]]]
+    (*else*),
+        Print["KS Distance"];
+        distancemax2res = Quiet[distancemax2[p,q,varscons,vars]];
+        printPrecision12[distancemax2res]];
+    Print[""];
 ]
 
 ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_] := Module[
@@ -184,7 +206,7 @@ ptvdcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[
 	    Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
 	    Print["Is Linear?"];
 	    Print["NA"],
-    Print[tvdvaluecont[p,q,epscons,varscons,vars]]];
+    Print[tvdvaluecont[p,q,epscons,varscons,{r}]]];
     Print[""]
 ]
 pklcont[flageps_,p_,q_,epscons_,varscons_,vars_, flagoptimization_] := Module[

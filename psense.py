@@ -97,7 +97,7 @@ def generate_math_exp(args):
     f_eps_name_pdf = args["f_eps_name_pdf"]
     f_exp_name = args["f_exp_name"]
     f_exp_eps_name = args["f_exp_eps_name"]
-    #f_num_param = args["f_num_param"]
+    f_param_dict = args["f_param_dict"]
     f_eps_param = args["f_eps_param"]
     f_eps_type = args["f_eps_type"]
     explict_eps = args["explict_eps"]
@@ -118,7 +118,7 @@ def generate_math_exp(args):
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization])
+    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, "{" + ", ".join(f_param_dict.keys()) + "}", custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization])
     runall = "runall[" + exp + "]"
     return runall
 
@@ -400,7 +400,6 @@ def parse_math_content(lines, explict_eps):
                     table_dict[abbr_metric].append(expr)
                     i += 2
                 while i < len(lines):
-                    print(lines[i])
                     if lines[i] == metric + " Max" or lines[i] == metric[:-len(" Bounds(lower, upper):")] + " Max"\
                             or lines[i] == metric[:-len(" (|E[X]-E[X_eps]|)")] + " Max"\
                             or lines[i] == metric[:-len(" (E[|X-X_eps|])")] + " Max":
@@ -460,6 +459,24 @@ def print_results(index, math_file, math_out, output_file, plain, explict_eps, c
         print_plain_results(message, output_file)
         print_table_results("Analyzed parameter " + str(index+1) + ": " + codes_line_change_i, table_math_out, output_file)
 
+def get_param_dict(fun_param):
+    ret = {}
+    for param_i in fun_param.split(","):
+        param_i_strip = param_i.strip()
+        if param_i_strip.endswith("_"):
+            param_name = param_i_strip[:-1]
+            ret.update({param_name.replace("_","Z") : param_name})
+    return ret
+
+def replace_underscore(fun_def):
+    fun_name_part = fun_def.split("[")[0] + "["
+    fun_param_part = (fun_def.split("[")[1]).split("]")[0]
+    fun_param_replace_dict = get_param_dict(fun_param_part)
+    fun_param_part = "_, ".join(fun_param_replace_dict.keys()) + "_"
+    fun_body_part = "] :=" + fun_def.split(":=")[1].replace("_","Z")
+    return fun_name_part + fun_param_part + fun_body_part
+
+
 def run_file(args):
     global file_dirs
     input_file = args["input_file"]
@@ -490,20 +507,16 @@ def run_file(args):
     psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_out):
         return 1
-    if numeric:
-        psi_func_name = psi_out.split("[")[0]  
-        psi_out = psi_func_name + " = \"" + psi_out.split(":=")[-1].strip() + "\""
-    else:
-        psi_func_name = rename_func(psi_out.split(":=")[0].strip())
-    #psi_func_num_param = len(psi_func_name.split(","))
+    psi_func_param_dict = get_param_dict((psi_out.split("[")[1]).split("]")[0])
+    psi_func_name = psi_out.split("[")[0]
+    psi_out = replace_underscore(psi_out)
 
     psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose, psi_file_org_log)
     if not check_psi_out(psi_file, output_file, psi_pdf_out):
         return 1
     psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
+    psi_pdf_out = replace_underscore(psi_pdf_out)
     psi_pdf_func_name = psi_pdf_out.split("[")[0]
-    if numeric:
-        psi_pdf_out = psi_pdf_func_name + " = \"" + psi_pdf_out.split(":=")[-1].strip() + "\""
 
     codes_eps, code_eps_params, codes_line_change = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
@@ -521,11 +534,9 @@ def run_file(args):
         if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
             return 1
         psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
-        if numeric:
-            psi_exp_func_name = psi_exp_out.split("[")[0] 
-            psi_exp_out = psi_exp_func_name + " = \"" + psi_exp_out.split(":=")[-1].strip() + "\""
-        else:
-            psi_exp_func_name = rename_func(psi_exp_out.split(":=")[0].strip())
+        psi_exp_func_name = psi_exp_out.split("[")[0].strip()
+        psi_exp_out = replace_underscore(psi_exp_out)
+
 
         codes_exp_eps, _, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_exp_eps", "psi", len(codes_exp_eps))
@@ -545,24 +556,18 @@ def run_file(args):
             continue
         psi_eps_out = rename_psi_out(psi_eps_out, "Eps")
         psi_eps_out_pdf = rename_psi_out(psi_eps_out_pdf, "EpsPDF")
-        psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0]
-        if numeric:
-            psi_eps_func_name = psi_eps_out.split("[")[0] 
-            psi_eps_out = psi_eps_func_name + " = \"" + psi_eps_out.split(":=")[-1].strip() + "\""
-            psi_eps_out_pdf = psi_eps_func_name_pdf + " = \"" + psi_eps_out_pdf.split(":=")[-1].strip() + "\""
-        else:
-            psi_eps_func_name = rename_func(psi_eps_out.split(":=")[0].strip())
+        psi_eps_out = replace_underscore(psi_eps_out)
+        psi_eps_out_pdf = replace_underscore(psi_eps_out_pdf)
+        psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0].strip()
+        psi_eps_func_name = psi_eps_out.split("[")[0].strip()
 
         if code_exp:
             psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose, log_files[i])
             if not check_psi_out(psi_exp_eps_files[i], output_file, psi_exp_eps_out):
                 continue
             psi_exp_eps_out = rename_psi_out(psi_exp_eps_out, "ExpEps")
-            if numeric:
-                psi_exp_eps_func_name = psi_exp_eps_out.split("[")[0] 
-                psi_exp_eps_out = psi_exp_eps_func_name + " = \"" + psi_exp_eps_out.split(":=")[-1].strip() + "\""
-            else:
-                psi_exp_eps_func_name = rename_func(psi_exp_eps_out.split(":=")[0].strip())
+            psi_exp_eps_out = replace_underscore(psi_exp_eps_out)
+            psi_exp_eps_func_name = psi_exp_eps_out.split("[")[0].strip()
         
         with open(math_files[i], "w", encoding="utf-8") as f:
             base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules", "base_runall_support.m")
@@ -580,7 +585,7 @@ def run_file(args):
             args["f_eps_name"] = psi_eps_func_name
             args["f_eps_name_pdf"] = psi_eps_func_name_pdf
 
-            #args["f_num_param"] = psi_func_num_param
+            args["f_param_dict"] = psi_func_param_dict
             args["f_eps_param"] = code_eps_params[i]
             args["f_eps_type"] = code_eps_params[i]["type"]
             args["custom_metric_name"] = custom_metric_name
@@ -597,6 +602,8 @@ def run_file(args):
             f.write(math_run + "\n")
     for i in range(len(psi_eps_files)):
         math_out = run_math(math_files[i], math_timeout, mathematica)
+        for changed_, origin_ in args["f_param_dict"].items():
+            math_out = math_out.replace(changed_,origin_)
         print_results(i, math_files[i], math_out, output_file, plain, explict_eps, codes_line_change[i])
     if not args["log"]:
         for path in file_dirs:
