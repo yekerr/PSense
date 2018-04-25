@@ -71,7 +71,7 @@ printPrecision12[num_] := (
         maxValue = ToString[num[[1]],InputForm];
         maxArgeps = "eps -> " <> "Indeterminate"];
     maximizeResult = ToString[Append[{maxValue}, maxArgeps]];
-    If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult], Print["error"]]
+    If[StringFreeQ[maximizeResult, "error"],Print[maximizeResult];maximizeResult, Print["error"];"error"]
 )
 printCheckExp[exp_] := Print[If[Not[StringQ[exp]],exp,"error"]]
 
@@ -121,7 +121,7 @@ pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Mo
 	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
 	printCheckExp[edistanceres];
     If[flagcsv, addquote[edistanceres]];
-    If[!flageps, checkProperties[edistanceres, "Expectation Distance 1", epscons, varscons, vars, flagoptimization]];
+    If[!flageps, checkProperties[edistanceres, "Expectation Distance 1", epscons, varscons, vars, flagoptimization, flagcsv]];
 	Print[""]
 ]
 
@@ -136,7 +136,7 @@ pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization
     Print["Expectation Distance 2 (E[|X-X_eps|])"];
     printCheckExp[edistNewRes];
     If[flagcsv, addquote[edistNewRes]];
-    If[!flageps, checkProperties[edistNewRes, "Expectation Distance 2", epscons, varscons, vars, flagoptimization]];
+    If[!flageps, checkProperties[edistNewRes, "Expectation Distance 2", epscons, varscons, vars, flagoptimization,flagcsv]];
     Print[""]
 ]
 
@@ -146,7 +146,7 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptim
     cusres = customfun[p,q];
     Print["User Defined Metric"];
     Print[cusres];
-    If[!flageps, checkProperties[cusres, "User Defined Metric", epscons, varscons, vars, flagoptimization]];
+    If[!flageps, checkProperties[cusres, "User Defined Metric", epscons, varscons, vars, flagoptimization,flagcsv]];
     Print[""]
 ]
 
@@ -176,8 +176,8 @@ pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Modul
         Print["Is Linear?"];
         disresr2[r2_] = (disres /. vars[[1]]->r2);
         islinear = islinear2[disresr2[r2]];
-        Print[islinear2];
-        If[flagcsv, addquote[islinear2]];
+        Print[islinear];
+        If[flagcsv, addquote[islinear]];
     (*else*),
         Print["KS Distance"];
         distancemax2res = Quiet[distancemax2[p,q,varscons,vars]];
@@ -191,7 +191,7 @@ ptvd[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,fla
 	Print["TVD"];
 	printCheckExp[tvdres];
     If[flagcsv, addquote[tvdres]];
-    If[!flageps, checkProperties[tvdres, "TVD", epscons, varscons, vars, flagoptimization]];
+    If[!flageps, checkProperties[tvdres, "TVD", epscons, varscons, vars, flagoptimization,flagcsv]];
 	Print[""]
 ]
 pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_, flagoptimization_,flagcsv_] := Module[
@@ -200,7 +200,7 @@ pkl[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_, flagoptimization_,fla
 	Print["KL Divergence"];
 	printCheckExp[klres];
     If[flagcsv, addquote[klres]];
-    If[!flageps, checkProperties[klres, "KL Divergence", epscons, varscons, vars, flagoptimization]];
+    If[!flageps, checkProperties[klres, "KL Divergence", epscons, varscons, vars, flagoptimization,flagcsv]];
 	Print[""]
 ]
 

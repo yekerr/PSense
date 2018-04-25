@@ -118,7 +118,7 @@ def generate_math_exp(args):
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = ",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, "{" + ", ".join(f_param_dict.keys()) + "}", custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization])
+    exp = (",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, "{" + ", ".join(f_param_dict.keys()) + "}", custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization]))
     runall = "runall[" + exp + "]"
     return runall
 

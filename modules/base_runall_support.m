@@ -11,7 +11,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     totalTime = TimeConstrained[
-    filecsv = False;
+    filecsv = True;
     If[filecsv, 
         If[flagoptimization,
             $stream = OpenAppend[mathepath<>"/optim_time.csv",BinaryFormat->True];
@@ -28,7 +28,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         ]
     ];
     Write[logstream, "Solving Support..."]; 
-    supportTime = TimeConstrained[
+    supportTime = Timing[TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     (*newvars = DeleteCases[DeleteDuplicates@Cases[p, _Symbol, Infinity], eps];
     newvars = DeleteCases[newvars, Alternatives @@ Select[newvars, NumericQ]];
@@ -49,22 +49,19 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     If[TrueQ[evalresolve], newvarscons = True];
     Quiet[discretevars = Solve[newvarscons, newvars]];
     (*If[discretevars === {}, newvarscons = True]*)
-    If[filecsv,
-	    Get[mathepath<>"/develop/base_runall_type_time_csv.m"],
-    	Get[mathepath<>"/base.m"]
-    ];
+   	Get[mathepath<>"/base.m"];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
-    , 6];
-    If[supportTime===$Aborted,
+    , 600]];
+    If[supportTime[[2]]===$Aborted,
         Print["Solving support time out"];
-        If[filecsv, WriteString[$stream, "SupportT/O,,,,,,,,,,,,,,,,,"]];
+        If[filecsv, WriteString[$stream, "SupportT/O,,,,,,,,,,,,,,,,,,"]];
         If[filecsv, WriteString[$stream,"\n"];Close[$stream]];
         Write[logstream, "Solving support time out"];Close[logstream]; 
         Quit[],
         Write[logstream, "Support solved: "]; 
         Write[logstream, newvarscons]; 
-        Write[logstream, newvars];
         Write[logstream, discretevars]; 
+	    If[filecsv,WriteString[$stream, supportTime[[1]]];WriteString[$stream,","]];
     ];
     Print["Function Type:"];
     If[continuous, Print["Continuous"],Print["Discrete"]];
@@ -75,7 +72,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     If[flagexpdist,
         Write[logstream, "Finding Expectation Distance 1..."]; 
 	    If[(Length[newvars]==1),
-	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars,flagoptimization],600]];
+	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars,flagoptimization, filecsv],600]];
             If[timeexpdist[[2]]===$Aborted,
                 Print["Finding Expectation Distance 1 time out"];
                 Write[logstream, "Finding Expectation Distance 1 time out"]; 
@@ -91,8 +88,8 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         Write[logstream, "Finding Expectation Distance 2..."];
         If[(Length[newvars]==1),
             timeexpdistNew = If[continuous,
-                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization],1]],
-                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization],600]]
+                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv],600]],
+                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
                 Print["Finding Expectation Distance 2 time out"];
@@ -107,7 +104,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     ];
     If[flagks,
         Write[logstream, "Finding KS Distance..."]; 
-	    timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization],600]];
+	    timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization, filecsv],600]];
         If[timeks[[2]]===$Aborted,
             Print["Finding KS Distance time out"];
             Write[logstream,"Finding KS Distance time out"];
@@ -120,8 +117,8 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     If[flagtvd,
         Write[logstream, "Finding TVD..."]; 
 	    If[continuous,
-	    	timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization],600]],
-	    	timetvd = Timing[TimeConstrained[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars,flagoptimization],600]]
+	    	timetvd = Timing[TimeConstrained[ptvdcont[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization,filecsv],600]],
+	    	timetvd = Timing[TimeConstrained[ptvd[flageps,p,np,newepscons,newvarscons,newvars,discretevars,flagoptimization,filecsv],600]]
 	    ];
         If[timetvd[[2]]===$Aborted,
             Print["Finding TVD time out"];
@@ -134,8 +131,8 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     If[flagkl,
         Write[logstream, "Finding KL Divergence..."]; 
 	    If[continuous,
-	    	timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars, flagoptimization],600]],
-	    	timekl = Timing[TimeConstrained[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars, flagoptimization],600]]
+	    	timekl = Timing[TimeConstrained[pklcont[flageps,p,np,newepscons,newvarscons,newvars, flagoptimization,filecsv],600]],
+	    	timekl = Timing[TimeConstrained[pkl[flageps,p,np,newepscons,newvarscons,newvars,discretevars, flagoptimization,filecsv],600]]
 	    ];
         If[timekl[[2]]===$Aborted,
             Print["Finding KL Divergence time out"];
@@ -156,7 +153,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     Print[""];
     Print[""];
     Print[""],
-    30];
+    3800];
     If[totalTime===$Aborted,
         (*Print["Total Time Out"];*)
 	    If[filecsv, WriteString[$stream,"AllT/O,,,,,,,,,,,,,,,,,"]];

@@ -38,10 +38,10 @@ def make_dirs(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-def run_psense(input_file, output_file):
-    cmd = ["python3","psense.py", "-tp", "600", "-f", input_file,"-log","-plain", ">", output_file]
+def run_psense(input_file, output_file, flag_optim):
+    cmd = ["python3","psense.py", "-tp", "600", "-f", input_file,"-log","-plain",flag_optim,">", output_file]
     cmd = " ".join(cmd)
-    print("Running", "psense", "-tp", "600", "-f", input_file, "-log","-plain",">", output_file)
+    print("Running", "psense", "-tp", "600", "-f", input_file, "-log","-plain",flag_optim,">", output_file)
     sp.run(cmd, shell=True)
 
 def exit_message(message):
@@ -58,13 +58,18 @@ def check_cmd():
         exit_message("Please include \"wolfram\" or \"wolframscript\" into your PATH.")
 
 def main():
-    if len(sys.argv) != 3:
-        exit_message("Usage: python3 benchmark.py input_directory output_directory")
+    if len(sys.argv) != 3 and len(sys.argv) != 4 :
+        exit_message("Usage: python3 benchmark.py input_directory output_directory [-s]\n\
+                optional argument: -s   Run PSense with '-s'")
     if (sys.version_info < (3, 5)): 
         exit_message("Python vesrion should be 3.5 or greater.")
     check_cmd()
     input_root_dir = sys.argv[1]
     output_root_dir = sys.argv[2]
+    if len(sys.argv) >= 4 and sys.argv[3] == "-s":
+        flag_optim = "-s"
+    else:
+        flag_optim = ""
     if not os.path.isdir(input_root_dir):
         print("The input directory \"" + input_root_dir + "\" is not existed.")
     for next_dir, _, file_list in os.walk(input_root_dir):
@@ -79,7 +84,7 @@ def main():
             make_dirs(output_dir)
             output_file_name = file_name.replace(".psi", ".txt")
             output_file = os.path.join(output_dir, output_file_name)
-            run_psense(input_file, output_file)
+            run_psense(input_file, output_file, flag_optim)
             sp.run("cat " + output_file,shell=True)
 
 if __name__ == "__main__":
