@@ -11,11 +11,12 @@ edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]],
 edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
 extract[f_] := Values[f][[1]]
 edistancemax[p_, q_, cons_] := distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
-tvd[p_,q_,epscons_,discretevars_] := 1/2*Total[Map[ReplaceAll[FullSimplify[distance2[p, q],epscons],#] &, discretevars]]
+tvd[p_,q_,epscons_,discretevars_] := (
+    If[FullSimplify[distance2[p, q],epscons]===0,0,1/2*Total[Map[ReplaceAll[FullSimplify[distance2[p, q],epscons],#] &, discretevars]]]
+)
 entropy[p_,q_] := q*Log2[q/p]
 kl[p_, q_, epscons_, discretevars_] := 
- Total[Map[ReplaceAll[FullSimplify[entropy[p, q], epscons], #] &, 
-   discretevars]]
+    If[FullSimplify[entropy[p, q], epscons]===0,0,Total[Map[ReplaceAll[FullSimplify[entropy[p, q], epscons], #] &, discretevars]]]
 tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons && varscons]] /. {eps -> v},Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]
 tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],Evaluate[{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
