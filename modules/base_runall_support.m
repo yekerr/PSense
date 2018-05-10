@@ -28,7 +28,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         ]
     ];
     Write[logstream, "Solving Support..."]; 
-    (*Solve Support*)
+    (*Solve support, decide continuous/discrete*)
     supportTime = Timing[TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     (*newvars = DeleteCases[DeleteDuplicates@Cases[p, _Symbol, Infinity], eps];
