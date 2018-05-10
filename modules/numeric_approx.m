@@ -1,7 +1,11 @@
 (*Packages*)
+
+(*Match Brackets*)
 ClearAll[balancedBracesQ]
 balancedBracesQ[str_String] := 
  StringCount[str, "["] === StringCount[str, "]"]
+
+(*Find distribution variables from expression, remove integrate vars xi*)
 findVar[toFindVar_] := (vars = 
    DeleteCases[DeleteDuplicates@Cases[toFindVar, _Symbol, Infinity], 
     eps]; vars = 
@@ -10,6 +14,8 @@ findVar[toFindVar_] := (vars =
   vars = DeleteCases[vars, 
     a_ /; StringMatchQ[ToString@a, RegularExpression["xi[0-9]+"]]];
   vars)
+
+(*Find distribution variables from string*)
 findAllVarFromStr[exprString_] := (
   toFindVar = ToExpression["Hold[" <> exprString <> "]"];
   vars = DeleteDuplicates@Cases[toFindVar, _Symbol, Infinity]; 
@@ -18,17 +24,26 @@ findAllVarFromStr[exprString_] := (
   vars = Fold[DeleteCases[#1, Symbol[#2]] &, vars, 
     StringCases[exprString, Shortest["{" ~~ x__ ~~ ","] -> x]];
   vars)
+
+(*Generate function args with the NumericQ constraints, return the exp in String*)
 setNumericQ[exprString_] := (
   vars = findAllVarFromStr[exprString];
   If[vars === {}, "", 
    StringReplace[
     ToString[vars], {"," -> "_?NumericQ,", "{" -> "[", 
      "}" -> "_?NumericQ]"}]])
+
+(*Generate the function args, return the exp in String*)
 setParam[exprString_] := (vars = findAllVarFromStr[exprString]; 
   If[vars === {}, "", 
    StringReplace[ToString[vars], {"{" -> "[", "}" -> "]"}]])
+
+(*Get the numerical integral function definictions at certain level*)
 tLevel[level_, intExp_] := (
   	Select[t, StringContainsQ[#, intExp <> ToString[level]] &])
+
+
+(*Replace the integrals in int_ with predefined numerical integrals*)
 simplify1t[int_, i_, intExp_] := (
   	intToSimplify = int;
   	For[k = 1, 
@@ -41,6 +56,8 @@ simplify1t[int_, i_, intExp_] := (
         setParam[funExpr])]
     	];
   	intToSimplify)
+
+(*Set the precisionGoal to 8 in NIntegrate*)
 nIntPrecision[str_] := (
   	strReplaced = str;
   	nInts = DeleteDuplicates@StringCases[strReplaced, 
@@ -54,16 +71,24 @@ nIntPrecision[str_] := (
     	];
   	strReplaced
   )
+
+(*Try to solve the integrals in dstrIn_. 
+Use intExpPrefix_ as the prefix of function names
+when defining helper functions for numerical integration*)
 numInt[dstrIn_, intExpPrefix_] := (
   intExp = intExpPrefix <> "int";
   dstr = dstrIn;
   dstr = StringReplace[dstr, "Integrate" -> "NIntegrate"];
   dstr = StringReplace[dstr, "Sum" -> "NSum"];
   dstr = StringReplace[dstr, "Maximize" -> "NMaximize"];
+
+  (*At most how many levels of nested integrals*)
   intLevels = 
    Length[DeleteDuplicates@
       StringCases[dstr, RegularExpression["xi[0-9]+"]]] + 1;
-  (*Extract All Level of Integrals*)
+
+  (*Extract all level of integralas, define them as individual helper functions,
+  add to set t*)
   Do[If[i == 1,
      	Evaluate[Symbol[intExp <> ToString[i]]] = StringCases[dstr, 
        		Shortest[{"NIntegrate[", "NSum[", 
@@ -90,7 +115,11 @@ numInt[dstrIn_, intExpPrefix_] := (
          Length[Evaluate[Symbol[intExp <> ToString[i]]]], 1}]];
      	];
    , {i, intLevels}];
-  (*Define Individual Functions for Integrals*)
+
+  (*Recursively replace the nested integrals in the input expression
+    and in each individual helper function
+    with defined helper functions,
+    Generate the function definition for all level of integrals*)
   tSimplified = {};
   Do[If[i == 1,
      	For[k = 1, 
@@ -109,13 +138,18 @@ numInt[dstrIn_, intExpPrefix_] := (
        tSimplified];
      	];
    , {i, intLevels}];
+
+  (*Activate all the defined helper functions*)
   Activate[Evaluate[ToExpression[tSimplified]]];
   (*Set Precision Goal*)
   (*dstr = nIntPrecision[
   dstr];*)
-  (*try numerical integrate*)
-  	
+
+  (*Try to do numerical integrate on the original expression*)
   dexp = TimeConstrained[Catch[ToExpression[dstr]], 6];
+
+  (*If fails, recover the unsolved part to original expression.
+    Return the result*)
   If[NumberQ[dexp], dexp,
    dstrRecover = dstr;
    For[k = 1, 

@@ -28,6 +28,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         ]
     ];
     Write[logstream, "Solving Support..."]; 
+    (*Solve Support*)
     supportTime = Timing[TimeConstrained[
     newepscons=If[!flageps,If[Maximize[{eps,epscons},eps][[1]]==0,(-0.01<=eps<=0.01),epscons],True];
     (*newvars = DeleteCases[DeleteDuplicates@Cases[p, _Symbol, Infinity], eps];
@@ -52,6 +53,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
    	Get[mathepath<>"/base.m"];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
     , 600]];
+    (*Check the support result*)
     If[supportTime[[2]]===$Aborted,
         Print["Solving support time out"];
         If[filecsv, WriteString[$stream, "SupportT/O,,,,,,,,,,,,,,,,,,"]];
