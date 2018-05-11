@@ -1,0 +1,19 @@
+var makeCoin = function(weight){
+return bernoulli(weight+0.1);
+}
+
+globalStore.observeData = [1,1,1,1,1]
+var main = function(){
+globalStore.coinWeight = uniform(0,1)
+var repeatloop = function(iter){
+if (iter == 5) return;
+globalStore.coin = makeCoin(globalStore.coinWeight)
+condition(globalStore.coin == 1)
+repeatloop(iter + 1);
+return;
+}
+repeatloop(0);
+
+return globalStore.coinWeight;
+}
+Infer({method: 'MCMC', samples: 1000},main)
