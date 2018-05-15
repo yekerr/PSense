@@ -11,7 +11,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     logstream = OpenAppend[logfile];
     $Messages = {logstream};
     totalTime = TimeConstrained[
-    filecsv = True;
+    filecsv = False;
     If[filecsv, 
         If[flagoptimization,
             $stream = OpenAppend[mathepath<>"/optim_time.csv",BinaryFormat->True];
