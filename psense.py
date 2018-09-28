@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 import os, sys
 import re
 import argparse
@@ -364,8 +365,8 @@ def parse_math_content(lines, explict_eps):
     func_type = "Discrete"
     prompt_func_type = "Function Type:"
     prompt_metrics = {"Discrete": set(["Expectation Distance 1 (|E[X]-E[X_eps]|)", "Expectation Distance 2 (E[|X-X_eps|])", "KS Distance", "TVD", "KL Divergence"]),
-        "Continuous": set(["Expectation Distance 1 (|E[X]-E[X_eps]|)", "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
-    translate_metrics = {"Expectation Distance 1 (|E[X]-E[X_eps]|)": "ED1 |E[X]-E[X_eps]|","Expectation Distance 2 (E[|X-X_eps|])":"ED2 E[|X-X_eps|]", "KS Distance": "KS Distance",
+            "Continuous": set(["Expectation Distance 1 (|E[X]-E[X_eps]|)",  "KS Distance", "TVD Bounds(lower, upper):", "KL Divergence Bounds(lower, upper):"])}
+    translate_metrics = {"Expectation Distance 1 (|E[X]-E[X_eps]|)": "ED1 |E[X]-E[X_eps]|",  "Expectation Distance 2 (E[|X-X_eps|])":"ED2 E[|X-X_eps|]", "KS Distance": "KS Distance",
         "TVD": "TVD", "KL Divergence": "KL", "TVD Bounds(lower, upper):": "TVD Bounds", "KL Divergence Bounds(lower, upper):": "KL Bounds"}
     errors = set(["::", "error"])
     if explict_eps:

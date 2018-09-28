@@ -7,10 +7,10 @@ subs[p_, q_,cons_,params_] := FullSimplify[Abs[p-q],cons] /. params
 distancemax[p_,q_,cons_,vars_] := FindMaximum[{FullSimplify[Abs[p-q],cons],cons},vars]
 distancemax2[p_,q_,cons_,vars_] := NMaximize[{FullSimplify[Abs[p-q],cons],cons},vars]
 (*distancemax3[p_,q_,cons_] := Maximize[{Abs[p-q],cons},{eps,Element[r1,Integers]}]*)
-edistance[p_,q_,cons_]:=distance[extract[f[p]],extract[f[FullSimplify[q,cons]]],cons]
-edistance2[p_,q_,cons_]:=distance2[extract[f[p]],extract[f[FullSimplify[q,cons]]]]
+edistance[p_,q_,cons_]:=distance[extract[extractDelta[FullSimplify[p,cons]]],extract[extractDelta[FullSimplify[q,cons]]],cons]
+edistance2[p_,q_,cons_]:=distance2[extract[extractDelta[p]],extract[extractDelta[FullSimplify[q,cons]]]]
 extract[f_] := Values[f][[1]]
-edistancemax[p_, q_, cons_] := distancemax[extract[f[p]], extract[f[FullSimplify[q,cons]]], cons]
+edistancemax[p_, q_, cons_] := distancemax[extract[extractDelta[p]], extract[extractDelta[FullSimplify[q,cons]]], cons]
 tvd[p_,q_,epscons_,discretevars_] := (
     If[FullSimplify[distance2[p, q],epscons]===0,0,1/2*Total[Map[ReplaceAll[FullSimplify[distance2[p, q],epscons],#] &, discretevars]]]
 )
@@ -21,6 +21,9 @@ tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[
 tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],Evaluate[{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
 samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
+SetAttributes[samplecont, HoldAll]
+sampleed1[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[edistance[p,np,epscons][[1]] /. {eps -> v}, epsrange]
+sampleks[p_,np_,epscons_,varscons_,vars_,epsrange_, disres_] := Table[MaxValue[disres, vars]/. {eps -> v}, epsrange]
 klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
 klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
 islinear2[p_]:= Module[
@@ -114,19 +117,62 @@ checkProperties[dist_, distName_, epscons_, varscons_, vars_, flagoptimization_,
 )
 
 
-pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Module[
+pedist[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_,flagnum_] := Module[
 	{},
-	f[_ DiracDelta[point_]] := Solve[point==0,vars];
-	f[DiracDelta[point_]] := Solve[point==0,vars];
-	edistanceres = edistance[p,q,epscons][[1]];
+	extractDelta[_ DiracDelta[point_]] := Solve[point==0,vars];
+	extractDelta[DiracDelta[point_]] := Solve[point==0,vars];
 	Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
-	printCheckExp[edistanceres];
-    If[flagcsv, addquote[edistanceres]];
-    If[!flageps, checkProperties[edistanceres, "Expectation Distance 1", epscons, varscons, vars, flagoptimization, flagcsv]];
-	Print[""]
+    If[!flagnum,
+    (*then*)
+	    edistanceres = edistance[p,q,epscons][[1]];
+	    printCheckExp[edistanceres];
+        If[flagcsv, addquote[edistanceres]];
+        If[!flageps, checkProperties[edistanceres, "Expectation Distance 1", epscons, varscons, vars, flagoptimization, flagcsv]];
+	    Print[""],
+    (*else*)
+        If[!flageps,
+	    epsmin = 0; (*Quiet[Minimize[{eps,epscons},eps][[1]]];*)
+	    epsmax = Quiet[Maximize[{eps,epscons},eps][[1]]];
+	    epsrange = {v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10};
+                xsample = Table[eps /. eps->v,{v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10}];
+            epscons2 = (epscons && (eps>0));
+	        table = sampleed1[p,q,epscons2,varscons,vars,epsrange];
+	        data = Transpose[{xsample,table}];
+	        lm = Quiet[LinearModelFit[data,eps,eps]];
+	        k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
+	        Print["ED1 Bounds(lower, upper):"];
+	        bmax = Max[table - k*xsample];
+	        bmin = Min[table - k*xsample];
+            lowerbound = k*eps+bmin;
+            upperbound = k*eps+bmax;
+	        printCheckExp[{lowerbound,upperbound}];
+            If[flagcsv, addquote[{lowerbound,upperbound}]];
+	        Print["ED1 Max"];
+	        maxSample = Max[table];
+	        Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
+	        Print["Is Linear?"];
+	        Print["NA"];
+            If[flagcsv,
+                WriteString[$stream,"\""];
+                WriteString[$stream,"{"];
+                WriteString[$stream,InputForm[maxSample]];
+                WriteString[$stream,", {eps -> "];
+                WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
+                WriteString[$stream,"}}"];
+                WriteString[$stream,"\""];
+	            WriteString[$stream,","];
+	            WriteString[$stream,","]
+           ],
+	        edistanceres = edistance[p,q,epscons][[1]];
+	        Print["Expectation Distance 1 (|E[X]-E[X_eps]|)"];
+	        printCheckExp[edistanceres];
+            If[flagcsv, addquote[edistanceres]];
+	        Print[""]
+        ];
+    Print[""]]
 ]
 
-pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,flagcsv_] := Module[
+pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,flagcsv_,flagnum_] := Module[
     (* Find expectation distance E[|X-X_eps|] for discrete distribution,
         where X~p and X_eps~q, p and q are PDFs.  *)
     {},
@@ -151,34 +197,68 @@ pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptim
     Print[""]
 ]
 
-pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_] := Module[
-	{},
+pks[flageps_,p_,q_,epscons_,varscons_,vars_,flagoptimization_,flagcsv_, flagnum_] := Module[
+    {},
     disres = FullSimplify[distance[p,q,epscons && varscons],epscons && varscons];
     If[!flageps,
-        Print["KS Distance"];
-        printCheckExp[disres];
-        If[flagcsv, addquote[disres]];
-        If[!flagoptimization,
-            Print["KS Distance Max"];
-            distancemax2res = Quiet[distancemax2[p,q,epscons && varscons,Prepend[vars,eps]]];
-            maxks = printPrecision12[distancemax2res];
-            If[flagcsv, addquote[maxks]];
-        (*else*),
-            Print["eps Bounds for " <> "KS Distance" <> " <= 0.1"];
-            KSeps = MaxValue[disres, vars];
-            optret = optimization[KSeps];
-            lowerbound = numPrecision12[optret[[1]]];
-            If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
-            upperbound = numPrecision12[optret[[2]]];
-            If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
-            Print[{lowerbound,upperbound}];
-            If[flagcsv, addquote[{lowerbound,upperbound}]];
-        ];
-        Print["Is Linear?"];
-        disresr2[r2_] = (disres /. vars[[1]]->r2);
-        islinear = islinear2[disresr2[r2]];
-        Print[islinear];
-        If[flagcsv, addquote[islinear]];
+        If[!flagnum,
+            Print["KS Distance"];
+            printCheckExp[disres];
+            If[flagcsv, addquote[disres]];
+            If[!flagoptimization,
+                Print["KS Distance Max"];
+                distancemax2res = Quiet[distancemax2[p,q,epscons && varscons,Prepend[vars,eps]]];
+                maxks = printPrecision12[distancemax2res];
+                If[flagcsv, addquote[maxks]];
+            (*else*),
+                Print["eps Bounds for " <> "KS Distance" <> " <= 0.1"];
+                KSeps = MaxValue[disres, vars];
+                optret = optimization[KSeps];
+                lowerbound = numPrecision12[optret[[1]]];
+                If[!StringFreeQ[lowerbound, "List"], lowerbound = "error"];
+                upperbound = numPrecision12[optret[[2]]];
+                If[!StringFreeQ[upperbound, "List"], upperbound = "error"];
+                Print[{lowerbound,upperbound}];
+                If[flagcsv, addquote[{lowerbound,upperbound}]];
+            ];
+            Print["Is Linear?"];
+            disresr2[r2_] = (disres /. vars[[1]]->r2);
+            islinear = islinear2[disresr2[r2]];
+            Print[islinear];
+            If[flagcsv, addquote[islinear]];
+        (*flagnum else*),
+	        epsmin = 0; (*Quiet[Minimize[{eps,epscons},eps][[1]]];*)
+	        epsmax = Quiet[Maximize[{eps,epscons},eps][[1]]];
+	        epsrange = {v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10};
+                    xsample = Table[eps /. eps->v,{v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10}];
+	            table = sampleks[p,q,epscons,varscons,vars,epsrange, disres];
+	            data = Transpose[{xsample,table}];
+	            lm = Quiet[LinearModelFit[data,eps,eps]];
+	            k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
+	            Print["KS Bounds(lower, upper):"];
+	            bmax = Max[table - k*xsample];
+	            bmin = Min[table - k*xsample];
+                lowerbound = k*eps+bmin;
+                upperbound = k*eps+bmax;
+	            printCheckExp[{lowerbound,upperbound}];
+                If[flagcsv, addquote[{lowerbound,upperbound}]];
+	            Print["KS Max"];
+	            maxSample = Max[table];
+	            Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
+	            Print["Is Linear?"];
+	            Print["NA"];
+                If[flagcsv,
+                    WriteString[$stream,"\""];
+                    WriteString[$stream,"{"];
+                    WriteString[$stream,InputForm[maxSample]];
+                    WriteString[$stream,", {eps -> "];
+                    WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
+                    WriteString[$stream,"}}"];
+                    WriteString[$stream,"\""];
+	                WriteString[$stream,","];
+	                WriteString[$stream,","]
+                ]
+        ](*end if flagnum*)
     (*else*),
         Print["KS Distance"];
         distancemax2res = Quiet[distancemax2[p,q,varscons,vars]];

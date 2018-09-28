@@ -12,6 +12,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     $Messages = {logstream};
     totalTime = TimeConstrained[
     filecsv = False;
+    flagnum = False;
     If[filecsv, 
         If[flagoptimization,
             $stream = OpenAppend[mathepath<>"/optim_time.csv",BinaryFormat->True];
@@ -20,7 +21,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
 	        WriteString[$stream,epsType];
 	        WriteString[$stream,","]
         (*else*),
-	        $stream = OpenAppend[mathepath<>"/results_time.csv",BinaryFormat->True];
+	        $stream = OpenAppend[mathepath<>"/ed1_ks_num.csv",BinaryFormat->True];
 	        WriteString[$stream,$CommandLine[[3]]];
 	        WriteString[$stream,","];
 	        WriteString[$stream,epsType];
@@ -53,6 +54,9 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
    	Get[mathepath<>"/base.m"];
     continuous = TrueQ[newvarscons]||MatchQ[newvarscons,__Inequality];
     , 600]];
+    (*TODO remove this line*)
+    (*If[!continuous, Quit[]]*)
+    
     (*Check the support result*)
     If[supportTime[[2]]===$Aborted,
         Print["Solving support time out"];
@@ -74,7 +78,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     If[flagexpdist,
         Write[logstream, "Finding Expectation Distance 1..."]; 
 	    If[(Length[newvars]==1),
-	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars,flagoptimization, filecsv],600]];
+	    	timeexpdist = Timing[TimeConstrained[pedist[flageps,e,ne,newepscons,newvarscons,newvars,flagoptimization, filecsv, flagnum],600]];
             If[timeexpdist[[2]]===$Aborted,
                 Print["Finding Expectation Distance 1 time out"];
                 Write[logstream, "Finding Expectation Distance 1 time out"]; 
@@ -90,7 +94,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         Write[logstream, "Finding Expectation Distance 2..."];
         If[(Length[newvars]==1),
             timeexpdistNew = If[continuous,
-                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv],600]],
+                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv,flagnum],600]],
                  Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
@@ -106,7 +110,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     ];
     If[flagks,
         Write[logstream, "Finding KS Distance..."]; 
-	    timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization, filecsv],600]];
+	    timeks = Timing[TimeConstrained[pks[flageps,p,np,newepscons,newvarscons,newvars,flagoptimization, filecsv, flagnum],600]];
         If[timeks[[2]]===$Aborted,
             Print["Finding KS Distance time out"];
             Write[logstream,"Finding KS Distance time out"];
