@@ -98,6 +98,7 @@ def generate_math_exp(args):
     f_eps_name_pdf = args["f_eps_name_pdf"]
     f_exp_name = args["f_exp_name"]
     f_exp_eps_name = args["f_exp_eps_name"]
+    f_ED2_eps_name = args["f_ED2_eps_name"]
     f_param_dict = args["f_param_dict"]
     f_eps_param = args["f_eps_param"]
     f_eps_type = args["f_eps_type"]
@@ -113,13 +114,14 @@ def generate_math_exp(args):
     if not f_exp_name or not f_exp_eps_name:
         f_exp_name = "Null"
         f_exp_eps_name = "Null"
+        f_ED2_eps_name = "Null"
     flag_eps = "True" if explict_eps else "False"
     flag_numeric = "True" if numeric else "False"
     flag_optimization = "True" if optimization else "False"
     flag_metrics = [str(v) for v in metrics]
     custom_metric_name = custom_metric_name if custom_metric_name else "None"
     modules_dir = "\"" + os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules") + "\""
-    exp = (",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, "{" + ", ".join(f_param_dict.keys()) + "}", custom_metric_name, f_exp_name, f_exp_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization]))
+    exp = (",".join([modules_dir, f_name, f_pdf_name, f_eps_name, f_eps_name_pdf, flag_eps, *flag_metrics, "{" + ", ".join(f_param_dict.keys()) + "}", custom_metric_name, f_exp_name, f_exp_eps_name, f_ED2_eps_name, eps_range, eps_type, flag_numeric, file, f_eps_type, flag_optimization]))
     runall = "runall[" + exp + "]"
     return runall
 
@@ -542,6 +544,16 @@ def run_file(args):
         codes_exp_eps, _, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
         psi_exp_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_exp_eps", "psi", len(codes_exp_eps))
         store_codes_to_files(codes_exp_eps, psi_exp_eps_files)
+        psi_ED2_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_ED2_eps", "psi", len(codes_exp_eps))
+        with open(psi_file, "r", encoding="utf-8") as f:
+            code = f.read()
+            codes_ED2_acc = code.replace("main(", "main_acc(")
+            codes_ED2_eps = [codes_ED2_acc + "def main_eps(){\n" \
+                + codes_eps_i.replace("main(", "main_in(") \
+                + "return main_in();\n}\n" \
+                + "def main(){return Expectation(abs(main_acc() -  main_eps()));}\n" \
+                        for codes_eps_i in codes_eps]
+            store_codes_to_files(codes_ED2_eps, psi_ED2_eps_files)
     elif output_file:
         with open(output_file, "a", encoding="utf-8") as f:
             f.write("Expectation is not supported" + "\n")
@@ -555,12 +567,17 @@ def run_file(args):
         psi_eps_out_pdf = run_psi(psi_eps_files[i], None, psi_timeout, verbose, log_files[i])
         if not check_psi_out(psi_eps_files[i], output_file, psi_eps_out_pdf):
             continue
+        #if not check_psi_out(psi_ED2_files[i], output_file, psi_ED2_out_pdf):
+        #    continue
         psi_eps_out = rename_psi_out(psi_eps_out, "Eps")
         psi_eps_out_pdf = rename_psi_out(psi_eps_out_pdf, "EpsPDF")
+        #psi_ED2_out_pdf = rename_psi_out(psi_ED2_out_pdf, "ED2PDF")
         psi_eps_out = replace_underscore(psi_eps_out)
         psi_eps_out_pdf = replace_underscore(psi_eps_out_pdf)
+        #psi_ED2_out_pdf = replace_underscore(psi_ED2_out_pdf)
         psi_eps_func_name_pdf = psi_eps_out_pdf.split("[")[0].strip()
         psi_eps_func_name = psi_eps_out.split("[")[0].strip()
+        #psi_ED2_func_name = psi_ED2_out_pdf.split("[")[0].strip()
 
         if code_exp:
             psi_exp_eps_out = run_psi(psi_exp_eps_files[i], None, psi_timeout, verbose, log_files[i])
@@ -570,6 +587,12 @@ def run_file(args):
             psi_exp_eps_out = replace_underscore(psi_exp_eps_out)
             psi_exp_eps_func_name = psi_exp_eps_out.split("[")[0].strip()
         
+            psi_ED2_eps_out = run_psi(psi_ED2_eps_files[i], None, psi_timeout, verbose, log_files[i])
+            if not check_psi_out(psi_ED2_eps_files[i], output_file, psi_ED2_eps_out):
+                continue
+            psi_ED2_eps_out = rename_psi_out(psi_ED2_eps_out, "ED2Eps")
+            psi_ED2_eps_out = replace_underscore(psi_ED2_eps_out)
+            psi_ED2_eps_func_name = psi_ED2_eps_out.split("[")[0].strip()
         with open(math_files[i], "w", encoding="utf-8") as f:
             base_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "modules", "base_runall_support.m")
             f.write("Get[\"" + base_file + "\"]\n")
@@ -578,7 +601,7 @@ def run_file(args):
             f.write(psi_out + "\n")
             f.write(psi_pdf_out + "\n")
             f.write(psi_eps_out + "\n")
-            f.write(psi_eps_out_pdf + "\n")
+            #f.write(psi_ED2_out_pdf + "\n")
             
             args["log_file"] = log_files[i]
             args["f_name"] = psi_func_name
@@ -595,6 +618,8 @@ def run_file(args):
                 f.write(psi_exp_eps_out + "\n")
                 args["f_exp_name"] = psi_exp_func_name
                 args["f_exp_eps_name"] = psi_exp_eps_func_name
+                f.write(psi_ED2_eps_out + "\n")
+                args["f_ED2_eps_name"] = psi_ED2_eps_func_name
                 math_run = generate_math_exp(args)
             else:
                 args["f_exp_name"] = None

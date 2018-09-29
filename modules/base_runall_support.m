@@ -2,7 +2,9 @@
 (* Input *)
 MyDiracDelta[x_] := Boole[x == 0]
 
-runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,newvars_,customfun_:0,eU_:1,neU_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:"", flagoptimization_: False] := Module[{},
+runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,newvars_,customfun_:0,eU_:1,neU_:1,ed2U_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:"", flagoptimization_: False] := Module[{},
+    Print["called"];
+    Print[ed2[r]];
     If[flagnumeric, 
         Print["Use numeric"]; 
         Get[mathepath<>"/numeric_approx.m"];
@@ -21,7 +23,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
 	        WriteString[$stream,epsType];
 	        WriteString[$stream,","]
         (*else*),
-	        $stream = OpenAppend[mathepath<>"/ed1_ks_num.csv",BinaryFormat->True];
+	        $stream = OpenAppend[mathepath<>"/ed2_num.csv",BinaryFormat->True];
 	        WriteString[$stream,$CommandLine[[3]]];
 	        WriteString[$stream,","];
 	        WriteString[$stream,epsType];
@@ -41,6 +43,7 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
     np = npU @@ newvars;
     e = eU @@ newvars;
     ne = neU @@ newvars;
+    ed2 = ed2U @@ newvars;
     pReplace = pdf /. DiracDelta -> MyDiracDelta;
     TimeConstrained[newvarscons = FullSimplify[FunctionDomain[1/Boole[0 != pReplace],newvars]],10];
     If[!ValueQ[newvarscons],
@@ -94,8 +97,12 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
         Write[logstream, "Finding Expectation Distance 2..."];
         If[(Length[newvars]==1),
             timeexpdistNew = If[continuous,
-                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv,flagnum],600]],
-                 Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv],600]]
+                 (*Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv,flagnum],600]]*)
+                 Timing[TimeConstrained[pedistNew2[flageps,ed2,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv,flagnum],600]]
+                 (*else discrete*),
+                 (*Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv],600]]*)
+                 Print["called in ED2"];
+                 Timing[TimeConstrained[pedistNew2[flageps,ed2,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv, flagnum],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
                 Print["Finding Expectation Distance 2 time out"];

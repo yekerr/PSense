@@ -21,8 +21,8 @@ tvdcont[p_,q_,epscons_,varscons_,vars_,v_] := 1/2*NIntegrate[Abs[p-FullSimplify[
 tvdvaluecont[p_,q_,epscons_,varscons_,vars_] := 1/2*NIntegrate[Abs[p-FullSimplify[q,epscons&&varscons]],Evaluate[{vars[[1]],Quiet[Minimize[{vars[[1]], varscons},vars[[1]]]][[1]],Quiet[Maximize[{vars[[1]], varscons},vars[[1]]]][[1]]}]]
 sample[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[Quiet[tvdcont[p,np,epscons,varscons,vars,v]], epsrange]
 samplekl[p_, np_,epscons_,varscons_,vars_,epsrange_] := Table[klcont[p,np,epscons,varscons,vars,v], epsrange]
-SetAttributes[samplecont, HoldAll]
 sampleed1[p_,np_,epscons_,varscons_,vars_,epsrange_] := Table[edistance[p,np,epscons][[1]] /. {eps -> v}, epsrange]
+sampleed2[ed2_,epscons_,varscons_,vars_,epsrange_] := Table[extract[extractDelta[FullSimplify[ed2,varscons]]][[1]] /. {eps -> v}, epsrange]
 sampleks[p_,np_,epscons_,varscons_,vars_,epsrange_, disres_] := Table[MaxValue[disres, vars]/. {eps -> v}, epsrange]
 klcont[p_,q_,epscons_,varscons_,vars_,v_]:= Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons] /. {eps -> v},Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
 klvaluecont[p_,q_,epscons_,varscons_,vars_]:=Quiet[NIntegrate[FullSimplify[entropy[p,q],epscons&&varscons],Evaluate[{vars[[1]],Minimize[{vars[[1]], varscons},vars[[1]]][[1]],Maximize[{vars[[1]], varscons},vars[[1]]][[1]]}]]]
@@ -187,6 +187,62 @@ pedistNew[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,flagoptimization
     Print[""]
 ]
 
+pedistNew2[flageps_,ed2_,epscons_,varscons_,vars_,discretevars_,flagoptimization_,flagcsv_,flagnum_] := Module[
+    (* Find expectation distance E[|X-X_eps|] for discrete distribution,
+        where X~p and X_eps~q, p and q are PDFs.  *)
+    {},
+	extractDelta[_ DiracDelta[point_]] := Solve[point==0,vars];
+	extractDelta[DiracDelta[point_]] := Solve[point==0,vars];
+    Print["Expectation Distance 2 (E[|X-X_eps|])"];
+    If[!flagnum,
+    (*then*)
+        edistNewRes2 = extract[extractDelta[FullSimplify[ed2,varscons]]][[1]];
+	    printCheckExp[edistNewRes2];
+        If[flagcsv, addquote[edistNewRes2]];
+        If[!flageps, checkProperties[edistNewRes2, "Expectation Distance 2", epscons, varscons, vars, flagoptimization, flagcsv]];
+	    Print[""],
+    (*else*)
+        If[!flageps,
+	    epsmin = 0; (*Quiet[Minimize[{eps,epscons},eps][[1]]];*)
+	    epsmax = Quiet[Maximize[{eps,epscons},eps][[1]]];
+	    epsrange = {v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10};
+                xsample = Table[eps /. eps->v,{v,epsmin+(epsmax-epsmin)/10,epsmax,(epsmax-epsmin)/10}];
+            epscons2 = (epscons && (eps>0));
+	        table = sampleed2[ed2,epscons2,varscons,vars,epsrange];
+	        data = Transpose[{xsample,table}];
+	        lm = Quiet[LinearModelFit[data,eps,eps]];
+	        k = Quiet[lm["ParameterTableEntries"][[2]][[1]]];
+	        Print["ED2 Bounds(lower, upper):"];
+	        bmax = Max[table - k*xsample];
+	        bmin = Min[table - k*xsample];
+            lowerbound = k*eps+bmin;
+            upperbound = k*eps+bmax;
+	        printCheckExp[{lowerbound,upperbound}];
+            If[flagcsv, addquote[{lowerbound,upperbound}]];
+	        Print["ED2 Max"];
+	        maxSample = Max[table];
+	        Print["{",ToString[SetPrecision[maxSample,12]],", ","{eps -> ",ToString[SetPrecision[xsample[[Position[table, maxSample][[1]][[1]]]],12]],"}}"];
+	        Print["Is Linear?"];
+	        Print["NA"];
+            If[flagcsv,
+                WriteString[$stream,"\""];
+                WriteString[$stream,"{"];
+                WriteString[$stream,InputForm[maxSample]];
+                WriteString[$stream,", {eps -> "];
+                WriteString[$stream,InputForm[xsample[[Position[table, maxSample][[1]][[1]]]]]];
+                WriteString[$stream,"}}"];
+                WriteString[$stream,"\""];
+	            WriteString[$stream,","];
+	            WriteString[$stream,","]
+           ],
+            edistNewRes2 = extract[extractDelta[FullSimplify[ed2,varscons]]][[1]];
+	        printCheckExp[edistNewRes2];
+            If[flagcsv, addquote[edistNewRes2]];
+	        Print[""]
+        ];
+    ];
+    Print[""];
+]
 
 pcus[flageps_,p_,q_,epscons_,varscons_,vars_,discretevars_,customfun_, flagoptimization_,flagcsv_] := Module[
     {},
