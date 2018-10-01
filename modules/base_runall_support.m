@@ -3,8 +3,6 @@
 MyDiracDelta[x_] := Boole[x == 0]
 
 runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,flagks_,flagtvd_,flagkl_,flagcustom_,newvars_,customfun_:0,eU_:1,neU_:1,ed2U_:1,epscons_:(-0.01<=eps<=0.01),varscons_:(r1==0||r1==1),flagnumeric_:False, logfile_:Null, epsType_:"", flagoptimization_: False] := Module[{},
-    Print["called"];
-    Print[ed2[r]];
     If[flagnumeric, 
         Print["Use numeric"]; 
         Get[mathepath<>"/numeric_approx.m"];
