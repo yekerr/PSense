@@ -99,7 +99,6 @@ runall[mathepath_,pU_,pdfU_,npU_,npdfU_,flageps_,flagexpdist_,flagexpdistNew_,fl
                  Timing[TimeConstrained[pedistNew2[flageps,ed2,newepscons,newvarscons,newvars,Null,flagoptimization, filecsv,flagnum],600]]
                  (*else discrete*),
                  (*Timing[TimeConstrained[pedistNew[flageps,pdfU,npdfU,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv],600]]*)
-                 Print["called in ED2"];
                  Timing[TimeConstrained[pedistNew2[flageps,ed2,newepscons,newvarscons,newvars,discretevars,flagoptimization, filecsv, flagnum],600]]
             ];
             If[timeexpdistNew[[2]]===$Aborted,
