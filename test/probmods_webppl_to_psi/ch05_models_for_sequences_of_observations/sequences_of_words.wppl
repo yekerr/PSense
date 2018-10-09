@@ -1,0 +1,23 @@
+var vocab = ['chef', 'omelet', 'soup', 'eat', 'work', 'bake', 'stop'];
+var transition = function(word) {
+  var ps = (word == 'start' ? [0.0032, 0.4863, 0.0789, 0.0675, 0.1974, 0.1387, 0.0277] :
+            word == 'chef' ? [0.0699, 0.1296, 0.0278, 0.4131, 0.1239, 0.2159, 0.0194] :
+            word == 'omelet' ? [0.2301, 0.0571, 0.1884, 0.1393, 0.0977, 0.1040, 0.1831] :
+            word == 'soup' ?  [0.1539, 0.0653, 0.0410, 0.1622, 0.2166, 0.2664, 0.0941] :
+            word == 'eat' ? [0.0343, 0.0258, 0.6170, 0.0610, 0.0203, 0.2401, 0.0011] :
+            word == 'work' ? [0.0602, 0.2479, 0.0034, 0.0095, 0.6363, 0.02908, 0.0133] :
+            word == 'bake' ? [0.0602, 0.2479, 0.0034, 0.0095, 0.6363, 0.02908, 0.0133] :
+            console.error("word (" + word + ") not recognized"))
+  return categorical({vs: vocab, ps: ps});
+}
+
+var sampleWords = function(lastWord) {
+  if(lastWord == 'stop') {
+    return [];
+  } else {
+    var nextWord = transition(lastWord);
+    return [lastWord].concat(sampleWords(nextWord));
+  }
+}
+
+sampleWords('start')

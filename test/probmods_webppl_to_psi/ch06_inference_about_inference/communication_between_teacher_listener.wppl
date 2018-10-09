@@ -1,0 +1,29 @@
+var dieToProbs = function(die) {
+  return (die == 'A' ? [0, .2, .8] :
+          die == 'B' ? [.1, .3, .6] :
+          'uhoh')
+}
+
+var sidePrior = Categorical({vs: ['red', 'green', 'blue'], ps: [1/3, 1/3, 1/3]})
+var diePrior = Categorical({vs: ['A', 'B'], ps: [1/2, 1/2]})
+var roll = function(die) {return categorical({vs: ['red', 'green', 'blue'], ps: dieToProbs(die)})}
+
+var teacher = function(die, depth) {
+  return Infer({method: 'enumerate'}, function() {
+    var side = sample(sidePrior);
+    condition(sample(learner(side, depth)) == die)
+    return side
+  })
+}
+
+var learner = function(side, depth) {
+  return Infer({method: 'enumerate'}, function() {
+    var die = sample(diePrior);
+    condition(depth == 1 ? 
+              side == roll(die) :
+              side == sample(teacher(die, depth - 1)))
+    return die
+  })
+}
+
+viz.auto(learner('green', 3))

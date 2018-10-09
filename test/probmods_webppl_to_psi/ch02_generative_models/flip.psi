@@ -1,0 +1,4 @@
+def main(){ 
+	x := bernoulli(0.1); 
+	return x; // expected: 1/5·δ[-x+1]+4/5·δ[x]
+} 

@@ -1,0 +1,11 @@
+
+def map(lambda: 𝟙→ ℝ){
+    a := [lambda()];
+    r₁ := [lambda()]~a;
+    return r₁;
+}
+
+def main(){
+    r:=map(()=>flip(1/2));
+    return r[0]+r[1]; // expected: 1/2·δ[-r₁+1]+1/4·δ[-r₁+2]+1/4·δ[r₁]
+}

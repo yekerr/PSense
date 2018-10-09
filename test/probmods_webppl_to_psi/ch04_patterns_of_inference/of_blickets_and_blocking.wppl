@@ -1,0 +1,13 @@
+var blicketPosterior = Infer({method: 'enumerate'}, function() {
+  var blicket = mem(function(block) {return flip(.4)})
+  var power = function(block) {return blicket(block) ? .9 : .05}
+  var machine = function(blocks) {
+    return (blocks.length == 0 ?
+            flip(.05) :
+            flip(power(first(blocks))) || machine(rest(blocks)))
+  }
+  condition(machine(['A', 'B']))
+  return blicket('A')
+});
+
+viz(blicketPosterior)

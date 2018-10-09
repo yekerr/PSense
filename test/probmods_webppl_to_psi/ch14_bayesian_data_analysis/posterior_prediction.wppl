@@ -1,0 +1,46 @@
+///fold:
+var marginalize = function(dist, key){
+  return Infer({method: "enumerate"}, function(){
+    return sample(dist)[key]
+  })
+}
+///
+// "Kids who help" in 2 experiments
+var k1 = 0;
+var k2 = 10;
+
+// Number of kids in 2 experiments
+var n1 = 10;
+var n2 = 10;
+
+var model = function() {
+
+  // "true effect in the population"
+  var p = uniform(0, 1);
+
+  // observed data from 2 experiments
+  observe(Binomial({p: p, n: n1}), k1);
+  observe(Binomial({p: p, n: n2}), k2);
+
+  // posterior prediction
+  var posteriorPredictive1 = binomial(p, n1)
+  var posteriorPredictive2 = binomial(p, n2)
+
+  return {
+    parameter : p,
+  };
+}
+
+var opts = {
+  method: "MCMC", callbacks: [editor.MCMCProgress()],
+  samples: 20000, burn: 10000
+};
+
+var posterior = Infer(opts, model);
+
+var posteriorPredictive = marginalize(posterior, "predictive")
+// save results for future code boxes
+editor.put("posteriorPredictive", posteriorPredictive)
+
+var parameterPosterior = marginalize(posterior, "parameter")
+viz.density(parameterPosterior, {bounds: [0, 1]})

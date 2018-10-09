@@ -1,0 +1,26 @@
+///fold:
+var actionPrior = Categorical({vs: ['a', 'b'], ps: [.5, .5]})
+var haveCookie = function(obj) {return obj == 'cookie'};
+var vendingMachine = function(state, action) {
+  return (action == 'a' ? categorical({vs: ['bagel', 'cookie'], ps: [.9, .1]}) :
+          action == 'b' ? categorical({vs: ['bagel', 'cookie'], ps: [.1, .9]}) :
+          'nothing');
+}
+///
+var chooseAction = function(goalSatisfied, transition, state) {
+  return Infer({method: 'enumerate'}, function() {
+    var action = sample(actionPrior)
+    condition(goalSatisfied(transition(state, action)))
+    return action;
+  })
+}
+
+var goalPosterior = Infer({method: 'enumerate'}, function() {
+  var goal = categorical({vs: ['bagel', 'cookie'], ps: [.5, .5]})
+  var goalSatisfied = function(outcome) {return outcome == goal};
+  var actionDist = chooseAction(goalSatisfied, vendingMachine, 'state')
+  factor(actionDist.score('b'));
+  return goal;
+})
+
+viz.auto(goalPosterior);

@@ -1,0 +1,35 @@
+///fold:
+var opts = {method: "rejection", samples: 5000}
+print("generating observer model predictions")
+var observerModel =  Infer(opts, function(){
+  var p = uniform(0, 1)
+  var coinSpinner = Binomial({n:20, p:p})
+  observe(coinSpinner, 15)
+  return binomial(p, 10)
+})
+
+print("generating skeptical model predictions")
+var skepticalModel =  Infer(opts, function(){
+  var sameAsFlipping = flip(0.5)
+  var p = sameAsFlipping ? 0.5 : uniform(0, 1)
+  var coinSpinner = Binomial({n:20, p:p})
+  observe(coinSpinner, 15)
+  return binomial(p, 10)
+})
+///
+
+var experimentalData = [9,8,7,5,4,5,6,7,9,4,8,7,8,3,9,6,5,7,8,5]
+
+// package the models up in an Object (for ease of reference)
+var modelObject = {observerModel: observerModel, skepticalModel: skepticalModel};
+
+var scientistModel = function(){
+  var theBetterModel_name = flip(0.5) ? "observerModel" : "skepticalModel"
+  var theBetterModel = modelObject[theBetterModel_name]
+  map(function(d){ observe(theBetterModel, d) }, experimentalData)
+  return {betterModel: theBetterModel_name}
+}
+
+var modelPosterior = Infer({method: "enumerate"}, scientistModel)
+
+viz(modelPosterior)

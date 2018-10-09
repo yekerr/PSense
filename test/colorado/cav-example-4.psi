@@ -1,0 +1,39 @@
+// TODO: this contains unbounded loops in the original, but only finite number of iterations are
+// relevant for computing probabilities
+// TODO: allow computing probabilities
+
+def main(){
+    x := 0;
+    guard := -1;
+    guard = uniform(0,1);
+    //while guard >= 1/2 {
+    repeat 21{ if guard >= 1/2 {
+        x = x + 1;
+		guard = uniform(0,1);
+    }}
+    return x; // expected: 1/1024·δ[-x+9]+1/1048576·δ[-x+19]+1/128·δ[-x+6]+1/131072·δ[-x+16]+1/16384·δ[-x+13]+1/16·δ[-x+3]+1/2048·δ[-x+10]+1/2097152·δ[-x+20]+1/2097152·δ[-x+21]+1/256·δ[-x+7]+1/262144·δ[-x+17]+1/2·δ[x]+1/32768·δ[-x+14]+1/32·δ[-x+4]+1/4096·δ[-x+11]+1/4·δ[-x+1]+1/512·δ[-x+8]+1/524288·δ[-x+18]+1/64·δ[-x+5]+1/65536·δ[-x+15]+1/8192·δ[-x+12]+1/8·δ[-x+2]
+}
+
+/*x = 0;
+  guard = -1.0;
+  guard = unifReal(0.0, 1.0);
+  while (guard >= 0.5) do
+  x = x + 1;
+  guard = unifReal(0.0, 1.0)
+  end;
+  estimateProb(x <= 0);
+  estimateProb(x <= 1);
+  estimateProb(x <= 2);
+  estimateProb(x <= 3);
+  estimateProb(x <= 4);
+  estimateProb(x <= 5);
+  estimateProb(x <= 6);
+  estimateProb(x <= 7);
+  estimateProb(x <= 8);
+  estimateProb(x <= 9);
+  estimateProb(x <= 10);
+  estimateProb(x <= 12);
+  estimateProb(x <= 14);
+  estimateProb(x <= 16);
+  estimateProb(x <= 18);
+  estimateProb(x <= 20)*/

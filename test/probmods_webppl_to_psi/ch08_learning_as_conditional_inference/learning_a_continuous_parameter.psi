@@ -1,0 +1,13 @@
+def makeCoin(weight){
+        return bernoulli(weight);
+}
+
+observeData := [1,1,1,1,1];//'h' represented by '1'
+def main(){
+        coinWeight := uniform(0+0.2/2,1-0.2/2);
+        repeat 5 {
+                coin := makeCoin(coinWeight);
+                observe(coin == 1);
+        }
+        return coinWeight; //expected: 6·[-1+coinWeight≤0]·[-coinWeight≤0]·coinWeight⁵
+}

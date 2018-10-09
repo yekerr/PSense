@@ -1,0 +1,21 @@
+var residuals = function(probs) {
+  if(probs.length == 0) {
+    return [];
+  } else {
+    return [first(probs) / sum(probs)].concat(residuals(rest(probs)));
+  }
+};
+
+var mySampleDiscrete = function(resid) {
+  if(resid.length == 0) {
+    return 0;
+  } else if(flip(first(resid))) {
+    return 1;
+  } else {
+    return 1 + mySampleDiscrete(rest(resid));
+  }
+}
+
+viz.auto(repeat(5000, function(){
+  return mySampleDiscrete(residuals([0.2, 0.3, 0.1, 0.4]))
+}))

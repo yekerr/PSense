@@ -1,0 +1,8 @@
+
+def main(){
+    x := uniform(0,1);
+    y := uniform(0,1);
+    k := uniform(0,1);
+    a := x*y+k;
+    return a; // expected: (-[-2+a≤0]·a+-[-2+a≤0]·log(-1+a)+2·[-2+a≤0]+[-2+a≤0]·a·log(-1+a))·[-a+1≠0]·[-a+1≤0]+-[-1+a≤0]·[-a≤0]·[a≠0]·a·log(a)+[-1+a≤0]·[-a≤0]·a
+}

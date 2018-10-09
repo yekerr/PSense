@@ -1,0 +1,21 @@
+//skipped
+//parameters
+height := [1.1,0.3,0.8,1.7];
+logbatteryLevel := [0.2,0.4];
+variance := 2;
+heightThresh := 1.5;
+batteryThresh := 1;
+
+def main(){
+	isSafe := 1;
+	for i in [0..2){
+		flyHigh := 0;
+		for j in [i..i+3){
+			flyHigh = flyHigh || (height[j] > heightThresh);
+		}
+		batteryNow := gauss(logbatteryLevel[i], i * variance);
+		batteryGood := (batteryNow > batteryThresh);
+		isSafe = isSafe && (!flyHigh || batteryGood);
+	}
+	return isSafe;
+}

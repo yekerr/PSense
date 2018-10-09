@@ -1,0 +1,15 @@
+var hypothesisToDist = function(hypothesis) {
+  return (hypothesis == 'A' ?
+          Categorical({vs: ['a', 'b', 'c', 'd'], ps: [0.375, 0.375, 0.125, 0.125]}) :
+          Categorical({vs: ['a', 'b', 'c', 'd'], ps: [0.25, 0.25, 0.25, 0.25]}))
+}
+
+var observedData = ['a', 'b', 'a', 'b', 'c', 'd', 'b', 'b']
+
+var posterior = Infer({method: 'enumerate'}, function(){
+  var hypothesis = flip() ? 'A' : 'B'
+  mapData({data: observedData}, function(d){observe(hypothesisToDist(hypothesis),d)})
+  return hypothesis
+})
+
+viz(posterior)
