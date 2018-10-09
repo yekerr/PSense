@@ -1,4 +1,4 @@
 # PSense
   Sensitivity Analysis of Probabilistic Programs
 
-  See: https://psense.info
+  See: https://yekerr.github.io/PSense/
