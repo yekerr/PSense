@@ -1,7 +1,6 @@
 ## PSense Development Team
 
-[**Zixin Huang**](https://yekerr.github.io/)
-
+[**Zixin Huang**](https://yekerr.github.io/)<br/>
 Student at the Department of Computer Science  
 University of Illinois at Urbana-Champaign  
 [zixinh2@illinois.edu](mailto:zixinh2@illinois.edu)
