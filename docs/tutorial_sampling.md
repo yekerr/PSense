@@ -30,7 +30,7 @@ Usage:
 java -jar psi2webppl/psi2webppl.jar <PSI file to translate>
 ```
 
-Notice that because WebPPL applies the functional programming paradigm, which the doesn't allow us to overwrite a variable. To allow overwriting as we did in PSI, we use the globalStore rather than conventional var. Also since WebPPL doesn't support for loop or while loop, we translate loops in PSI to recursions in WebPPL.
+Notice that because WebPPL applies the functional programming paradigm, it doesn't allow us to overwrite a variable. To support overwriting to a variable as we did in PSI, we use the globalStore rather than the conventional var. Also since WebPPL doesn't support for loops or while loops, we translate loops in PSI to recursions in WebPPL.
 
 ### Sampling Based Sensitivity Analysis
 
