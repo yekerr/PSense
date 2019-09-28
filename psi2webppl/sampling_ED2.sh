@@ -26,7 +26,7 @@ num_params=0
 num_params=$(ls ${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps*.psi | wc -l)
 >&2 tput setaf 1
 >&2 echo "//Total ${num_params} parameters"
->&2 echo "//Sampling ED2 with eps=$eps for parameter $param"
+>&2 echo "//Sampling ED2 for parameter $param"
 >&2 echo "//========WebPPL Code for ${rawfilename%.*}_ED2_eps$param.wppl========"
 >&2 tput sgr0
 
