@@ -8,7 +8,6 @@ Since exact probabilistic inference is computationally hard, we've implemented a
 Run the following command to translate `examples/conditioning.psi` to WebPPL:
 ```{shell}
 java -jar psi2webppl/psi2webppl.jar examples/conditioning.psi
-
 ```
 It prints the WebPPL code to standard output. 
 ```
