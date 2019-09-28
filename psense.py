@@ -1,9 +1,10 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 import os, sys
 import re
 import argparse
 import shutil
 import subprocess as sp
+import numpy as np
 
 from terminaltables import SingleTable
 from textwrap import wrap
@@ -493,6 +494,7 @@ def run_file(args):
     plain = args["plain"]
     mathematica = args["mathematica"]
     numeric = args["numeric"]
+    skip_run = args["skip_run"]
     
     
     psi_file = input_file
@@ -507,19 +509,20 @@ def run_file(args):
         custom_metric_name_index = custom_metric_file_name.index(".")
         custom_metric_name = custom_metric_file_name[:custom_metric_name_index]
 
-    psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose, psi_file_org_log)
-    if not check_psi_out(psi_file, output_file, psi_out):
-        return 1
-    psi_func_param_dict = get_param_dict((psi_out.split("[")[1]).split("]")[0])
-    psi_func_name = psi_out.split("[")[0]
-    psi_out = replace_underscore(psi_out)
+    if not skip_run: 
+        psi_out = run_psi(psi_file, "--cdf", psi_timeout, verbose, psi_file_org_log)
+        if not check_psi_out(psi_file, output_file, psi_out):
+            return 1
+        psi_func_param_dict = get_param_dict((psi_out.split("[")[1]).split("]")[0])
+        psi_func_name = psi_out.split("[")[0]
+        psi_out = replace_underscore(psi_out)
 
-    psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose, psi_file_org_log)
-    if not check_psi_out(psi_file, output_file, psi_pdf_out):
-        return 1
-    psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
-    psi_pdf_out = replace_underscore(psi_pdf_out)
-    psi_pdf_func_name = psi_pdf_out.split("[")[0]
+        psi_pdf_out = run_psi(psi_file, None, psi_timeout, verbose, psi_file_org_log)
+        if not check_psi_out(psi_file, output_file, psi_pdf_out):
+            return 1
+        psi_pdf_out = rename_psi_out(psi_pdf_out, "PDF")
+        psi_pdf_out = replace_underscore(psi_pdf_out)
+        psi_pdf_func_name = psi_pdf_out.split("[")[0]
 
     codes_eps, code_eps_params, codes_line_change = generate_psi_epsilon(psi_file, explict_eps)
     psi_eps_files = extend_n_files_name(psi_file_dir, psi_file_name, "_eps", "psi", len(codes_eps))
@@ -533,12 +536,13 @@ def run_file(args):
     if code_exp:
         psi_exp_file = extend_file_name(psi_file_dir, psi_file_name, "_exp", "psi")    
         store_codes_to_files([code_exp],[psi_exp_file])
-        psi_exp_out = run_psi(psi_exp_file, None, psi_timeout, verbose, psi_file_org_log)
-        if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
-            return 1
-        psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
-        psi_exp_func_name = psi_exp_out.split("[")[0].strip()
-        psi_exp_out = replace_underscore(psi_exp_out)
+        if not skip_run: 
+            psi_exp_out = run_psi(psi_exp_file, None, psi_timeout, verbose, psi_file_org_log)
+            if not check_psi_out(psi_exp_file, output_file, psi_exp_out):
+                return 1
+            psi_exp_out = rename_psi_out(psi_exp_out, "Exp")
+            psi_exp_func_name = psi_exp_out.split("[")[0].strip()
+            psi_exp_out = replace_underscore(psi_exp_out)
 
 
         codes_exp_eps, _, _ = generate_psi_epsilon(psi_exp_file, explict_eps)
@@ -554,6 +558,13 @@ def run_file(args):
                 + "def main(){return Expectation(abs(main_acc() -  main_eps()));}\n" \
                         for codes_eps_i in codes_eps]
             store_codes_to_files(codes_ED2_eps, psi_ED2_eps_files)
+        if skip_run: 
+            for i in range(len(psi_eps_files)):
+                eps_range, eps_type = generate_eps_param(code_eps_params[i], args["noise_percentage"])
+                eps_lu = eps_range[1:-1].split("<=")
+                with open(log_files[i], "w", encoding="utf-8") as f:
+                    f.write(",".join([str(xx) for xx in np.linspace(float(eps_lu[0]),float(eps_lu[2]), 10)]) + '\n')
+            return
     elif output_file:
         with open(output_file, "a", encoding="utf-8") as f:
             f.write("Expectation is not supported" + "\n")
@@ -659,6 +670,7 @@ def init_args():
     parser.add_argument("-verbose", action="store_true", help="Print outputs of PSI")
     parser.add_argument("-n", action="store_true", help="Apply numerical integration and maximization")
     parser.add_argument("-s", action="store_true", help="Search for the bounds of noise when the distance is constrainted to <= 0.1. (support ExpDist1,ExpDist2,KS,TVD,KL,Custom).")
+    parser.add_argument("-k", action="store_true", help="Only generate files with eps param without running")
     parser.add_argument("-log", action="store_true", help="Keep the generated files")
     argv = parser.parse_args(sys.argv[1:])
     if argv.f and not os.path.isfile(argv.f):
@@ -712,7 +724,7 @@ def init_args():
         "directory": argv.r,
         "output_file": argv.o,
         "explict_eps": argv.e,
-        "noise_percentage": loat(argv.p) if argv.p else 0.1,
+        "noise_percentage": float(argv.p) if argv.p else 0.1,
         "metrics": metrics,
         "custom_metric_file": custom_metric_file,
         "math_timeout": argv.tm,
@@ -722,7 +734,8 @@ def init_args():
         "log": argv.log,
         "numeric": argv.n,
         "optimization": argv.s,
-        "mathematica": mathematica
+        "mathematica": mathematica,
+        "skip_run": argv.k
     }
     return args
 
@@ -733,8 +746,9 @@ def check_cmd():
         exit_message("Please include \"wolfram\" or \"wolframscript\" into your PATH.")
 
 def main():
-    check_cmd()
     args = init_args()
+    if not args["skip_run"]:
+        check_cmd()
     if args["input_file"]:
         run_file(args)
     else:
