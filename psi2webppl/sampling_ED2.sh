@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
-script_dir=$(realpath $(dirname ${BASH_SOURCE[0]}))
+script_dir=$(dirname ${BASH_SOURCE[0]})
+script_dir=$([[ "$script_dir" = /* ]] && echo "$script_dir" || echo "$PWD/${script_dir#./}")
 
 while getopts f:p: option
 do
@@ -13,7 +14,8 @@ do
     esac
 done
 
-rawfilepath=$(dirname $(realpath $rawfile))
+
+rawfilepath=$(dirname $([[ "$rawfile" = /* ]] && echo "$rawfile" || echo "$PWD/${rawfile#./}"))
 rawfilename=$(basename $rawfile)
 ed2file=${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps${param}.psi
 # if [ ! -e $ed2file ]; then
