@@ -50,7 +50,7 @@ export PATH=$PATH:`pwd`
 
 ## Running PSense
 
-Run the following commend to analyze the probabilistic program `coins.psi`:
+Run the following commend to analyze the probabilistic program `conditioning.psi`:
 ```{shell}
 psense -f examples/conditioning.psi
 ```
