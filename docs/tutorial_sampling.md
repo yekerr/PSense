@@ -93,6 +93,8 @@ The sampling based sensitivity analysis is not so accurate.
 One can also apply other metrics, e.g. Expectation Distance 1, on the samples generated from WebPPL. To do so, first run the translated code in WebPPL(using `java -jar psi2webppl/psi2webppl.jar <PSI file to translate>`), and save the samples. Then modified the parame by adding a small perturbation to the parameters, and run the program again to save the samples. Then one can use different metrics to calculate the distance between the two copies of samples.
 
 
+***
+[Return to Tutorials](tutorial.html)
 
 
 <!---First run PSense with the `-log` option. Notice that PSense will keep the all source code used to 
