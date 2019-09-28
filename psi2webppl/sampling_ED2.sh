@@ -3,13 +3,13 @@
 function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 script_dir=$(realpath $(dirname ${BASH_SOURCE[0]}))
 
-while getopts f:p:e: option
+while getopts f:p: option
 do
     case "${option}"
         in
         f) rawfile=${OPTARG};;
         p) param=${OPTARG};;
-        e) eps=${OPTARG};;
+        #e) eps=${OPTARG};;
     esac
 done
 
@@ -37,3 +37,10 @@ if [ $num_params -ge $param ]; then
 else
     echo "Error: no such parameter"
 fi
+
+rm -r ${rawfilepath}_ED2_eps
+rm -r ${rawfilepath}_eps
+rm -r ${rawfilepath}_exp_eps
+rm -r ${rawfilepath}_exp
+rm -r ${rawfilepath}_log
+rm -r ${rawfilepath}_math
