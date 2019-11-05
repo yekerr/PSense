@@ -28,14 +28,15 @@ num_params=0
 num_params=$(ls ${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps*.psi | wc -l)
 >&2 tput setaf 1
 >&2 echo "//Total ${num_params} parameters"
->&2 echo "//Sampling ED2 for parameter $param"
->&2 echo "//========WebPPL Code for ${rawfilename%.*}_ED2_eps$param.wppl========"
+>&2 echo "//Sampling ED1 for parameter $param"
+>&2 echo "//========WebPPL Code for ${rawfilename%.*}_ED1_eps$param.wppl========"
 >&2 tput sgr0
 
 # sed "s/globalStore.eps/\\$eps/g" |
 if [ $num_params -ge $param ]; then
     range=$(cat ${rawfilepath}_log/${rawfilename%.*}_log${param}.log)
-    java -jar $script_dir/psi2webppl.jar $ed2file 2>/dev/null |  sed "s/Infer({.*},main)/map(function(eps){globalStore.eps=eps; return expectation(Infer({method: 'MCMC', samples: 1000},main))},[\\$range])/" | awk '/var main = function()/ && c == 0 {c = 1; print "var abs = function(v){return v>0?v:-v}"}; {print}' 
+    java -jar $script_dir/psi2webppl.jar $ed2file 2>/dev/null | sed "s/abs(main_acc() - main_eps())/main_acc() - main_eps()/" |  sed "s/Infer({.*},main)/var eps_list = [\\$range]/" | sed "/^var eps_list =.*/a var sen_list = map(function(eps){globalStore.eps=eps; return abs(expectation(Infer({method: 'MCMC', samples: 1000},main)))},eps_list)" | sed '/^var main = function().*/i var abs = function(v){return v>0?v:-v}' | sed -e "\$aviz.scatter(eps_list, sen_list)" 
+    # awk '/var main = function()/ && c == 0 {c = 1; print "var abs = function(v){return v>0?v:-v}"}; {print}'
 else
     echo "Error: no such parameter"
 fi
