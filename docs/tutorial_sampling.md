@@ -37,18 +37,18 @@ Notice that because WebPPL applies the functional programming paradigm, it doesn
 We can also try the sensitivity analysis with metric Expectation Distance 1(ED1). The following code finds the approximate ED1 for the first parameter in file `examples/conditioning.psi`.
 
 ```{shell}
-./psi2webppl/sampling_ED1.sh -f examples/conditioning.psi -p 1
+./psi2webppl/sampling_ED1.sh -f examples/conditioning.psi -p 2
 ```
 
 Usage:
 ```
-./psi2webppl/sampling_ED1.sh -f <PSI file to translate and analyze> -p <index of parameter to analyze>
+./psi2webppl/sampling_ED1.sh -f <PSI file to translate and analyze> -p <index of parameter to analyze> [ -n <noise percentage> ]
 ```
 
 To analyze the first parameter in file `examples/conditioning.psi`, it generates the following WebPPL program:
 
 ```
-//Total        4 parameters
+//Total 4 parameters
 //Sampling ED1 for parameter 2
 //========WebPPL Code for conditioning_ED1_eps2.wppl========
 var main_acc = function(){
@@ -74,10 +74,15 @@ return main_in();
 }
 
 var abs = function(v){return v>0?v:-v}
+
 var main = function(){
-return abs(main_acc() - main_eps());
+return main_acc() - main_eps();
 }
-map(function(eps){globalStore.eps=eps; return expectation(Infer({method: 'MCMC', samples: 1000},main))},[-0.05,-0.03888888888888889,-0.02777777777777778,-0.01666666666666667,-0.005555555555555557,0.005555555555555557,0.016666666666666663,0.027777777777777776,0.03888888888888889,0.05])
+var eps_list = [-0.05,-0.03888888888888889,-0.02777777777777778,-0.01666666666666667,-0.005555555555555557,0.005555555555555557,0.016666666666666663,0.027777777777777776,0.03888888888888889,0.05]
+var sample_size = 1000
+var sen_list = map(function(eps){globalStore.eps=eps; return abs(expectation(Infer({method: 'MCMC', samples: sample_size},main)))},eps_list)
+sen_list
+viz.scatter(eps_list, sen_list)
 ```
 
 Run the code above in WebPPL and get the results:
@@ -89,7 +94,7 @@ With sampling inference, we need to give concrete value to the variable eps. Her
 
 The sampling based sensitivity analysis is not so accurate. 
 
-One can also apply other metrics, e.g. Expectation Distance 1, on the samples generated from WebPPL. To do so, first run the translated code in WebPPL(using `java -jar psi2webppl/psi2webppl.jar <PSI file to translate>`), and save the samples. Then modified the parame by adding a small perturbation to the parameters, and run the program again to save the samples. Then one can use different metrics to calculate the distance between the two copies of samples.
+One can also apply other metrics, e.g. Expectation Distance 2, on the samples generated from WebPPL. To do so, first run the translated code in WebPPL(using `java -jar psi2webppl/psi2webppl.jar <PSI file to translate>`), and save the samples. Then modified the parame by adding a small perturbation to the parameters, and run the program again to save the samples. Then one can use different metrics to calculate the distance between the two copies of samples.
 
 
 ***
