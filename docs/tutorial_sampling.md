@@ -85,14 +85,14 @@ sen_list
 viz.scatter(eps_list, sen_list)
 ```
 
-Run the code above in WebPPL and get the results:
+Run the code above in WebPPL and get the set of ED1s for 10 concrete eps values:
 ```
-[0.40508,0.38377,0.38731,0.38505,0.38397,0.38326,0.37403,0.37085,0.4528,0.45441]
+[0.02300000000000002,0.16700000000000004,0.025000000000000022,0.121,0.09800000000000003,0.048000000000000015,0.10300000000000001,0.06599999999999998,0.04400000000000001,0.06700000000000003]
 ```
 
 With sampling inference, we need to give concrete value to the variable eps. Here PSense chooses 10 values uniformly from negative 10% of the original value to positive 10% of the original value, i.e., $eps\in[-0.05,0.05]$. PSense also ensures the value of eps is within a legal range. For example, in statement flip(0.95), it will choose values for eps in the range $[-0.095, 0.05]$.
 
-The sampling based sensitivity analysis is not so accurate. 
+The sampling based sensitivity analysis is not so accurate. Try to run with larger `sample_size` to get better accuracy.
 
 One can also apply other metrics, e.g. Expectation Distance 2, on the samples generated from WebPPL. To do so, first run the translated code in WebPPL(using `java -jar psi2webppl/psi2webppl.jar <PSI file to translate>`), and save the samples. Then modified the parame by adding a small perturbation to the parameters, and run the program again to save the samples. Then one can use different metrics to calculate the distance between the two copies of samples.
 
