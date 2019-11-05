@@ -83,7 +83,10 @@ def generate_eps_param(f_eps_param, noise_percentage):
     param_lower, param_upper, param_type = distribution_range[f_eps_param["type"]]
     try:
         value = float(f_eps_param["value"])
-        noise_value = value*noise_percentage
+        if value == 0:
+            noise_value = noise_percentage
+        else:
+            noise_value = value*noise_percentage
         eps_lower = max(param_lower - value, -noise_value) if param_lower else -noise_value
         eps_upper = min(param_upper - value, noise_value) if param_upper else noise_value
         eps_range = "(" + "{:.16f}".format(eps_lower) + "<=eps<=" + "{:.16f}".format(eps_upper) + ")"

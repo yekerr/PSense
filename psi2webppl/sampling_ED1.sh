@@ -4,12 +4,13 @@ function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 script_dir=$(dirname ${BASH_SOURCE[0]})
 script_dir=$([[ "$script_dir" = /* ]] && echo "$script_dir" || echo "$PWD/${script_dir#./}")
 
-while getopts f:p: option
+while getopts f:p:n: option
 do
     case "${option}"
         in
         f) rawfile=${OPTARG};;
         p) param=${OPTARG};;
+        n) perc=${OPTARG};;
         #e) eps=${OPTARG};;
     esac
 done
@@ -20,9 +21,11 @@ rawfilename=$(basename $rawfile)
 ed2file=${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps${param}.psi
 # if [ ! -e $ed2file ]; then
     >&2 tput setaf 2
-    >&2 python3 $script_dir/../psense.py -f $rawfile -m expdist2 -p 0.1 -log -k 
+    >&2 python3 $script_dir/../psense.py -f $rawfile -m expdist2 -p $perc -log -k 
     >&2 tput sgr0
 # fi
+
+if [ ! -e ${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps*.psi ] ; then exit 0 ; fi &> /dev/null
 
 num_params=0
 num_params=$(ls ${rawfilepath}_ED2_eps/${rawfilename%.*}_ED2_eps*.psi | wc -l)
@@ -47,9 +50,9 @@ else
     echo "Error: no such parameter"
 fi
 
-rm -r ${rawfilepath}_ED2_eps
-rm -r ${rawfilepath}_eps
-rm -r ${rawfilepath}_exp_eps
-rm -r ${rawfilepath}_exp
-rm -r ${rawfilepath}_log
-rm -r ${rawfilepath}_math
+rm -r ${rawfilepath}_ED2_eps &> /dev/null
+rm -r ${rawfilepath}_eps &> /dev/null
+rm -r ${rawfilepath}_exp_eps &> /dev/null
+rm -r ${rawfilepath}_exp &> /dev/null
+rm -r ${rawfilepath}_log &> /dev/null
+rm -r ${rawfilepath}_math &> /dev/null
