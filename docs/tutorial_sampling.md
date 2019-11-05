@@ -34,23 +34,23 @@ Notice that because WebPPL applies the functional programming paradigm, it doesn
 
 ### Sampling Based Sensitivity Analysis
 
-We can also try the sensitivity analysis with metric Expectation Distance 2(ED2). The following code finds the approximate ED2 for the first parameter in file `examples/conditioning.psi`.
+We can also try the sensitivity analysis with metric Expectation Distance 1(ED1). The following code finds the approximate ED1 for the first parameter in file `examples/conditioning.psi`.
 
 ```{shell}
-./psi2webppl/sampling_ED2.sh -f examples/conditioning.psi -p 1
+./psi2webppl/sampling_ED1.sh -f examples/conditioning.psi -p 1
 ```
 
 Usage:
 ```
-./psi2webppl/sampling_ED2.sh -f <PSI file to translate and analyze> -p <index of parameter to analyze>
+./psi2webppl/sampling_ED1.sh -f <PSI file to translate and analyze> -p <index of parameter to analyze>
 ```
 
 To analyze the first parameter in file `examples/conditioning.psi`, it generates the following WebPPL program:
 
 ```
 //Total        4 parameters
-//Sampling ED2 for parameter 2
-//========WebPPL Code for conditioning_ED2_eps2.wppl========
+//Sampling ED1 for parameter 2
+//========WebPPL Code for conditioning_ED1_eps2.wppl========
 var main_acc = function(){
 globalStore.A = flip(0.5)
 globalStore.B = flip(0.5)
