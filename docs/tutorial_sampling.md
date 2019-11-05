@@ -85,7 +85,7 @@ sen_list
 viz.scatter(eps_list, sen_list)
 ```
 
-Run the code above in WebPPL and get the set of ED1s for 10 concrete eps values:
+Run the code above in [WebPPL](http://webppl.org) and get the set of ED1s for 10 concrete eps values:
 ```
 [0.02300000000000002,0.16700000000000004,0.025000000000000022,0.121,0.09800000000000003,0.048000000000000015,0.10300000000000001,0.06599999999999998,0.04400000000000001,0.06700000000000003]
 ```
