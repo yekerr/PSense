@@ -1,5 +1,5 @@
 {% include head.html %}
-## Tutorial 2: Unknown Vending Machine
+## Tutorial 3: Unknown Vending Machine
 
 ### Build Models in PSI
 
