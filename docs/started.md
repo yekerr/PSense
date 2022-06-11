@@ -14,6 +14,7 @@ Mathematica 11
 ```{shell}
 git clone https://github.com/eth-srl/psi.git
 cd psi
+git checkout 24d07f7
 chmod +x dependencies.sh
 ./dependencies.sh && ./build.sh
 cd ..
