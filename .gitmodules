@@ -1,0 +1,3 @@
+[submodule "psi"]
+	path = artifact/source/psi
+	url = https://github.com/eth-sri/psi.git 
